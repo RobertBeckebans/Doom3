@@ -38,6 +38,7 @@ Icon
 
 build/
 base/
+d3xp/
 neo/OculusSDK/
 
 *.opensdf
