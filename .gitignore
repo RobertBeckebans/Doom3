@@ -36,8 +36,6 @@ Icon
 .Spotlight-V100
 .Trashes
 
-build/
-base/
 
 *.opensdf
 *.sdf

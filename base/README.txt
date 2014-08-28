@@ -1,0 +1,1 @@
+Copy your Doom3 base folder here.
