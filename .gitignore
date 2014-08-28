@@ -36,6 +36,9 @@ Icon
 .Spotlight-V100
 .Trashes
 
+build/
+base/
+neo/OculusSDK/
 
 *.opensdf
 *.sdf
