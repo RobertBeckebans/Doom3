@@ -7,7 +7,7 @@
 
 	This file has been generated with the Type Info Generator v1.0 (c) 2004 id Software
 
-	1168 constants
+	1167 constants
 	129 enums
 	529 classes/structs/unions
 	36 templates
@@ -355,7 +355,6 @@ static constantInfo_t constantInfo[] = {
 	{ "int", "ovrRenderAPI_D3D10", "4" },
 	{ "int", "ovrRenderAPI_D3D11", "5" },
 	{ "int", "ovrRenderAPI_Count", "6" },
-	{ "const float", "OculusHmd::eyeOffset", "0.65" },
 	{ "int", "DECL_TABLE", "0" },
 	{ "int", "DECL_MATERIAL", "1" },
 	{ "int", "DECL_SKIN", "2" },

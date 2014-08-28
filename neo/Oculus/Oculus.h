@@ -34,7 +34,6 @@ If you have questions concerning this license or the applicable additional terms
 #define GAME_NAME_VR "DOOM 3 VR"
 #define	WIN32_VR_WINDOW_CLASS_NAME "DOOM3_VR"
 
-#pragma once
 #include <GL/GL.h>
 
 #undef strncmp
@@ -59,8 +58,6 @@ public:
 	idVec3				GetHeadTrackingOrientation();
 	idVec3				GetHeadTrackingPosition();
 
-	void				CreateWindowClasses();
-	bool				CreateHMDWindow();
 	bool				InitDriver();
 	bool				InitRenderTarget();
 
@@ -77,7 +74,6 @@ public:
 
 	int					GetRenderWidth();
 	int					GetRenderHeight();
-	const float			eyeOffset = 0.65f;
 	idVec3				GetViewAdjustVector(int eye);
 
 private:

@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LocalDebuggerCommand>.\build\$(PlatformName)\$(Configuration)\doom3.exe</LocalDebuggerCommand>
+    <LocalDebuggerCommandArguments>+set com_allowConsole 1 +set vr_enableOculusRiftRendering 1 +set si_pure 0 +map game/mp/d3dm1.map </LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)../</LocalDebuggerWorkingDirectory>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LocalDebuggerCommand>.\build\$(PlatformName)\$(Configuration)\doom3.exe</LocalDebuggerCommand>
+    <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
+    <LocalDebuggerCommandArguments>+set com_allowConsole 1 +set vr_enableOculusRiftRendering 1 +set si_pure 0 +map game/mp/d3dm1.map </LocalDebuggerCommandArguments>
+    <LocalDebuggerWorkingDirectory>$(ProjectDir)../</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+</Project>

@@ -708,8 +708,8 @@ static bool GLW_CreateWindow( glimpParms_t parms ) {
 }
 
 // OCULUS BEGIN
-static bool GLW_CreateOculusWindow(glimpParms_t parms) {
-	int				stylebits;
+static bool GLW_CreateOculusWindow(glimpParms_t parms)
+{
 	int				x, y, w, h;
 	int				exstyle;
 

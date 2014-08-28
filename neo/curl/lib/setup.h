@@ -41,6 +41,8 @@
 #include "config.h" /* the configure script results */
 #else
 #ifdef WIN32
+#define _WINSOCK_DEPRECATED_NO_WARNINGS
+
 /* hand-modified win32 config.h! */
 #include "config-win32.h"
 #endif

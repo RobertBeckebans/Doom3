@@ -180,7 +180,6 @@ idVec3 OculusHmd::GetHeadTrackingPosition()
 
 	if (ts.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked))
 	{
-		float y, p, r;
 		position.x = pose.Translation.x;
 		position.y = pose.Translation.y;
 		position.z = pose.Translation.z;

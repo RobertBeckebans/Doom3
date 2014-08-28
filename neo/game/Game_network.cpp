@@ -1606,7 +1606,6 @@ bool idGameLocal::DownloadRequest( const char *IP, const char *guid, const char 
 		idStr::Copynz( urls, reply, MAX_STRING_CHARS );
 		return true;
 	}
-	return false;
 }
 
 /*

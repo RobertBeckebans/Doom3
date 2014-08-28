@@ -8347,7 +8347,6 @@ bool idPlayer::ClientReceiveEvent( int event, int time, const idBitMsg &msg ) {
 			return idActor::ClientReceiveEvent( event, time, msg );
 		}
 	}
-	return false;
 }
 
 /*
