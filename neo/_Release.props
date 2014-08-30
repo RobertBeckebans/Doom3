@@ -25,7 +25,7 @@
       <GenerateMapFile>false</GenerateMapFile>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>.\OculusSDK\LibOVR\Lib\Win32\VS2013</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\OculusSDK\LibOVR\Lib\Win32\VS2013;C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\atlmfc\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
 </Project>

@@ -48,3 +48,4 @@ neo/OculusSDK/
 *.ipch
 *.ipch
 *.~1~
+*.user

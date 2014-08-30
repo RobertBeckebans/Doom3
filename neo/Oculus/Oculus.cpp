@@ -80,6 +80,7 @@ bool OculusHmd::Init()
 	}
 
 	// Set HMD Resolution description, this is the Hmd screen resolution
+
 	Resolution.description = "Oculus VR HMD";
 	Resolution.width = Hmd->Resolution.w;
 	Resolution.height = Hmd->Resolution.h;
@@ -103,9 +104,10 @@ bool OculusHmd::Init()
 	Sizei recommenedTex0Size = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Left, Hmd->DefaultEyeFov[0], 1.0f);
 	Sizei recommenedTex1Size = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Right, Hmd->DefaultEyeFov[1], 1.0f);
 	
-	RenderWidth = Hmd->Resolution.w; //(recommenedTex0Size.w>recommenedTex1Size.w ? recommenedTex0Size.w : recommenedTex1Size.w);
-	RenderHeight = Hmd->Resolution.h; // (recommenedTex0Size.h>recommenedTex1Size.h ? recommenedTex0Size.h : recommenedTex1Size.h);
-	
+	RenderWidth = Hmd->Resolution.w;
+	RenderHeight = Hmd->Resolution.h;
+
+	// This doesnt seem to work in Oculus OpenGL rendering
 	//RenderWidth = (recommenedTex0Size.w>recommenedTex1Size.w ? recommenedTex0Size.w : recommenedTex1Size.w);
 	//RenderHeight = (recommenedTex0Size.h>recommenedTex1Size.h ? recommenedTex0Size.h : recommenedTex1Size.h);
 
@@ -264,7 +266,7 @@ bool OculusHmd::InitRenderTarget()
 	ovrGLConfig glcfg;
 	glcfg.OGL.Header.API = ovrRenderAPI_OpenGL;
 	glcfg.OGL.Header.RTSize = Sizei(Hmd->Resolution.w, Hmd->Resolution.h);
-	glcfg.OGL.Header.Multisample = 1;
+	glcfg.OGL.Header.Multisample = 8;
 	glcfg.OGL.Window = win32.hWnd;
 	glcfg.OGL.DC = win32.hDC;
 

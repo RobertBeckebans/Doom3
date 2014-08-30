@@ -706,8 +706,8 @@ void idRenderWorldLocal::RenderSceneStereo(const renderView_t *renderView, int e
 	// setup view parms for the initial view
 	//
 	viewDef_t *parms = (viewDef_t *)R_ClearedFrameAlloc(sizeof(*parms));
-	
 	parms->renderView = *renderView;
+	parms->renderView.forceUpdate = true;
 	parms->eye = eye;
 
 	if (eye == 0)
@@ -788,12 +788,9 @@ void idRenderWorldLocal::RenderScene( const renderView_t *renderView )
 	{
 		const renderView_t *left = renderView;
 		const renderView_t *right = renderView;
-
+		
 		RenderSceneStereo(left, 0);
 		RenderSceneStereo(right, 1);
-
-		// prepare for any 2D drawing after this
-		tr.guiModel->Clear();
 
 		return;
 	}

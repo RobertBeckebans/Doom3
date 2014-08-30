@@ -296,10 +296,16 @@ bool idSmokeParticles::UpdateRenderEntity( renderEntity_s *renderEntity, const r
 		return false;
 	}
 
+	// OCULUS BEGIN
+	// Muzzle smoke only show up for a single eye
+	// FIXME forceUpdate is now true on the second frame but probably pricey
+
 	// don't regenerate it if it is current
 	if ( renderView->time == currentParticleTime && !renderView->forceUpdate ) {
 		return false;
 	}
+	// OCULUS END
+
 	currentParticleTime = renderView->time;
 
 	particleGen_t g;
