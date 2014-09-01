@@ -8641,7 +8641,15 @@ bool idPlayer::NeedsIcon( void ) {
 void idPlayer::UpdateAimPointerTrace(trace_t &result)
 {
 	idVec3 start = GetEyePosition();
-	idVec3 end = start + viewAngles.ToForward() * 1024.0f;
+
+	const float scale = 50.0f;
+
+	idAngles aimAngle = viewAngles;
+	aimAngle.pitch += usercmd.mposy / scale;
+	aimAngle.yaw += -usercmd.mposx / scale;
+
+	idVec3 end = start + aimAngle.ToForward() * 1024.0f;
+	
 	gameLocal.clip.TracePoint(result, start, end, CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
 }
 
@@ -8653,6 +8661,12 @@ idPlayer::UpdateAimPointer
 
 void idPlayer::UpdateAimPointer(const trace_t tr)
 {
+	// idVec3 start = GetEyePosition();
+
+	idVec3 position = tr.endpos;
+	gameRenderWorld->DebugSphere(colorOrange, idSphere(tr.endpos, 1));
+
+	/*
 	// only show in the player's view
 	aimPointerRenderEntity.allowSurfaceInViewID = entityNumber + 1;
 	aimPointerRenderEntity.axis.Identity();
@@ -8666,6 +8680,7 @@ void idPlayer::UpdateAimPointer(const trace_t tr)
 	{
 		gameRenderWorld->UpdateEntityDef(aimPointerHandle, &aimPointerRenderEntity);
 	}
+	*/
 }
 
 /*
@@ -8710,7 +8725,10 @@ void idPlayer::UpdateLaserSight(const trace_t tr)
 
 	laserSightRenderEntity.origin = muzzleOrigin - muzzleAxis[0] * 2.0f;
 	idVec3	&target = *reinterpret_cast<idVec3 *>(&laserSightRenderEntity.shaderParms[SHADERPARM_BEAM_END_X]);
-	target = tr.endpos; // End at the aiming location instead
+
+
+	idVec3 position = tr.endpos;
+	target = position; // End at the aiming location instead
 
 	laserSightRenderEntity.shaderParms[SHADERPARM_BEAM_WIDTH] = vr_laserSightWidth.GetFloat();
 

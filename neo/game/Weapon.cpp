@@ -2981,6 +2981,17 @@ void idWeapon::Event_LaunchProjectiles( int num_projectiles, float spread, float
 				ang = idMath::Sin( spreadRad * gameLocal.random.RandomFloat() );
 				spin = (float)DEG2RAD( 360.0f ) * gameLocal.random.RandomFloat();
 				dir = playerViewAxis[ 0 ] + playerViewAxis[ 2 ] * ( ang * idMath::Sin( spin ) ) - playerViewAxis[ 1 ] * ( ang * idMath::Cos( spin ) );
+
+				// OCULUS BEGIN
+				const float scale = 50.0f;
+				idPlayer *player;
+				player = gameLocal.GetLocalPlayer();
+				idAngles aimAngle = dir.ToAngles();
+				aimAngle.pitch += player->usercmd.mposy / scale;
+				aimAngle.yaw += -player->usercmd.mposx / scale;
+				dir = aimAngle.ToForward();
+				// OCULUS END
+
 				dir.Normalize();
 				gameLocal.clip.Translation( tr, muzzle_pos, muzzle_pos + dir * 4096.0f, NULL, mat3_identity, MASK_SHOT_RENDERMODEL, owner );
 				if ( tr.fraction < 1.0f ) {
@@ -2999,7 +3010,18 @@ void idWeapon::Event_LaunchProjectiles( int num_projectiles, float spread, float
 		for( i = 0; i < num_projectiles; i++ ) {
 			ang = idMath::Sin( spreadRad * gameLocal.random.RandomFloat() );
 			spin = (float)DEG2RAD( 360.0f ) * gameLocal.random.RandomFloat();
-			dir = playerViewAxis[ 0 ] + playerViewAxis[ 2 ] * ( ang * idMath::Sin( spin ) ) - playerViewAxis[ 1 ] * ( ang * idMath::Cos( spin ) );
+			dir = playerViewAxis[0] + playerViewAxis[2] * (ang * idMath::Sin(spin)) - playerViewAxis[1] * (ang * idMath::Cos(spin));
+			
+			// OCULUS BEGIN
+			const float scale = 50.0f;
+			idPlayer *player;
+			player = gameLocal.GetLocalPlayer();
+			idAngles aimAngle = dir.ToAngles();
+			aimAngle.pitch += player->usercmd.mposy / scale;
+			aimAngle.yaw += -player->usercmd.mposx / scale;
+			dir = aimAngle.ToForward();
+			// OCULUS END
+
 			dir.Normalize();
 
 			if ( projectileEnt ) {
@@ -3029,11 +3051,13 @@ void idWeapon::Event_LaunchProjectiles( int num_projectiles, float spread, float
 			// make sure the projectile starts inside the bounding box of the owner
 			if ( i == 0 ) {
 				muzzle_pos = muzzleOrigin + playerViewAxis[ 0 ] * 2.0f;
+
 				if ( ( ownerBounds - projBounds).RayIntersection( muzzle_pos, playerViewAxis[0], distance ) ) {
 					start = muzzle_pos + distance * playerViewAxis[0];
 				} else {
 					start = ownerBounds.GetCenter();
 				}
+
 				gameLocal.clip.Translation( tr, start, muzzle_pos, proj->GetPhysics()->GetClipModel(), proj->GetPhysics()->GetClipModel()->GetAxis(), MASK_SHOT_RENDERMODEL, owner );
 				muzzle_pos = tr.endpos;
 			}

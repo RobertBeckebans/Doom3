@@ -3875,6 +3875,8 @@ static classVariableInfo_t usercmd_t_typeInfo[] = {
 	{ "short[3]", "angles", (int)(&((usercmd_t *)0)->angles), sizeof( ((usercmd_t *)0)->angles ) },
 	{ "short", "mx", (int)(&((usercmd_t *)0)->mx), sizeof( ((usercmd_t *)0)->mx ) },
 	{ "short", "my", (int)(&((usercmd_t *)0)->my), sizeof( ((usercmd_t *)0)->my ) },
+	{ "short", "mposx", (int)(&((usercmd_t *)0)->mposx), sizeof( ((usercmd_t *)0)->mposx ) },
+	{ "short", "mposy", (int)(&((usercmd_t *)0)->mposy), sizeof( ((usercmd_t *)0)->mposy ) },
 	{ "signed char", "impulse", (int)(&((usercmd_t *)0)->impulse), sizeof( ((usercmd_t *)0)->impulse ) },
 	{ "byte", "flags", (int)(&((usercmd_t *)0)->flags), sizeof( ((usercmd_t *)0)->flags ) },
 	{ "int", "sequence", (int)(&((usercmd_t *)0)->sequence), sizeof( ((usercmd_t *)0)->sequence ) },

@@ -192,6 +192,10 @@ void idAsyncNetwork::WriteUserCmdDelta( idBitMsg &msg, const usercmd_t &cmd, con
 		msg.WriteDeltaByte( base->buttons, cmd.buttons );
 		msg.WriteDeltaShort( base->mx, cmd.mx );
 		msg.WriteDeltaShort( base->my, cmd.my );
+		// OCULUS BEGIN
+		msg.WriteDeltaShort(base->mposx, cmd.mposx);
+		msg.WriteDeltaShort(base->mposy, cmd.mposy);
+		// OCULUS END
 		msg.WriteDeltaChar( base->forwardmove, cmd.forwardmove );
 		msg.WriteDeltaChar( base->rightmove, cmd.rightmove );
 		msg.WriteDeltaChar( base->upmove, cmd.upmove );
@@ -205,6 +209,10 @@ void idAsyncNetwork::WriteUserCmdDelta( idBitMsg &msg, const usercmd_t &cmd, con
 	msg.WriteByte( cmd.buttons );
     msg.WriteShort( cmd.mx );
 	msg.WriteShort( cmd.my );
+	// OCULUS BEGIN
+	msg.WriteShort( cmd.mposx );
+	msg.WriteShort( cmd.mposy );
+	// OCULUS END
 	msg.WriteChar( cmd.forwardmove );
 	msg.WriteChar( cmd.rightmove );
 	msg.WriteChar( cmd.upmove );
@@ -226,6 +234,12 @@ void idAsyncNetwork::ReadUserCmdDelta( const idBitMsg &msg, usercmd_t &cmd, cons
 		cmd.buttons = msg.ReadDeltaByte( base->buttons );
 		cmd.mx = msg.ReadDeltaShort( base->mx );
 		cmd.my = msg.ReadDeltaShort( base->my );
+		
+		// OCULUS BEGIN
+		cmd.mposx = msg.ReadDeltaShort(base->mposx);
+		cmd.mposy = msg.ReadDeltaShort(base->mposy);
+		// OCULUS END
+
 		cmd.forwardmove = msg.ReadDeltaChar( base->forwardmove );
 		cmd.rightmove = msg.ReadDeltaChar( base->rightmove );
 		cmd.upmove = msg.ReadDeltaChar( base->upmove );
@@ -239,6 +253,12 @@ void idAsyncNetwork::ReadUserCmdDelta( const idBitMsg &msg, usercmd_t &cmd, cons
     cmd.buttons = msg.ReadByte();
     cmd.mx = msg.ReadShort();
 	cmd.my = msg.ReadShort();
+	
+	// OCULUS BEGIN
+	cmd.mposx = msg.ReadShort();
+	cmd.mposy = msg.ReadShort();
+	// OCULUS END
+
 	cmd.forwardmove = msg.ReadChar();
 	cmd.rightmove = msg.ReadChar();
 	cmd.upmove = msg.ReadChar();
@@ -283,6 +303,10 @@ bool idAsyncNetwork::UsercmdInputChanged( const usercmd_t &previousUserCmd, cons
 			previousUserCmd.forwardmove != currentUserCmd.forwardmove ||
 			previousUserCmd.rightmove != currentUserCmd.rightmove ||
 			previousUserCmd.upmove != currentUserCmd.upmove ||
+			// OCULUS BEGIN
+			previousUserCmd.mposx != currentUserCmd.mposx ||
+			previousUserCmd.mposy != currentUserCmd.mposy ||
+			// OCULUS END
 			previousUserCmd.angles[0] != currentUserCmd.angles[0] ||
 			previousUserCmd.angles[1] != currentUserCmd.angles[1] ||
 			previousUserCmd.angles[2] != currentUserCmd.angles[2];

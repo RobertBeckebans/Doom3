@@ -53,6 +53,10 @@ bool usercmd_t::operator==( const usercmd_t &rhs ) const {
 			forwardmove == rhs.forwardmove &&
 			rightmove == rhs.rightmove &&
 			upmove == rhs.upmove &&
+			// OCULUS BEGIN
+			mposx == rhs.mposx &&
+			mposy == rhs.mposy &&
+			// OCULUS END
 			angles[0] == rhs.angles[0] &&
 			angles[1] == rhs.angles[1] &&
 			angles[2] == rhs.angles[2] &&
@@ -363,6 +367,7 @@ private:
 
 	// OCULUS BEGIN
 	idVec3			aimangles;
+	idVec2			aimoffsets;
 	//OCULUS END
 
 	int				flags;
@@ -664,21 +669,43 @@ void idUsercmdGenLocal::MouseMove( void ) {
 	}
 
 	if ( !ButtonState( UB_STRAFE ) ) {
-		viewangles[YAW] -= m_yaw.GetFloat() * mx;
+		//viewangles[YAW] -= m_yaw.GetFloat() * mx;
 	} else {
 		cmd.rightmove = idMath::ClampChar( (int)(cmd.rightmove + strafeMx) );
 	}
 
 	if ( !ButtonState( UB_STRAFE ) && ( cmd.buttons & BUTTON_MLOOK ) ) {
-		viewangles[PITCH] += m_pitch.GetFloat() * my;
+		//viewangles[PITCH] += m_pitch.GetFloat() * my;
 	} else {
 		cmd.forwardmove = idMath::ClampChar( (int)(cmd.forwardmove - strafeMy) );
 	}
 
 	// OCULUS BEGIN
 
-	aimangles.x += mx;
-	aimangles.y += my;
+	aimoffsets.x += mx;
+	aimoffsets.y += my;
+
+	const int maxoffset = 1024;
+
+	if (aimoffsets.x > maxoffset)
+	{
+		viewangles[YAW] -= m_yaw.GetFloat() * mx;
+		aimoffsets.x = maxoffset;
+	}
+	if (aimoffsets.y > maxoffset)
+	{
+		aimoffsets.y = maxoffset;
+	}
+	
+	if (aimoffsets.x < -maxoffset)
+	{
+		viewangles[YAW] -= m_yaw.GetFloat() * mx;
+		aimoffsets.x = -maxoffset;
+	}
+	if (aimoffsets.y < -maxoffset)
+	{
+		aimoffsets.y = -maxoffset;
+	}
 
 	// OCULUS END
 }
@@ -780,11 +807,13 @@ void idUsercmdGenLocal::MakeCurrentOculus(void)
 {
 	idVec3		oldAngles;
 	idVec3		oldAimAngles; // OCULUS TMP
+	idVec2		oldaimoffsets;
 
 	int		i;
 
 	oldAngles = viewangles;
 	oldAimAngles = aimangles;
+	oldaimoffsets = aimoffsets;
 
 	if (!Inhibited())
 	{
@@ -828,8 +857,12 @@ void idUsercmdGenLocal::MakeCurrentOculus(void)
 		cmd.angles[i] = ANGLE2SHORT(finalviewangles[i]);
 	}
 
+
 	cmd.mx = continuousMouseX;
 	cmd.my = continuousMouseY;
+
+	cmd.mposx = aimoffsets.x;
+	cmd.mposy = aimoffsets.y;
 
 	flags = cmd.flags;
 	impulse = cmd.impulse;
@@ -845,12 +878,10 @@ void idUsercmdGenLocal::MakeCurrent( void ) {
 	// OCULUS END
 
 	idVec3		oldAngles;
-	idVec3		oldAimAngles; // OCULUS TMP
 
 	int		i;
 
 	oldAngles = viewangles;
-	oldAimAngles = aimangles;
 
 	if ( !Inhibited() )
 	{
