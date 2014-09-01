@@ -9,7 +9,7 @@
 
 	1167 constants
 	129 enums
-	529 classes/structs/unions
+	530 classes/structs/unions
 	36 templates
 	6 max inheritance level for 'idPlayer'
 
@@ -4063,6 +4063,12 @@ static classVariableInfo_t OculusHmd_typeInfo[] = {
 	{ NULL, 0 }
 };
 
+static classVariableInfo_t XinputGamePad_typeInfo[] = {
+	{ "int", "id", (int)(&((XinputGamePad *)0)->id), sizeof( ((XinputGamePad *)0)->id ) },
+	{ "XINPUT_STATE", "state", (int)(&((XinputGamePad *)0)->state), sizeof( ((XinputGamePad *)0)->state ) },
+	{ NULL, 0 }
+};
+
 static classVariableInfo_t idDeclBase_typeInfo[] = {
 	{ NULL, 0 }
 };
@@ -5268,11 +5274,11 @@ static classVariableInfo_t frameLookup_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static classVariableInfo_t class_275_class_275_typeInfo[] = {
-//	{ "const idSoundShader *", "soundShader", (int)(&((class_275::class_275 *)0)->soundShader), sizeof( ((class_275::class_275 *)0)->soundShader ) },
-//	{ "const function_t *", "function", (int)(&((class_275::class_275 *)0)->function), sizeof( ((class_275::class_275 *)0)->function ) },
-//	{ "const idDeclSkin *", "skin", (int)(&((class_275::class_275 *)0)->skin), sizeof( ((class_275::class_275 *)0)->skin ) },
-//	{ "int", "index", (int)(&((class_275::class_275 *)0)->index), sizeof( ((class_275::class_275 *)0)->index ) },
+static classVariableInfo_t class_276_class_276_typeInfo[] = {
+//	{ "const idSoundShader *", "soundShader", (int)(&((class_276::class_276 *)0)->soundShader), sizeof( ((class_276::class_276 *)0)->soundShader ) },
+//	{ "const function_t *", "function", (int)(&((class_276::class_276 *)0)->function), sizeof( ((class_276::class_276 *)0)->function ) },
+//	{ "const idDeclSkin *", "skin", (int)(&((class_276::class_276 *)0)->skin), sizeof( ((class_276::class_276 *)0)->skin ) },
+//	{ "int", "index", (int)(&((class_276::class_276 *)0)->index), sizeof( ((class_276::class_276 *)0)->index ) },
 	{ NULL, 0 }
 };
 
@@ -7221,6 +7227,8 @@ static classVariableInfo_t idPlayer_typeInfo[] = {
 	{ "idPlayerView", "playerView", (int)(&((idPlayer *)0)->playerView), sizeof( ((idPlayer *)0)->playerView ) },
 	{ "renderEntity_t", "laserSightRenderEntity", (int)(&((idPlayer *)0)->laserSightRenderEntity), sizeof( ((idPlayer *)0)->laserSightRenderEntity ) },
 	{ "qhandle_t", "laserSightHandle", (int)(&((idPlayer *)0)->laserSightHandle), sizeof( ((idPlayer *)0)->laserSightHandle ) },
+	{ "renderEntity_t", "aimPointerRenderEntity", (int)(&((idPlayer *)0)->aimPointerRenderEntity), sizeof( ((idPlayer *)0)->aimPointerRenderEntity ) },
+	{ "qhandle_t", "aimPointerHandle", (int)(&((idPlayer *)0)->aimPointerHandle), sizeof( ((idPlayer *)0)->aimPointerHandle ) },
 	{ "bool", "noclip", (int)(&((idPlayer *)0)->noclip), sizeof( ((idPlayer *)0)->noclip ) },
 	{ "bool", "godmode", (int)(&((idPlayer *)0)->godmode), sizeof( ((idPlayer *)0)->godmode ) },
 	{ "bool", "spawnAnglesSet", (int)(&((idPlayer *)0)->spawnAnglesSet), sizeof( ((idPlayer *)0)->spawnAnglesSet ) },
@@ -8361,6 +8369,7 @@ static classTypeInfo_t classTypeInfo[] = {
 	{ "ovrTexture", "", sizeof(ovrTexture), ovrTexture_typeInfo },
 	{ "ovrvidmode_t", "", sizeof(ovrvidmode_t), ovrvidmode_t_typeInfo },
 	{ "OculusHmd", "", sizeof(OculusHmd), OculusHmd_typeInfo },
+	{ "XinputGamePad", "", sizeof(XinputGamePad), XinputGamePad_typeInfo },
 	{ "idDeclBase", "", sizeof(idDeclBase), idDeclBase_typeInfo },
 	{ "idDecl", "", sizeof(idDecl), idDecl_typeInfo },
 	{ "idDeclManager", "", sizeof(idDeclManager), idDeclManager_typeInfo },
@@ -8475,7 +8484,7 @@ static classTypeInfo_t classTypeInfo[] = {
 	{ "jointInfo_t", "", sizeof(jointInfo_t), jointInfo_t_typeInfo },
 	{ "jointMod_t", "", sizeof(jointMod_t), jointMod_t_typeInfo },
 	{ "frameLookup_t", "", sizeof(frameLookup_t), frameLookup_t_typeInfo },
-//	{ "class_275::class_275", "", sizeof(class_275::class_275), class_275_class_275_typeInfo },
+//	{ "class_276::class_276", "", sizeof(class_276::class_276), class_276_class_276_typeInfo },
 	{ "frameCommand_t", "", sizeof(frameCommand_t), frameCommand_t_typeInfo },
 	{ "animFlags_t", "", sizeof(animFlags_t), animFlags_t_typeInfo },
 	{ "idMD5Anim", "", sizeof(idMD5Anim), idMD5Anim_typeInfo },

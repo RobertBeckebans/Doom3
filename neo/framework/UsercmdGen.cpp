@@ -341,6 +341,9 @@ public:
 
 private:
 	void			MakeCurrent( void );
+	// OCULUS BEGIN
+	void			MakeCurrentOculus(void);
+	//OCULUS END
 	void			InitCurrent( void );
 
 	bool			Inhibited( void );
@@ -357,6 +360,11 @@ private:
 	void			Key( int keyNum, bool down );
 
 	idVec3			viewangles;
+
+	// OCULUS BEGIN
+	idVec3			aimangles;
+	//OCULUS END
+
 	int				flags;
 	int				impulse;
 
@@ -633,7 +641,7 @@ void idUsercmdGenLocal::MouseMove( void ) {
 	my *= sensitivity.GetFloat();
 
 	if ( m_showMouseRate.GetBool() ) {
-		Sys_DebugPrintf( "[%3i %3i  = %5.1f %5.1f = %5.1f %5.1f] ", mouseDx, mouseDy, mx, my, strafeMx, strafeMy );
+		Sys_DebugPrintf( "[%3i %3i  = %5.1f %5.1f = %5.1f %5.1f]\n", mouseDx, mouseDy, mx, my, strafeMx, strafeMy );
 	}
 
 	mouseDx = 0;
@@ -662,10 +670,17 @@ void idUsercmdGenLocal::MouseMove( void ) {
 	}
 
 	if ( !ButtonState( UB_STRAFE ) && ( cmd.buttons & BUTTON_MLOOK ) ) {
-		//viewangles[PITCH] += m_pitch.GetFloat() * my;
+		viewangles[PITCH] += m_pitch.GetFloat() * my;
 	} else {
 		cmd.forwardmove = idMath::ClampChar( (int)(cmd.forwardmove - strafeMy) );
 	}
+
+	// OCULUS BEGIN
+
+	aimangles.x += mx;
+	aimangles.y += my;
+
+	// OCULUS END
 }
 
 /*
@@ -759,11 +774,83 @@ idUsercmdGenLocal::MakeCurrent
 creates the current command for this frame
 ================
 */
-void idUsercmdGenLocal::MakeCurrent( void ) {
+
+// OCULUS BEGIN
+void idUsercmdGenLocal::MakeCurrentOculus(void)
+{
 	idVec3		oldAngles;
+	idVec3		oldAimAngles; // OCULUS TMP
+
 	int		i;
 
 	oldAngles = viewangles;
+	oldAimAngles = aimangles;
+
+	if (!Inhibited())
+	{
+		// update toggled key states
+		toggled_crouch.SetKeyState(ButtonState(UB_DOWN), in_toggleCrouch.GetBool());
+		toggled_run.SetKeyState(ButtonState(UB_SPEED), in_toggleRun.GetBool() && idAsyncNetwork::IsActive());
+		toggled_zoom.SetKeyState(ButtonState(UB_ZOOM), in_toggleZoom.GetBool());
+
+		// set button bits
+		CmdButtons();
+
+		// get basic movement from keyboard
+		KeyMove();
+
+		// get basic movement from mouse
+		MouseMove();
+
+		// check to make sure the angles haven't wrapped
+		if (viewangles[PITCH] - oldAngles[PITCH] > 90)
+		{
+			viewangles[PITCH] = oldAngles[PITCH] + 90;
+		}
+		else if (oldAngles[PITCH] - viewangles[PITCH] > 90)
+		{
+			viewangles[PITCH] = oldAngles[PITCH] - 90;
+		}
+	}
+	else
+	{
+		mouseDx = 0;
+		mouseDy = 0;
+	}
+
+	idVec3 finalviewangles = viewangles;
+
+	if (vr_enableOculusRiftRendering.GetBool() && !ovr.isDebughmd)
+		finalviewangles += ovr.GetHeadTrackingOrientation();
+
+	for (i = 0; i < 3; i++)
+	{
+		cmd.angles[i] = ANGLE2SHORT(finalviewangles[i]);
+	}
+
+	cmd.mx = continuousMouseX;
+	cmd.my = continuousMouseY;
+
+	flags = cmd.flags;
+	impulse = cmd.impulse;
+}
+
+// OCULUS END
+
+void idUsercmdGenLocal::MakeCurrent( void ) {
+
+	// OCULUS BEGIN
+	MakeCurrentOculus();
+	return;
+	// OCULUS END
+
+	idVec3		oldAngles;
+	idVec3		oldAimAngles; // OCULUS TMP
+
+	int		i;
+
+	oldAngles = viewangles;
+	oldAimAngles = aimangles;
 
 	if ( !Inhibited() )
 	{
@@ -787,8 +874,6 @@ void idUsercmdGenLocal::MakeCurrent( void ) {
 		// get basic movement from joystick
 		JoystickMove();
 
-		//viewangles = viewangles + ovrPose;
-
 		// check to make sure the angles haven't wrapped
 		if ( viewangles[PITCH] - oldAngles[PITCH] > 90 )
 		{
@@ -805,18 +890,9 @@ void idUsercmdGenLocal::MakeCurrent( void ) {
 		mouseDy = 0;
 	}
 
-	idVec3 finalviewangles = viewangles;
-
-	// OCULUS BEGIN
-#ifdef ENABLE_OCULUS_HMD
-	if (!ovr.isDebughmd)
-		finalviewangles += ovr.GetHeadTrackingOrientation();
-#endif
-	// OCULUS END
-
 	for ( i = 0; i < 3; i++ )
 	{
-		cmd.angles[i] = ANGLE2SHORT( finalviewangles[i] );
+		cmd.angles[i] = ANGLE2SHORT(viewangles[i]);
 	}
 
 	cmd.mx = continuousMouseX;

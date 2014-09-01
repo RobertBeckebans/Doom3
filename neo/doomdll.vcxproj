@@ -112,6 +112,7 @@
     <ClInclude Include="framework\async\MsgChannel.h" />
     <ClInclude Include="framework\async\NetworkSystem.h" />
     <ClInclude Include="framework\async\ServerScan.h" />
+    <ClInclude Include="Oculus\InputDevices.h" />
     <ClInclude Include="Oculus\Oculus.h" />
     <ClInclude Include="renderer\Cinematic.h" />
     <ClInclude Include="renderer\glext.h" />
@@ -312,6 +313,7 @@
     <ClCompile Include="framework\async\MsgChannel.cpp" />
     <ClCompile Include="framework\async\NetworkSystem.cpp" />
     <ClCompile Include="framework\async\ServerScan.cpp" />
+    <ClCompile Include="Oculus\InputDevices.cpp" />
     <ClCompile Include="Oculus\Oculus.cpp" />
     <ClCompile Include="Oculus\OculusRender.cpp" />
     <ClCompile Include="renderer\Cinematic.cpp" />

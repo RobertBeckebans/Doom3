@@ -546,6 +546,9 @@
     <ClInclude Include="Oculus\Oculus.h">
       <Filter>Oculus</Filter>
     </ClInclude>
+    <ClInclude Include="Oculus\InputDevices.h">
+      <Filter>Oculus</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="cm\CollisionModel_contacts.cpp">
@@ -1278,6 +1281,9 @@
       <Filter>Oculus</Filter>
     </ClCompile>
     <ClCompile Include="Oculus\OculusRender.cpp">
+      <Filter>Oculus</Filter>
+    </ClCompile>
+    <ClCompile Include="Oculus\InputDevices.cpp">
       <Filter>Oculus</Filter>
     </ClCompile>
   </ItemGroup>

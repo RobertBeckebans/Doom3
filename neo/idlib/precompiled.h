@@ -129,6 +129,7 @@ If you have questions concerning this license or the applicable additional terms
 
 // OCULUS BEGIN
 #include "../Oculus/Oculus.h"
+#include "../Oculus/InputDevices.h"
 // OCULUS END
 
 // decls

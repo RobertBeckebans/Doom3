@@ -966,6 +966,10 @@ idPlayer::idPlayer() {
 	// Add lasersight based on Doom3 BFG
 	laserSightHandle = -1;
 	memset(&laserSightRenderEntity, 0, sizeof(laserSightRenderEntity));
+
+	// Add aiming pointer
+	aimPointerHandle = -1;
+	memset(&aimPointerRenderEntity, 0, sizeof(aimPointerRenderEntity));
 	// OCULUS END
 
 	weapon					= NULL;
@@ -1420,6 +1424,19 @@ void idPlayer::Init( void ) {
 	laserSightRenderEntity.customSkin = declManager->FindSkin(skin);
 	laserSightRenderEntity.noSelfShadow = true;
 	laserSightRenderEntity.noShadow = true;
+
+	memset(&aimPointerRenderEntity, 0, sizeof(aimPointerRenderEntity));
+	aimPointerRenderEntity.hModel = renderModelManager->FindModel("_sprite");
+	//aimPointerRenderEntity.hModel = renderModelManager->FindModel("models/particles/plasma_bolt/plasma_bolt.lwo");
+
+	aimPointerRenderEntity.bounds = aimPointerRenderEntity.hModel->Bounds(&aimPointerRenderEntity);
+	aimPointerRenderEntity.shaderParms[SHADERPARM_RED] = 1.0f;
+	aimPointerRenderEntity.shaderParms[SHADERPARM_GREEN] = 1.0f;
+	aimPointerRenderEntity.shaderParms[SHADERPARM_BLUE] = 1.0f;
+	aimPointerRenderEntity.shaderParms[SHADERPARM_ALPHA] = 1.0f;
+	aimPointerRenderEntity.customSkin = declManager->FindSkin(skin);
+	aimPointerRenderEntity.noSelfShadow = true;
+	aimPointerRenderEntity.noShadow = true;
 	// OCULUS END
 }
 
@@ -2077,6 +2094,17 @@ void idPlayer::Restore( idRestoreGame *savefile ) {
 	laserSightRenderEntity.customSkin = declManager->FindSkin(skin);
 	laserSightRenderEntity.noSelfShadow = true;
 	laserSightRenderEntity.noShadow = true;
+
+	memset(&aimPointerRenderEntity, 0, sizeof(aimPointerRenderEntity));
+	aimPointerRenderEntity.hModel = renderModelManager->FindModel("_sprite");
+	aimPointerRenderEntity.bounds = laserSightRenderEntity.hModel->Bounds(&aimPointerRenderEntity);
+	aimPointerRenderEntity.shaderParms[SHADERPARM_RED] = 1.0f;
+	aimPointerRenderEntity.shaderParms[SHADERPARM_GREEN] = 1.0f;
+	aimPointerRenderEntity.shaderParms[SHADERPARM_BLUE] = 1.0f;
+	aimPointerRenderEntity.shaderParms[SHADERPARM_ALPHA] = 1.0f;
+	aimPointerRenderEntity.customSkin = declManager->FindSkin(skin);
+	aimPointerRenderEntity.noSelfShadow = true;
+	aimPointerRenderEntity.noShadow = true;
 	// OCULUS END
 
 	// set the pm_ cvars
@@ -6437,7 +6465,10 @@ void idPlayer::Think( void ) {
 		LinkCombat();
 
 		// OCULUSE BEGIN
-		UpdateLaserSight();
+		trace_t tr;
+		UpdateAimPointerTrace(tr);
+		UpdateAimPointer(tr);
+		UpdateLaserSight(tr);
 		// OCULUS END
 
 		playerView.CalculateShake();
@@ -8605,6 +8636,38 @@ bool idPlayer::NeedsIcon( void ) {
 }
 
 // OCULUS BEGIN, Merge laser sight from BFG Edition
+
+
+void idPlayer::UpdateAimPointerTrace(trace_t &result)
+{
+	idVec3 start = GetEyePosition();
+	idVec3 end = start + viewAngles.ToForward() * 1024.0f;
+	gameLocal.clip.TracePoint(result, start, end, CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
+}
+
+/*
+==============
+idPlayer::UpdateAimPointer
+==============
+*/
+
+void idPlayer::UpdateAimPointer(const trace_t tr)
+{
+	// only show in the player's view
+	aimPointerRenderEntity.allowSurfaceInViewID = entityNumber + 1;
+	aimPointerRenderEntity.axis.Identity();
+	aimPointerRenderEntity.origin = tr.endpos;
+
+	if (aimPointerHandle == -1)
+	{
+		aimPointerHandle = gameRenderWorld->AddEntityDef(&aimPointerRenderEntity);
+	}
+	else
+	{
+		gameRenderWorld->UpdateEntityDef(aimPointerHandle, &aimPointerRenderEntity);
+	}
+}
+
 /*
 ==============
 idPlayer::UpdateLaserSight
@@ -8612,9 +8675,9 @@ idPlayer::UpdateLaserSight
 */
 
 idCVar vr_laserSightWidth("vr_laserSightWidth", "0.2", CVAR_FLOAT | CVAR_ARCHIVE, "laser sight beam width");
-idCVar vr_laserSightLength("vr_laserSightLength", "250", CVAR_FLOAT | CVAR_ARCHIVE, "laser sight beam length");
+idCVar vr_laserSightLength("vr_laserSightLength", "128", CVAR_FLOAT | CVAR_ARCHIVE, "laser sight beam length");
 
-void idPlayer::UpdateLaserSight()
+void idPlayer::UpdateLaserSight(const trace_t tr)
 {
 	idVec3	muzzleOrigin;
 	idMat3	muzzleAxis;
@@ -8625,7 +8688,7 @@ void idPlayer::UpdateLaserSight()
 		return;
 	}
 
-	if (!weapon.GetEntity()->ShowCrosshair() || AI_DEAD || weapon.GetEntity()->IsHidden() || !weapon.GetEntity()->GetMuzzlePositionWithHacks(muzzleOrigin, muzzleAxis))
+	if (!weapon.GetEntity()->ShowCrosshair() || AI_RELOAD || AI_ONLADDER || AI_DEAD || weapon.GetEntity()->IsHidden() || !weapon.GetEntity()->GetMuzzlePositionWithHacks(muzzleOrigin, muzzleAxis))
 	{
 		// hide it
 		laserSightRenderEntity.allowSurfaceInViewID = -1;
@@ -8647,8 +8710,7 @@ void idPlayer::UpdateLaserSight()
 
 	laserSightRenderEntity.origin = muzzleOrigin - muzzleAxis[0] * 2.0f;
 	idVec3	&target = *reinterpret_cast<idVec3 *>(&laserSightRenderEntity.shaderParms[SHADERPARM_BEAM_END_X]);
-
-	target = muzzleOrigin + muzzleAxis[0] * vr_laserSightLength.GetFloat();
+	target = tr.endpos; // End at the aiming location instead
 
 	laserSightRenderEntity.shaderParms[SHADERPARM_BEAM_WIDTH] = vr_laserSightWidth.GetFloat();
 

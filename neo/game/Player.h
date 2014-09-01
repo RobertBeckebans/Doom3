@@ -213,6 +213,8 @@ public:
 	// Merge from BFG Edition
 	renderEntity_t			laserSightRenderEntity;
 	qhandle_t				laserSightHandle;
+	renderEntity_t			aimPointerRenderEntity;
+	qhandle_t				aimPointerHandle;
 	// END
 
 	bool					noclip;
@@ -331,8 +333,9 @@ public:
 	void					Think( void );
 
 	// OCULUS BEGIN
-	// Merge from BFG
-	void					UpdateLaserSight();
+	void					UpdateAimPointerTrace(trace_t &result);
+	void					UpdateLaserSight(const trace_t tr);
+	void					UpdateAimPointer(const trace_t tr);
 	// END
 
 	// save games

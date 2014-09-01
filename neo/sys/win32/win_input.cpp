@@ -601,8 +601,9 @@ void IN_ActivateMouse( void ) {
 	if ( !win32.in_mouse.GetBool() || win32.mouseGrabbed || !win32.g_pMouse ) {
 		return;
 	}
-
+	
 	win32.mouseGrabbed = true;
+	
 	for ( i = 0; i < 10; i++ ) {
 		if ( ::ShowCursor( false ) < 0 ) {
 			break;
@@ -690,14 +691,19 @@ void Sys_ShutdownInput( void ) {
 Sys_InitInput
 ===========
 */
-void Sys_InitInput( void ) {
+void Sys_InitInput( void )
+{
 	common->Printf ("\n------- Input Initialization -------\n");
 	IN_InitDirectInput();
-	if ( win32.in_mouse.GetBool() ) {
+
+	if ( win32.in_mouse.GetBool() )
+	{
 		IN_InitDIMouse();
 		// don't grab the mouse on initialization
 		Sys_GrabMouseCursor( false );
-	} else {
+	}
+	else
+	{
 		common->Printf ("Mouse control not active.\n");
 	}
 	IN_StartupKeyboard();
