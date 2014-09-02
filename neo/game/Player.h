@@ -210,11 +210,11 @@ public:
 	class idPlayerView		playerView;			// handles damage kicks and effects
 
 	// OCULUS BEGIN
-	// Merge from BFG Edition
 	renderEntity_t			laserSightRenderEntity;
 	qhandle_t				laserSightHandle;
 	renderEntity_t			aimPointerRenderEntity;
 	qhandle_t				aimPointerHandle;
+	idAngles				aimAngles;
 	// END
 
 	bool					noclip;
@@ -333,9 +333,9 @@ public:
 	void					Think( void );
 
 	// OCULUS BEGIN
-	void					UpdateAimPointerTrace(trace_t &result);
-	void					UpdateLaserSight(const trace_t tr);
-	void					UpdateAimPointer(const trace_t tr);
+	void					UpdateAimAngles();
+	void					UpdateAimPointer();
+	void					UpdateLaserSight();
 	// END
 
 	// save games

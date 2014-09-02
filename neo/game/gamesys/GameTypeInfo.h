@@ -7231,6 +7231,7 @@ static classVariableInfo_t idPlayer_typeInfo[] = {
 	{ "qhandle_t", "laserSightHandle", (int)(&((idPlayer *)0)->laserSightHandle), sizeof( ((idPlayer *)0)->laserSightHandle ) },
 	{ "renderEntity_t", "aimPointerRenderEntity", (int)(&((idPlayer *)0)->aimPointerRenderEntity), sizeof( ((idPlayer *)0)->aimPointerRenderEntity ) },
 	{ "qhandle_t", "aimPointerHandle", (int)(&((idPlayer *)0)->aimPointerHandle), sizeof( ((idPlayer *)0)->aimPointerHandle ) },
+	{ "idAngles", "aimAngles", (int)(&((idPlayer *)0)->aimAngles), sizeof( ((idPlayer *)0)->aimAngles ) },
 	{ "bool", "noclip", (int)(&((idPlayer *)0)->noclip), sizeof( ((idPlayer *)0)->noclip ) },
 	{ "bool", "godmode", (int)(&((idPlayer *)0)->godmode), sizeof( ((idPlayer *)0)->godmode ) },
 	{ "bool", "spawnAnglesSet", (int)(&((idPlayer *)0)->spawnAnglesSet), sizeof( ((idPlayer *)0)->spawnAnglesSet ) },

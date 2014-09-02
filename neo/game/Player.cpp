@@ -6465,10 +6465,9 @@ void idPlayer::Think( void ) {
 		LinkCombat();
 
 		// OCULUSE BEGIN
-		trace_t tr;
-		UpdateAimPointerTrace(tr);
-		UpdateAimPointer(tr);
-		UpdateLaserSight(tr);
+		UpdateAimAngles();
+		UpdateAimPointer();
+		UpdateLaserSight();
 		// OCULUS END
 
 		playerView.CalculateShake();
@@ -7181,7 +7180,11 @@ void idPlayer::CalculateViewWeaponPos( idVec3 &origin, idMat3 &axis ) {
 
 	// CalculateRenderView must have been called first
 	const idVec3 &viewOrigin = firstPersonViewOrigin;
-	const idMat3 &viewAxis = firstPersonViewAxis;
+
+	// OCULUS BEGIN
+	//const idMat3 &viewAxis = firstPersonViewAxis;
+	const idMat3 &viewAxis = aimAngles.ToMat3();
+	// OCULUS END
 
 	// these cvars are just for hand tweaking before moving a value to the weapon def
 	idVec3	gunpos( g_gun_x.GetFloat(), g_gun_y.GetFloat(), g_gun_z.GetFloat() );
@@ -8637,20 +8640,20 @@ bool idPlayer::NeedsIcon( void ) {
 
 // OCULUS BEGIN, Merge laser sight from BFG Edition
 
+/*
+==============
+idPlayer::UpdateAimAngles
+==============
+*/
 
-void idPlayer::UpdateAimPointerTrace(trace_t &result)
+void idPlayer::UpdateAimAngles()
 {
 	idVec3 start = GetEyePosition();
-
 	const float scale = 50.0f;
 
-	idAngles aimAngle = viewAngles;
-	aimAngle.pitch += usercmd.mposy / scale;
-	aimAngle.yaw += -usercmd.mposx / scale;
-
-	idVec3 end = start + aimAngle.ToForward() * 1024.0f;
-	
-	gameLocal.clip.TracePoint(result, start, end, CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
+	aimAngles = viewAngles;
+	aimAngles.pitch += usercmd.mposy / scale;
+	aimAngles.yaw += -usercmd.mposx / scale;
 }
 
 /*
@@ -8659,28 +8662,18 @@ idPlayer::UpdateAimPointer
 ==============
 */
 
-void idPlayer::UpdateAimPointer(const trace_t tr)
+void idPlayer::UpdateAimPointer()
 {
-	// idVec3 start = GetEyePosition();
+	trace_t tr;
+	idVec3 start = GetEyePosition();
 
-	idVec3 position = tr.endpos;
-	gameRenderWorld->DebugSphere(colorOrange, idSphere(tr.endpos, 1));
-
-	/*
-	// only show in the player's view
-	aimPointerRenderEntity.allowSurfaceInViewID = entityNumber + 1;
-	aimPointerRenderEntity.axis.Identity();
-	aimPointerRenderEntity.origin = tr.endpos;
-
-	if (aimPointerHandle == -1)
+	if (!weapon.GetEntity()->ShowCrosshair() || AI_RELOAD || AI_ONLADDER || AI_DEAD || weapon.GetEntity()->IsHidden())
 	{
-		aimPointerHandle = gameRenderWorld->AddEntityDef(&aimPointerRenderEntity);
+		return;
 	}
-	else
-	{
-		gameRenderWorld->UpdateEntityDef(aimPointerHandle, &aimPointerRenderEntity);
-	}
-	*/
+
+	gameLocal.clip.TracePoint(tr, start, (start + aimAngles.ToForward() * 96.0f), CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
+	gameRenderWorld->DebugSphere(colorOrange, idSphere(tr.endpos, 0.5f));
 }
 
 /*
@@ -8692,7 +8685,7 @@ idPlayer::UpdateLaserSight
 idCVar vr_laserSightWidth("vr_laserSightWidth", "0.2", CVAR_FLOAT | CVAR_ARCHIVE, "laser sight beam width");
 idCVar vr_laserSightLength("vr_laserSightLength", "128", CVAR_FLOAT | CVAR_ARCHIVE, "laser sight beam length");
 
-void idPlayer::UpdateLaserSight(const trace_t tr)
+void idPlayer::UpdateLaserSight()
 {
 	idVec3	muzzleOrigin;
 	idMat3	muzzleAxis;
@@ -8726,9 +8719,9 @@ void idPlayer::UpdateLaserSight(const trace_t tr)
 	laserSightRenderEntity.origin = muzzleOrigin - muzzleAxis[0] * 2.0f;
 	idVec3	&target = *reinterpret_cast<idVec3 *>(&laserSightRenderEntity.shaderParms[SHADERPARM_BEAM_END_X]);
 
-
-	idVec3 position = tr.endpos;
-	target = position; // End at the aiming location instead
+	trace_t tr;
+	gameLocal.clip.TracePoint(tr, laserSightRenderEntity.origin, (laserSightRenderEntity.origin + aimAngles.ToForward() * 128.0f), CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
+	target = tr.endpos;
 
 	laserSightRenderEntity.shaderParms[SHADERPARM_BEAM_WIDTH] = vr_laserSightWidth.GetFloat();
 

@@ -578,8 +578,8 @@ static bool R_GetModeInfo( int *width, int *height, int mode ) {
 #ifdef ENABLE_OCULUS_HMD
 	if (vr_enableOculusRiftRendering.GetBool())
 	{
-		*width = ovr.GetRenderWidth();
-		*height = ovr.GetRenderHeight();
+		*width = ovr.Hmd->Resolution.w;
+		*height = ovr.Hmd->Resolution.h;
 		return true;
 	}
 #endif

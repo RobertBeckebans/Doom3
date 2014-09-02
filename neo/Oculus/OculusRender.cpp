@@ -129,8 +129,7 @@ void OR_SetupViewFrustum(idRenderSystemLocal &tr)
 	float	xs, xc;
 	float	ang;
 
-	int FOV = 100;
-
+	int FOV = 105;
 	ang = DEG2RAD(FOV) * 0.5f;
 	idMath::SinCos(ang, xs, xc);
 

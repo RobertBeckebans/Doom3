@@ -33,7 +33,9 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "../sys/win32/win_local.h"
 
-#include "../OculusSDK/LibOVR/Src/Kernel/OVR_Math.h"
+#include "../OculusSDK/LibOVR/Include/OVR_Kernel.h"
+#include "../OculusSDK/LibOVR/Src/OVR_Stereo.h"
+//#include "../OculusSDK/LibOVR/Src/Kernel/OVR_Math.h"
 #include "../OculusSDK/LibOVR/Src/OVR_CAPI_GL.h"
 
 using namespace OVR;
@@ -72,7 +74,7 @@ bool OculusHmd::Init()
 	// Check if we have real hardware or else create a debug HMD for testing
 	if (!Hmd)
 	{
-		Hmd = ovrHmd_CreateDebug(ovrHmd_DK1);
+		Hmd = ovrHmd_CreateDebug(ovrHmd_DK2);
 		isDebughmd = true;
 
 		if (!Hmd)
@@ -85,24 +87,21 @@ bool OculusHmd::Init()
 	Resolution.width = Hmd->Resolution.w;
 	Resolution.height = Hmd->Resolution.h;
 
-	if (Hmd->HmdCaps & ovrHmdCap_ExtendDesktop)
-	{
-
-	}
-	else
-	{
-
-	}
-
 	ovrHmd_SetEnabledCaps(Hmd, ovrHmdCap_LowPersistence | ovrHmdCap_DynamicPrediction);	
 	ovrHmd_ConfigureTracking(Hmd, ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0);
 
+	float FovSideTanLimit = FovPort::Max(Hmd->MaxEyeFov[0], Hmd->MaxEyeFov[1]).GetMaxSideTan();
+	float FovSideTanMax = FovPort::Max(Hmd->DefaultEyeFov[0], Hmd->DefaultEyeFov[1]).GetMaxSideTan();
+
 	eyeFov[0] = Hmd->DefaultEyeFov[0];
 	eyeFov[1] = Hmd->DefaultEyeFov[1];
+	
+	eyeFov[0] = OVR::FovPort::Min(eyeFov[0], FovPort(FovSideTanMax));
+	eyeFov[1] = OVR::FovPort::Min(eyeFov[1], FovPort(FovSideTanMax));
 
 	//Configure Stereo settings.
-	Sizei recommenedTex0Size = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Left, Hmd->DefaultEyeFov[0], 1.0f);
-	Sizei recommenedTex1Size = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Right, Hmd->DefaultEyeFov[1], 1.0f);
+	Sizei recommenedTex0Size = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Left, Hmd->DefaultEyeFov[0], 1.5f);
+	Sizei recommenedTex1Size = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Right, Hmd->DefaultEyeFov[1], 1.5f);
 	
 	RenderWidth = Hmd->Resolution.w;
 	RenderHeight = Hmd->Resolution.h;
@@ -261,15 +260,17 @@ bool OculusHmd::InitRenderTarget()
 	eyeFov[0] = Hmd->DefaultEyeFov[0];
 	eyeFov[1] = Hmd->DefaultEyeFov[1];
 
-	unsigned distortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette;
+	unsigned distortionCaps = NULL;
+
+	if (!isDebughmd)
+		unsigned distortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette;
 
 	ovrGLConfig glcfg;
 	glcfg.OGL.Header.API = ovrRenderAPI_OpenGL;
 	glcfg.OGL.Header.RTSize = Sizei(Hmd->Resolution.w, Hmd->Resolution.h);
-	glcfg.OGL.Header.Multisample = 8;
+	glcfg.OGL.Header.Multisample = 1;
 	glcfg.OGL.Window = win32.hWnd;
 	glcfg.OGL.DC = win32.hDC;
-
 
 	ovrBool result = ovrHmd_ConfigureRendering(Hmd, &glcfg.Config, distortionCaps, eyeFov, EyeRenderDesc);
 
@@ -286,7 +287,7 @@ Get HMD rendering resolution width
 
 int OculusHmd::GetRenderWidth()
 {
-	return Resolution.width;
+	return RenderWidth;
 }
 
 /*
@@ -298,7 +299,7 @@ Get HMD rendering resolution height
 */
 int OculusHmd::GetRenderHeight()
 {
-	return Resolution.height;
+	return RenderHeight;
 }
 
 /*
