@@ -174,7 +174,7 @@ RB_SetBuffer
 
 =============
 */
-static void	RBO_SetBuffer(const void *data)
+static void	RB_SetBuffer(const void *data)
 {
 	const setBufferCommand_t	*cmd;
 
@@ -206,6 +206,14 @@ static void	RBO_SetBuffer(const void *data)
 		qglClear(GL_COLOR_BUFFER_BIT);
 	}
 }
+/*
+=============
+RB_CopyRender
+
+Copy part of the current framebuffer to an image
+=============
+*/
+const void RB_CopyRender(const void *data);
 
 /*
 =============
@@ -267,15 +275,14 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 				break;
 			}
 			case RC_SET_BUFFER:
-				RBO_SetBuffer(cmds);
+				RB_SetBuffer(cmds);
 				break;
 			case RC_SWAP_BUFFERS:
 				// Ignore this. The Oculus SDK handle that
 				//RB_SwapBuffers( cmds );
 				break;
 			case RC_COPY_RENDER:
-				// Dont need it
-				//RB_CopyRender(cmds);
+				RB_CopyRender(cmds);
 				break;
 			default:
 				common->Error("RB_ExecuteBackEndCommands: bad commandId");

@@ -37,7 +37,9 @@ If you have questions concerning this license or the applicable additional terms
 ===============================================================================
 */
 
-const int USERCMD_HZ			= 60;			// 60 frames per second
+// OCULUS BEGIN
+const int USERCMD_HZ			= 75;			// 60 frames per second // 75 on Oculus Rift
+// OCULUS END
 const int USERCMD_MSEC			= 1000 / USERCMD_HZ;
 
 // usercmd_t->button bits
