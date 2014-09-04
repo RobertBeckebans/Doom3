@@ -107,12 +107,17 @@ extern PFNGLGETBUFFERPARAMETERIVARBPROC qglGetBufferParameterivARB;
 extern PFNGLGETBUFFERPOINTERVARBPROC qglGetBufferPointervARB;
 
 // OCULUS BEGIN
+
 extern PFNGLGENFRAMEBUFFERSPROC				glGenFramebuffers;
 extern PFNGLDELETEFRAMEBUFFERSPROC			glDeleteFramebuffers;
 extern PFNGLCHECKFRAMEBUFFERSTATUSPROC		glCheckFramebufferStatus;
 extern PFNGLFRAMEBUFFERRENDERBUFFERPROC		glFramebufferRenderbuffer;
 extern PFNGLFRAMEBUFFERTEXTURE2DPROC		glFramebufferTexture2D;
 extern PFNGLBINDFRAMEBUFFEREXTPROC			glBindFramebuffer;
+extern PFNGLGENRENDERBUFFERSPROC			glGenRenderbuffers;
+extern PFNGLBINDRENDERBUFFERPROC			glBindRenderbuffer;
+extern PFNGLRENDERBUFFERSTORAGEEXTPROC		glRenderbufferStorage;
+
 // OCULUS END
 
 // NV_register_combiners

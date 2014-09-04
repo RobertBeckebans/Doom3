@@ -221,6 +221,23 @@ RBO_ExecuteBackEndCommands
 
 =============
 */
+
+void R_CopyFramebuffer(GLuint texnum, int x, int y, int imageWidth, int imageHeight)
+{
+	qglBindTexture(GL_TEXTURE_2D, texnum);
+
+	qglReadBuffer(GL_BACK);
+
+	qglCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, imageWidth, imageHeight, 0);
+
+	// these shouldn't be necessary if the image was initialized properly
+	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+}
+
 void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 {
 	// needed for editor rendering
@@ -234,9 +251,41 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 
 	for (int i = 0; i < 2; i++)
 	{
+		if (false)
+		{
+			glBindFramebuffer(GL_FRAMEBUFFER, ovr.Framebuffer);
+			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ovr.RenderTargetTexture[i], 0);
+			glClearColor(1.0f, 0.0f, 0.0f, 0.5f);
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			continue;
+			glClearColor(1.0f, 0.0f, 0.0f, 0.5f);
+			glClear(GL_COLOR_BUFFER_BIT);
+			qglBindTexture(GL_TEXTURE_2D, ovr.RenderTargetTexture[i]);
+			qglReadBuffer(GL_BACK);
+			qglCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0, 0, ovr.GetRenderWidth(), ovr.GetRenderHeight(), 0);
+			continue;
+		}
+
 		RB_SetDefaultGLState();
 
 		// Execute all the commands for each eyes
+
+
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ovr.Framebuffer);
+		glBindRenderbuffer(GL_RENDERBUFFER, ovr.rbo);
+		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, ovr.GetRenderWidth(), ovr.GetRenderHeight());
+
+		glFramebufferRenderbuffer(
+			GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, ovr.rbo
+			);
+
+		glClearColor(1.0f, 0.0f, 0.0f, 0.5f);
+		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_DEPTH_BUFFER_BIT);
+
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ovr.RenderTargetTexture[i], 0);
+
 
 		for (const emptyCommand_t * cmds = allCmds; cmds != NULL; cmds = (const emptyCommand_t *)cmds->next)
 		{
@@ -275,14 +324,14 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 				break;
 			}
 			case RC_SET_BUFFER:
-				RB_SetBuffer(cmds);
+				//RB_SetBuffer(cmds);
 				break;
 			case RC_SWAP_BUFFERS:
 				// Ignore this. The Oculus SDK handle that
 				//RB_SwapBuffers( cmds );
 				break;
 			case RC_COPY_RENDER:
-				RB_CopyRender(cmds);
+				//RB_CopyRender(cmds);
 				break;
 			default:
 				common->Error("RB_ExecuteBackEndCommands: bad commandId");
@@ -299,14 +348,29 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 			glClear(GL_COLOR_BUFFER_BIT);
 			glScissor(0, 0, renderSystem->GetScreenWidth(), renderSystem->GetScreenHeight());
 		}
-		//
+	
+		// Copy frame
+		
+		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glDeleteFramebuffers(1, &ovr.Framebuffer);
 
-		// Copy the frame to our render target
-		qglBindTexture(GL_TEXTURE_2D, ovr.RenderTargetTexture[i]);
-		qglCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, renderSystem->GetScreenWidth(), renderSystem->GetScreenHeight(), 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		//glBindFramebuffer(GL_FRAMEBUFFER, ovr.Framebuffer);
+		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ovr.RenderTargetTexture[i], 0);
+
+		//qglBindTexture(GL_TEXTURE_2D, ovr.RenderTargetTexture[i]);
+		//qglReadBuffer(GL_BACK);
+		//qglCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0, 0, ovr.GetRenderWidth(), ovr.GetRenderHeight(), 0);
+		//qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		//qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		//qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		//qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		//qglBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	// Done rendering. Send this off to the Oculus SDK
+	glViewport(0, 0, ovr.Hmd->Resolution.w, ovr.Hmd->Resolution.h);
+	glScissor(0, 0, ovr.Hmd->Resolution.w, ovr.Hmd->Resolution.h);
+
 	ovrHmd_EndFrame(ovr.Hmd, headPose, ovr.EyeTexture);
 }

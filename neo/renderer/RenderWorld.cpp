@@ -729,6 +729,7 @@ void idRenderWorldLocal::RenderSceneStereo(const renderView_t *renderView, int e
 	parms->scissor.y1 = 0;
 	parms->scissor.x2 = parms->viewport.x2 - parms->viewport.x1;
 	parms->scissor.y2 = parms->viewport.y2 - parms->viewport.y1;
+
 	parms->isSubview = false;
 	parms->initialViewAreaOrigin = renderView->vieworg;
 	parms->floatTime = parms->renderView.time * 0.001f;

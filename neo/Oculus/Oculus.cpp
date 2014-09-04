@@ -33,10 +33,9 @@ If you have questions concerning this license or the applicable additional terms
 
 #include "../sys/win32/win_local.h"
 
-#include "../OculusSDK/LibOVR/Include/OVR_Kernel.h"
-#include "../OculusSDK/LibOVR/Src/OVR_Stereo.h"
-//#include "../OculusSDK/LibOVR/Src/Kernel/OVR_Math.h"
-#include "../OculusSDK/LibOVR/Src/OVR_CAPI_GL.h"
+#include "../extern/OculusSDK/LibOVR/Include/OVR_Kernel.h"
+#include "../extern/OculusSDK/LibOVR/Src/OVR_Stereo.h"
+#include "../extern/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h"
 
 using namespace OVR;
 
@@ -100,15 +99,14 @@ bool OculusHmd::Init()
 	eyeFov[1] = OVR::FovPort::Min(eyeFov[1], FovPort(FovSideTanMax));
 
 	//Configure Stereo settings.
-	Sizei recommenedTex0Size = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Left, Hmd->DefaultEyeFov[0], 1.5f);
-	Sizei recommenedTex1Size = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Right, Hmd->DefaultEyeFov[1], 1.5f);
+	Sizei recommenedTex0Size = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Left, Hmd->DefaultEyeFov[0], 1.0f);
+	Sizei recommenedTex1Size = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Right, Hmd->DefaultEyeFov[1], 1.0f);
 	
-	RenderWidth = Hmd->Resolution.w;
-	RenderHeight = Hmd->Resolution.h;
+	//RenderWidth = Hmd->Resolution.w;
+	//RenderHeight = Hmd->Resolution.h;
 
-	// This doesnt seem to work in Oculus OpenGL rendering
-	//RenderWidth = (recommenedTex0Size.w>recommenedTex1Size.w ? recommenedTex0Size.w : recommenedTex1Size.w);
-	//RenderHeight = (recommenedTex0Size.h>recommenedTex1Size.h ? recommenedTex0Size.h : recommenedTex1Size.h);
+	RenderWidth = (recommenedTex0Size.w>recommenedTex1Size.w ? recommenedTex0Size.w : recommenedTex1Size.w);
+	RenderHeight = (recommenedTex0Size.h>recommenedTex1Size.h ? recommenedTex0Size.h : recommenedTex1Size.h);
 
 	return true;
 };
@@ -198,13 +196,14 @@ Create opengl texture
 
 static GLuint CreateTexture(int width, int height)
 {
+	/*
 	GLuint texid;
 	unsigned int* texdata;
 	const unsigned int size = (width * height) * 4;
 
 	texdata = (unsigned int*)new GLuint[(size * sizeof(unsigned int))];
 	ZeroMemory(texdata, size * sizeof(unsigned int));
-	
+
 	glGenTextures(1, &texid);
 	glBindTexture(GL_TEXTURE_2D, texid);
 	glTexImage2D(GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texdata);
@@ -214,6 +213,18 @@ static GLuint CreateTexture(int width, int height)
 
 	delete[] texdata;
 	return texid;
+	*/
+	GLuint i;
+	glGenTextures(1, &i);
+	glBindTexture(GL_TEXTURE_2D, i);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	return i;
 }
 
 /*
@@ -239,6 +250,38 @@ static ovrTexture CreateOculusTexture(GLuint id, int width, int height)
 	return tex;
 }
 
+void* GetFunction(const char* functionName)
+{
+	return wglGetProcAddress(functionName);
+}
+
+PFNGLGENFRAMEBUFFERSPROC				glGenFramebuffers;
+PFNGLDELETEFRAMEBUFFERSPROC				glDeleteFramebuffers;
+PFNGLCHECKFRAMEBUFFERSTATUSPROC			glCheckFramebufferStatus;
+PFNGLFRAMEBUFFERRENDERBUFFERPROC		glFramebufferRenderbuffer;
+PFNGLFRAMEBUFFERTEXTURE2DPROC			glFramebufferTexture2D;
+PFNGLBINDFRAMEBUFFERPROC				glBindFramebuffer;
+PFNGLGENRENDERBUFFERSPROC				glGenRenderBuffers;
+PFNGLBINDRENDERBUFFERPROC				glBindRenderbuffer;
+PFNGLRENDERBUFFERSTORAGEEXTPROC			glRenderbufferStorage;
+
+void InitGLExtensions()
+{
+	if (glGenFramebuffers)
+		return;
+
+	glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)GetFunction("glGenFramebuffersEXT");
+	glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSPROC)GetFunction("glDeleteFramebuffersEXT");
+	glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)GetFunction("glCheckFramebufferStatusEXT");
+	glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)GetFunction("glFramebufferRenderbufferEXT");
+	glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)GetFunction("glFramebufferTexture2DEXT");
+	glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)GetFunction("glBindFramebufferEXT");
+	glGenRenderBuffers = (PFNGLGENRENDERBUFFERSPROC)GetFunction("glGenRenderbuffersEXT");
+	glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)GetFunction("glBindRenderbufferEXT");
+	glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEEXTPROC)GetFunction("glRenderbufferStorageEXT");
+//    glDeleteRenderbuffers =             (PFNGLDELETERENDERBUFFERSPROC)             GetFunction("glDeleteRenderbuffersEXT");
+}
+
 /*
 =======================
 InitRenderTarget
@@ -249,6 +292,11 @@ Create the render targets and setup opengl rendering to our window
 
 bool OculusHmd::InitRenderTarget()
 {
+	InitGLExtensions();
+
+	glGenFramebuffers(1, &Framebuffer);
+	glGenRenderBuffers(1, &rbo);
+
 	for (int i = 0; i < 3; i++)
 	{
 		RenderTargetTexture[i] = CreateTexture(RenderWidth, RenderHeight);
@@ -263,7 +311,7 @@ bool OculusHmd::InitRenderTarget()
 	unsigned distortionCaps = NULL;
 
 	if (!isDebughmd)
-		unsigned distortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette;
+		distortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette;
 
 	ovrGLConfig glcfg;
 	glcfg.OGL.Header.API = ovrRenderAPI_OpenGL;

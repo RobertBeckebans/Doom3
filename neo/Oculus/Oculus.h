@@ -65,6 +65,7 @@ public:
 	int					multiSamples;
 
 	GLuint				Framebuffer;
+	GLuint				rbo;
 	GLuint				RenderTargetTexture[2];
 	ovrTexture			EyeTexture[2];
 	ovrEyeRenderDesc	EyeRenderDesc[2];

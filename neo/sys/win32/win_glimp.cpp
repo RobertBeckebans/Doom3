@@ -720,10 +720,10 @@ static bool GLW_CreateOculusWindow(glimpParms_t parms)
 	RECT	r;
 
 	// adjust width and height for window border
-	r.bottom = parms.height;
+	r.bottom = ovr.Resolution.height;
 	r.left = 0;
 	r.top = 0;
-	r.right = parms.width;
+	r.right = ovr.Resolution.width;
 
 	exstyle = 0;
 	AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
