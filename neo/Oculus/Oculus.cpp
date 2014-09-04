@@ -73,7 +73,7 @@ bool OculusHmd::Init()
 	// Check if we have real hardware or else create a debug HMD for testing
 	if (!Hmd)
 	{
-		Hmd = ovrHmd_CreateDebug(ovrHmd_DK2);
+		Hmd = ovrHmd_CreateDebug(ovrHmd_DK1);
 		isDebughmd = true;
 
 		if (!Hmd)

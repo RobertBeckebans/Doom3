@@ -4056,6 +4056,7 @@ static classVariableInfo_t OculusHmd_typeInfo[] = {
 	{ "bool", "isDebughmd", (int)(&((OculusHmd *)0)->isDebughmd), sizeof( ((OculusHmd *)0)->isDebughmd ) },
 	{ "int", "multiSamples", (int)(&((OculusHmd *)0)->multiSamples), sizeof( ((OculusHmd *)0)->multiSamples ) },
 	{ "GLuint", "Framebuffer", (int)(&((OculusHmd *)0)->Framebuffer), sizeof( ((OculusHmd *)0)->Framebuffer ) },
+	{ "GLuint", "rbo", (int)(&((OculusHmd *)0)->rbo), sizeof( ((OculusHmd *)0)->rbo ) },
 	{ "GLuint[2]", "RenderTargetTexture", (int)(&((OculusHmd *)0)->RenderTargetTexture), sizeof( ((OculusHmd *)0)->RenderTargetTexture ) },
 	{ "ovrTexture[2]", "EyeTexture", (int)(&((OculusHmd *)0)->EyeTexture), sizeof( ((OculusHmd *)0)->EyeTexture ) },
 	{ "ovrEyeRenderDesc[2]", "EyeRenderDesc", (int)(&((OculusHmd *)0)->EyeRenderDesc), sizeof( ((OculusHmd *)0)->EyeRenderDesc ) },

@@ -174,21 +174,21 @@ RB_SetBuffer
 
 =============
 */
-static void	RB_SetBuffer(const void *data)
+static void	RB_SetBuffer(const void *data, int eye)
 {
 	const setBufferCommand_t	*cmd;
-
-	// see which draw buffer we want to render the frame to
-
 	cmd = (const setBufferCommand_t *)data;
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ovr.Framebuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, ovr.rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, ovr.GetRenderWidth(), ovr.GetRenderHeight());
+
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, ovr.rbo);
 
 	backEnd.frameCount = cmd->frameCount;
 
-	qglDrawBuffer(cmd->buffer);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ovr.RenderTargetTexture[eye], 0);
 
-	// clear screen for debugging
-	// automatically enable this with several other debug tools
-	// that might leave unrendered portions of the screen
 	if (r_clear.GetFloat() || idStr::Length(r_clear.GetString()) != 1 || r_lockSurfaces.GetBool() || r_singleArea.GetBool() || r_showOverDraw.GetBool()) {
 		float c[3];
 		if (sscanf(r_clear.GetString(), "%f %f %f", &c[0], &c[1], &c[2]) == 3) {
@@ -205,6 +205,8 @@ static void	RB_SetBuffer(const void *data)
 		}
 		qglClear(GL_COLOR_BUFFER_BIT);
 	}
+
+	return;
 }
 /*
 =============
@@ -222,22 +224,6 @@ RBO_ExecuteBackEndCommands
 =============
 */
 
-void R_CopyFramebuffer(GLuint texnum, int x, int y, int imageWidth, int imageHeight)
-{
-	qglBindTexture(GL_TEXTURE_2D, texnum);
-
-	qglReadBuffer(GL_BACK);
-
-	qglCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, x, y, imageWidth, imageHeight, 0);
-
-	// these shouldn't be necessary if the image was initialized properly
-	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-}
-
 void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 {
 	// needed for editor rendering
@@ -253,12 +239,6 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 	{
 		if (false)
 		{
-			glBindFramebuffer(GL_FRAMEBUFFER, ovr.Framebuffer);
-			glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ovr.RenderTargetTexture[i], 0);
-			glClearColor(1.0f, 0.0f, 0.0f, 0.5f);
-			glClear(GL_COLOR_BUFFER_BIT);
-
-			continue;
 			glClearColor(1.0f, 0.0f, 0.0f, 0.5f);
 			glClear(GL_COLOR_BUFFER_BIT);
 			qglBindTexture(GL_TEXTURE_2D, ovr.RenderTargetTexture[i]);
@@ -268,24 +248,6 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 		}
 
 		RB_SetDefaultGLState();
-
-		// Execute all the commands for each eyes
-
-
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ovr.Framebuffer);
-		glBindRenderbuffer(GL_RENDERBUFFER, ovr.rbo);
-		glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, ovr.GetRenderWidth(), ovr.GetRenderHeight());
-
-		glFramebufferRenderbuffer(
-			GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, ovr.rbo
-			);
-
-		glClearColor(1.0f, 0.0f, 0.0f, 0.5f);
-		glClear(GL_COLOR_BUFFER_BIT);
-		glClear(GL_DEPTH_BUFFER_BIT);
-
-		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ovr.RenderTargetTexture[i], 0);
-
 
 		for (const emptyCommand_t * cmds = allCmds; cmds != NULL; cmds = (const emptyCommand_t *)cmds->next)
 		{
@@ -324,14 +286,14 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 				break;
 			}
 			case RC_SET_BUFFER:
-				//RB_SetBuffer(cmds);
+				RB_SetBuffer(cmds, i);
 				break;
 			case RC_SWAP_BUFFERS:
 				// Ignore this. The Oculus SDK handle that
 				//RB_SwapBuffers( cmds );
 				break;
 			case RC_COPY_RENDER:
-				//RB_CopyRender(cmds);
+				RB_CopyRender(cmds);
 				break;
 			default:
 				common->Error("RB_ExecuteBackEndCommands: bad commandId");
@@ -346,14 +308,13 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 			glScissor((renderSystem->GetScreenWidth() / 2) - 2, (renderSystem->GetScreenHeight() / 2) - 2, 4, 2);
 			glClearColor(1.0f, 0.0f, 0.0f, 0.5f);
 			glClear(GL_COLOR_BUFFER_BIT);
-			glScissor(0, 0, renderSystem->GetScreenWidth(), renderSystem->GetScreenHeight());
 		}
 	
 		// Copy frame
 		
 		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glDeleteFramebuffers(1, &ovr.Framebuffer);
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//glDeleteFramebuffers(1, &ovr.Framebuffer);
 
 		//glBindFramebuffer(GL_FRAMEBUFFER, ovr.Framebuffer);
 		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ovr.RenderTargetTexture[i], 0);

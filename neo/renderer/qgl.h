@@ -35,6 +35,10 @@ If you have questions concerning this license or the applicable additional terms
 #if defined( _WIN32 )
 
 #include <gl/gl.h>
+// OCULUS BEGIN
+// Use updated glext
+#include "../extern/glext/GL/glext.h"
+// OCULUS END
 
 #elif defined( MACOS_X )
 
@@ -70,7 +74,7 @@ If you have questions concerning this license or the applicable additional terms
 
 // OCULUS BEGIN
 // Use updated glext
-#include "../extern/glext/GL/glext.h"
+// #include "../extern/glext/GL/glext.h"
 // OCULUS END
 
 #endif
