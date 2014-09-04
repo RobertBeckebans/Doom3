@@ -559,6 +559,9 @@
       <Project>{f46f5d4e-c1d4-4ade-9faa-5f0ce3aa07f1}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
+    <ProjectReference Include="extern\OculusSDK\LibOVR\Projects\Win32\VS2013\LibOVR.vcxproj">
+      <Project>{ea50e705-5113-49e5-b105-2512edc8ddc6}</Project>
+    </ProjectReference>
     <ProjectReference Include="idlib.vcxproj">
       <Project>{49bec5c6-b964-417a-851e-808886b57400}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
