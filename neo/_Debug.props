@@ -19,7 +19,7 @@
       <IgnoreSpecificDefaultLibraries>nafxcwd.lib;libcmtd.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <GenerateMapFile>true</GenerateMapFile>
-      <AdditionalLibraryDirectories>.\OculusSDK\LibOVR\Lib\Win32\VS2013;C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\atlmfc\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>.\extern\OculusSDK\LibOVR\Lib\Win32\VS2013;C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\atlmfc\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
 </Project>
