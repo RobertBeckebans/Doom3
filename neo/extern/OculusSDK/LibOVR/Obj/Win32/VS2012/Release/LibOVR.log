@@ -1,0 +1,179 @@
+﻿Build started 19/08/2014 1:29:37 PM.
+     1>Project "E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Projects\Win32\VS2012\LibOVR.vcxproj" on node 4 (Build target(s)).
+     1>CustomBuild:
+         Performing Custom Build Tools
+         Compiling shader and packing into header: E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\DistortionChroma_ps.psh
+         compilation object save succeeded; see E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\DistortionChroma_ps
+         Generating shader reflection data for DistortionChroma_ps
+         Successfully serialized shader reflection info: DistortionChroma_ps_refl.h
+         Performing Custom Build Tools
+         Compiling shader and packing into header: E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\DistortionChroma_vs.vsh
+         compilation object save succeeded; see E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\DistortionChroma_vs
+         Generating shader reflection data for DistortionChroma_vs
+         Successfully serialized shader reflection info: DistortionChroma_vs_refl.h
+         Performing Custom Build Tools
+         Compiling shader and packing into header: E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\DistortionTimewarpChroma_vs.vsh
+         compilation object save succeeded; see E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\DistortionTimewarpChroma_vs
+         Generating shader reflection data for DistortionTimewarpChroma_vs
+         Successfully serialized shader reflection info: DistortionTimewarpChroma_vs_refl.h
+         Performing Custom Build Tools
+         Compiling shader and packing into header: E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\DistortionTimewarp_vs.vsh
+         compilation object save succeeded; see E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\DistortionTimewarp_vs
+         Generating shader reflection data for DistortionTimewarp_vs
+         Successfully serialized shader reflection info: DistortionTimewarp_vs_refl.h
+         Performing Custom Build Tools
+         Compiling shader and packing into header: E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\Distortion_ps.psh
+         compilation object save succeeded; see E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\Distortion_ps
+         Generating shader reflection data for Distortion_ps
+         Did not get a constant buffer from shader: Distortion_psPerforming Custom Build Tools
+         Compiling shader and packing into header: E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\Distortion_vs.vsh
+         compilation object save succeeded; see E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\Distortion_vs
+         Generating shader reflection data for Distortion_vs
+         Successfully serialized shader reflection info: Distortion_vs_refl.h
+         Performing Custom Build Tools
+         Compiling shader and packing into header: E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\SimpleQuad_ps.psh
+         compilation object save succeeded; see E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\SimpleQuad_ps
+         Generating shader reflection data for SimpleQuad_ps
+         Successfully serialized shader reflection info: SimpleQuad_ps_refl.h
+         Performing Custom Build Tools
+         Compiling shader and packing into header: E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\SimpleQuad_vs.vsh
+         compilation object save succeeded; see E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\SimpleQuad_vs
+         Generating shader reflection data for SimpleQuad_vs
+         Successfully serialized shader reflection info: SimpleQuad_vs_refl.h
+         Performing Custom Build Tools
+         Compiling shader and packing into header: E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\SimpleTexturedQuad_ps.psh
+         compilation object save succeeded; see E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\SimpleTexturedQuad_ps
+         Generating shader reflection data for SimpleTexturedQuad_ps
+         Successfully serialized shader reflection info: SimpleTexturedQuad_ps_refl.h
+         Performing Custom Build Tools
+         Compiling shader and packing into header: E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\SimpleTexturedQuad_vs.vsh
+         compilation object save succeeded; see E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Src\CAPI\Shaders\SimpleTexturedQuad_vs
+         Generating shader reflection data for SimpleTexturedQuad_vs
+         Successfully serialized shader reflection info: SimpleTexturedQuad_vs_refl.h
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\CL.exe /c /I../../../../3rdParty/glext/ /Z7 /nologo /W4 /WX- /MP /O2 /Oi /Oy- /D WIN32 /D NDEBUG /D _LIB /D _UNICODE /D UNICODE /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Fo"../../../Obj/Win32/VS2012/Release/" /Fd"../../../Obj/Win32/VS2012/Release/vc110.pdb" /Gd /TP /analyze- /Zl /errorReport:prompt /d2Zi+ ..\..\..\Src\CAPI\CAPI_DistortionRenderer.cpp ..\..\..\Src\CAPI\CAPI_FrameTimeManager.cpp ..\..\..\Src\CAPI\CAPI_HMDRenderState.cpp ..\..\..\Src\CAPI\CAPI_HMDState.cpp ..\..\..\Src\CAPI\CAPI_HSWDisplay.cpp ..\..\..\Src\CAPI\D3D1X\CAPI_D3D10_DistortionRenderer.cpp ..\..\..\Src\CAPI\D3D1X\CAPI_D3D10_HSWDisplay.cpp ..\..\..\Src\CAPI\D3D1X\CAPI_D3D11_DistortionRenderer.cpp ..\..\..\Src\CAPI\D3D1X\CAPI_D3D11_HSWDisplay.cpp ..\..\..\Src\CAPI\D3D1X\CAPI_D3D9_DistortionRenderer.cpp ..\..\..\Src\CAPI\D3D1X\CAPI_D3D9_HSWDisplay.cpp ..\..\..\Src\CAPI\D3D1X\CAPI_D3D9_Util.cpp ..\..\..\Src\CAPI\GL\CAPI_GL_DistortionRenderer.cpp ..\..\..\Src\CAPI\GL\CAPI_GL_HSWDisplay.cpp ..\..\..\Src\CAPI\GL\CAPI_GL_Util.cpp ..\..\..\Src\Displays\OVR_Win32_Display.cpp ..\..\..\Src\Displays\OVR_Win32_FocusReader.cpp ..\..\..\Src\Displays\OVR_Win32_RenderShim.cpp ..\..\..\Src\Displays\OVR_Win32_ShimFunctions.cpp ..\..\..\Src\Kernel\OVR_Alg.cpp ..\..\..\Src\Kernel\OVR_Allocator.cpp ..\..\..\Src\Kernel\OVR_Atomic.cpp ..\..\..\Src\Kernel\OVR_CRC32.cpp ..\..\..\Src\Kernel\OVR_File.cpp ..\..\..\Src\Kernel\OVR_FileFILE.cpp ..\..\..\Src\Kernel\OVR_Lockless.cpp ..\..\..\Src\Kernel\OVR_Log.cpp ..\..\..\Src\Kernel\OVR_Math.cpp ..\..\..\Src\Kernel\OVR_RefCount.cpp ..\..\..\Src\Kernel\OVR_SharedMemory.cpp ..\..\..\Src\Kernel\OVR_Std.cpp ..\..\..\Src\Kernel\OVR_String.cpp ..\..\..\Src\Kernel\OVR_String_FormatUtil.cpp ..\..\..\Src\Kernel\OVR_String_PathUtil.cpp ..\..\..\Src\Kernel\OVR_SysFile.cpp ..\..\..\Src\Kernel\OVR_System.cpp ..\..\..\Src\Kernel\OVR_ThreadCommandQueue.cpp ..\..\..\Src\Kernel\OVR_ThreadsWinAPI.cpp ..\..\..\Src\Kernel\OVR_Timer.cpp ..\..\..\Src\Kernel\OVR_UTF8Util.cpp ..\..\..\Src\Net\OVR_BitStream.cpp ..\..\..\Src\Net\OVR_NetworkPlugin.cpp ..\..\..\Src\Net\OVR_PacketizedTCPSocket.cpp ..\..\..\Src\Net\OVR_RPC1.cpp ..\..\..\Src\Net\OVR_Session.cpp ..\..\..\Src\Net\OVR_Socket.cpp ..\..\..\Src\Net\OVR_Win32_Socket.cpp ..\..\..\Src\OVR_CAPI.cpp ..\..\..\Src\OVR_JSON.cpp ..\..\..\Src\OVR_Profile.cpp ..\..\..\Src\OVR_SerialFormat.cpp ..\..\..\Src\OVR_Stereo.cpp ..\..\..\Src\Service\Service_NetClient.cpp ..\..\..\Src\Service\Service_NetSessionCommon.cpp ..\..\..\Src\Tracking\Tracking_SensorStateReader.cpp ..\..\..\Src\Util\Util_ImageWindow.cpp ..\..\..\Src\Util\Util_Interface.cpp ..\..\..\Src\Util\Util_LatencyTest2Reader.cpp ..\..\..\Src\Util\Util_Render_Stereo.cpp
+         CAPI_DistortionRenderer.cpp
+         CAPI_FrameTimeManager.cpp
+         CAPI_HMDRenderState.cpp
+         CAPI_HMDState.cpp
+         CAPI_HSWDisplay.cpp
+         CAPI_D3D10_DistortionRenderer.cpp
+         CAPI_D3D10_HSWDisplay.cpp
+         CAPI_D3D11_DistortionRenderer.cpp
+         CAPI_D3D11_HSWDisplay.cpp
+         CAPI_D3D9_DistortionRenderer.cpp
+         CAPI_D3D9_HSWDisplay.cpp
+         CAPI_D3D9_Util.cpp
+         CAPI_GL_DistortionRenderer.cpp
+         CAPI_GL_HSWDisplay.cpp
+         CAPI_GL_Util.cpp
+         OVR_Win32_Display.cpp
+         OVR_Win32_FocusReader.cpp
+         OVR_Win32_RenderShim.cpp
+         OVR_Win32_ShimFunctions.cpp
+         OVR_Alg.cpp
+         OVR_Allocator.cpp
+         OVR_Atomic.cpp
+         OVR_CRC32.cpp
+         OVR_File.cpp
+         OVR_FileFILE.cpp
+         OVR_Lockless.cpp
+         OVR_Log.cpp
+         OVR_Math.cpp
+         OVR_RefCount.cpp
+         OVR_SharedMemory.cpp
+         OVR_Std.cpp
+         OVR_String.cpp
+         OVR_String_FormatUtil.cpp
+         OVR_String_PathUtil.cpp
+         OVR_SysFile.cpp
+         OVR_System.cpp
+         OVR_ThreadCommandQueue.cpp
+         OVR_ThreadsWinAPI.cpp
+         OVR_Timer.cpp
+         OVR_UTF8Util.cpp
+         OVR_BitStream.cpp
+         OVR_NetworkPlugin.cpp
+         OVR_PacketizedTCPSocket.cpp
+         OVR_RPC1.cpp
+         OVR_Session.cpp
+         OVR_Socket.cpp
+         OVR_Win32_Socket.cpp
+         OVR_CAPI.cpp
+         OVR_JSON.cpp
+         OVR_Profile.cpp
+         OVR_SerialFormat.cpp
+         OVR_Stereo.cpp
+         Service_NetClient.cpp
+         Service_NetSessionCommon.cpp
+         Tracking_SensorStateReader.cpp
+         Util_ImageWindow.cpp
+         Util_Interface.cpp
+         Util_LatencyTest2Reader.cpp
+         Util_Render_Stereo.cpp
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 11.0\VC\bin\Lib.exe /OUT:"../../../Lib/Win32/VS2012/libovr.lib" Setupapi.lib /NOLOGO /LTCG ../../../Obj/Win32/VS2012/Release/CAPI_DistortionRenderer.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_FrameTimeManager.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_HMDRenderState.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_HMDState.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_HSWDisplay.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_D3D10_DistortionRenderer.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_D3D10_HSWDisplay.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_D3D11_DistortionRenderer.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_D3D11_HSWDisplay.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_D3D9_DistortionRenderer.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_D3D9_HSWDisplay.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_D3D9_Util.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_GL_DistortionRenderer.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_GL_HSWDisplay.obj
+         ../../../Obj/Win32/VS2012/Release/CAPI_GL_Util.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Win32_Display.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Win32_FocusReader.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Win32_RenderShim.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Win32_ShimFunctions.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Alg.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Allocator.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Atomic.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_CRC32.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_File.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_FileFILE.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Lockless.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Log.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Math.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_RefCount.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_SharedMemory.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Std.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_String.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_String_FormatUtil.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_String_PathUtil.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_SysFile.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_System.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_ThreadCommandQueue.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_ThreadsWinAPI.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Timer.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_UTF8Util.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_BitStream.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_NetworkPlugin.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_PacketizedTCPSocket.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_RPC1.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Session.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Socket.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Win32_Socket.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_CAPI.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_JSON.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Profile.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_SerialFormat.obj
+         ../../../Obj/Win32/VS2012/Release/OVR_Stereo.obj
+         ../../../Obj/Win32/VS2012/Release/Service_NetClient.obj
+         ../../../Obj/Win32/VS2012/Release/Service_NetSessionCommon.obj
+         ../../../Obj/Win32/VS2012/Release/Tracking_SensorStateReader.obj
+         ../../../Obj/Win32/VS2012/Release/Util_ImageWindow.obj
+         ../../../Obj/Win32/VS2012/Release/Util_Interface.obj
+         ../../../Obj/Win32/VS2012/Release/Util_LatencyTest2Reader.obj
+         ../../../Obj/Win32/VS2012/Release/Util_Render_Stereo.obj
+         LibOVR.vcxproj -> E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Projects\Win32\VS2012\../../../Lib/Win32/VS2012/libovr.lib
+     1>Done Building Project "E:\Dev\Bazaar\Doom3\trunk\neo\OculusSDK\LibOVR\Projects\Win32\VS2012\LibOVR.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:04.09
