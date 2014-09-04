@@ -37,7 +37,7 @@ If you have questions concerning this license or the applicable additional terms
 #include <GL/GL.h>
 
 #undef strncmp
-#include "../OculusSDK/LibOVR/Src/OVR_CAPI.h"
+#include "../extern/OculusSDK/LibOVR/Src/OVR_CAPI.h"
 
 typedef struct ovrvidmode_t
 {
@@ -63,8 +63,9 @@ public:
 
 	bool				isDebughmd;
 	int					multiSamples;
-	
-	GLuint				RenderTargetTexture[3];
+
+	GLuint				Framebuffer;
+	GLuint				RenderTargetTexture[2];
 	ovrTexture			EyeTexture[2];
 	ovrEyeRenderDesc	EyeRenderDesc[2];
 

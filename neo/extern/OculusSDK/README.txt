@@ -1,1 +1,1 @@
-Oculus SDK go here
+Place the Oculus Rift SDK files here

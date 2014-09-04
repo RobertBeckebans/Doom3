@@ -68,7 +68,10 @@ If you have questions concerning this license or the applicable additional terms
 // http://oss.sgi.com/projects/ogl-sample/ABI/
 #ifndef GL_GLEXT_VERSION
 
-#include "glext.h"
+// OCULUS BEGIN
+// Use updated glext
+#include "../extern/glext/GL/glext.h"
+// OCULUS END
 
 #endif
 
@@ -103,6 +106,14 @@ extern PFNGLUNMAPBUFFERARBPROC qglUnmapBufferARB;
 extern PFNGLGETBUFFERPARAMETERIVARBPROC qglGetBufferParameterivARB;
 extern PFNGLGETBUFFERPOINTERVARBPROC qglGetBufferPointervARB;
 
+// OCULUS BEGIN
+extern PFNGLGENFRAMEBUFFERSPROC				glGenFramebuffers;
+extern PFNGLDELETEFRAMEBUFFERSPROC			glDeleteFramebuffers;
+extern PFNGLCHECKFRAMEBUFFERSTATUSPROC		glCheckFramebufferStatus;
+extern PFNGLFRAMEBUFFERRENDERBUFFERPROC		glFramebufferRenderbuffer;
+extern PFNGLFRAMEBUFFERTEXTURE2DPROC		glFramebufferTexture2D;
+extern PFNGLBINDFRAMEBUFFEREXTPROC			glBindFramebuffer;
+// OCULUS END
 
 // NV_register_combiners
 extern	void ( APIENTRY *qglCombinerParameterfvNV )( GLenum pname, const GLfloat *params );

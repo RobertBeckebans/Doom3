@@ -115,7 +115,6 @@
     <ClInclude Include="Oculus\InputDevices.h" />
     <ClInclude Include="Oculus\Oculus.h" />
     <ClInclude Include="renderer\Cinematic.h" />
-    <ClInclude Include="renderer\glext.h" />
     <ClInclude Include="renderer\GuiModel.h" />
     <ClInclude Include="renderer\Image.h" />
     <ClInclude Include="renderer\Interaction.h" />
@@ -138,7 +137,6 @@
     <ClInclude Include="renderer\simplex.h" />
     <ClInclude Include="renderer\tr_local.h" />
     <ClInclude Include="renderer\VertexCache.h" />
-    <ClInclude Include="renderer\wglext.h" />
     <ClInclude Include="renderer\jpeg-6\jchuff.h" />
     <ClInclude Include="renderer\jpeg-6\jconfig.h" />
     <ClInclude Include="renderer\jpeg-6\jdct.h" />

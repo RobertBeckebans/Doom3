@@ -41,7 +41,7 @@ base/
 d3xp/
 hd/
 perfected/
-neo/OculusSDK/
+neo/extern/
 sikkmod/
 
 *.opensdf
