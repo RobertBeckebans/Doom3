@@ -44,7 +44,6 @@
     <Import Project="_Common.props" />
     <Import Project="_DoomDLL.props" />
     <Import Project="_Release.props" />
-    <Import Project="_OculusVR.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />

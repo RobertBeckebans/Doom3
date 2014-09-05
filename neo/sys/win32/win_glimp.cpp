@@ -500,7 +500,7 @@ static bool GLW_InitDriver( glimpParms_t parms )
 #ifdef ENABLE_OCULUS_HMD
 	if (vr_enableOculusRiftRendering.GetBool())
 	{
-		ovr.InitRenderTarget();
+		ovr.InitRendering();
 		ovrHmd_DismissHSWDisplay(ovr.Hmd);
 	}
 #endif
@@ -722,8 +722,8 @@ static bool GLW_CreateOculusWindow(glimpParms_t parms)
 	exstyle = 0;
 	AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
 
-	w = ovr.Resolution.width;
-	h = ovr.Resolution.height;
+	w = ovr.Hmd->Resolution.w;
+	h = ovr.Hmd->Resolution.h;
 
 	x = ovr.Hmd->WindowsPos.x;
 	y = ovr.Hmd->WindowsPos.y;

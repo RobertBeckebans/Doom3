@@ -7,7 +7,7 @@
 
 	This file has been generated with the Type Info Generator v1.0 (c) 2004 id Software
 
-	1167 constants
+	1168 constants
 	129 enums
 	530 classes/structs/unions
 	36 templates
@@ -339,6 +339,7 @@ static constantInfo_t constantInfo[] = {
 	{ "int", "ovrDistortionCap_FlipInput", "32" },
 	{ "int", "ovrDistortionCap_SRGB", "64" },
 	{ "int", "ovrDistortionCap_Overdrive", "128" },
+	{ "int", "ovrDistortionCap_HqDistortion", "256" },
 	{ "int", "ovrDistortionCap_ProfileNoTimewarpSpinWaits", "65536" },
 	{ "int", "ovrEye_Left", "0" },
 	{ "int", "ovrEye_Right", "1" },
@@ -1573,6 +1574,7 @@ static enumValueInfo_t ovrDistortionCaps_typeInfo[] = {
 	{ "ovrDistortionCap_FlipInput", 32 },
 	{ "ovrDistortionCap_SRGB", 64 },
 	{ "ovrDistortionCap_Overdrive", 128 },
+	{ "ovrDistortionCap_HqDistortion", 256 },
 	{ "ovrDistortionCap_ProfileNoTimewarpSpinWaits", 65536 },
 	{ NULL, 0 }
 };
@@ -3997,6 +3999,7 @@ static classVariableInfo_t ovrTrackingState_typeInfo[] = {
 	{ "ovrPosef", "LeveledCameraPose", (int)(&((ovrTrackingState *)0)->LeveledCameraPose), sizeof( ((ovrTrackingState *)0)->LeveledCameraPose ) },
 	{ "ovrSensorData", "RawSensorData", (int)(&((ovrTrackingState *)0)->RawSensorData), sizeof( ((ovrTrackingState *)0)->RawSensorData ) },
 	{ "unsigned int", "StatusFlags", (int)(&((ovrTrackingState *)0)->StatusFlags), sizeof( ((ovrTrackingState *)0)->StatusFlags ) },
+	{ "double", "LastVisionProcessingTime", (int)(&((ovrTrackingState *)0)->LastVisionProcessingTime), sizeof( ((ovrTrackingState *)0)->LastVisionProcessingTime ) },
 	{ NULL, 0 }
 };
 
@@ -4055,15 +4058,13 @@ static classVariableInfo_t ovrvidmode_t_typeInfo[] = {
 static classVariableInfo_t OculusHmd_typeInfo[] = {
 	{ "bool", "isDebughmd", (int)(&((OculusHmd *)0)->isDebughmd), sizeof( ((OculusHmd *)0)->isDebughmd ) },
 	{ "int", "multiSamples", (int)(&((OculusHmd *)0)->multiSamples), sizeof( ((OculusHmd *)0)->multiSamples ) },
-	{ "GLuint", "Framebuffer", (int)(&((OculusHmd *)0)->Framebuffer), sizeof( ((OculusHmd *)0)->Framebuffer ) },
-	{ "GLuint", "rbo", (int)(&((OculusHmd *)0)->rbo), sizeof( ((OculusHmd *)0)->rbo ) },
-	{ "GLuint[2]", "RenderTargetTexture", (int)(&((OculusHmd *)0)->RenderTargetTexture), sizeof( ((OculusHmd *)0)->RenderTargetTexture ) },
-	{ "ovrTexture[2]", "EyeTexture", (int)(&((OculusHmd *)0)->EyeTexture), sizeof( ((OculusHmd *)0)->EyeTexture ) },
-	{ "ovrEyeRenderDesc[2]", "EyeRenderDesc", (int)(&((OculusHmd *)0)->EyeRenderDesc), sizeof( ((OculusHmd *)0)->EyeRenderDesc ) },
-	{ "ovrvidmode_t", "Resolution", (int)(&((OculusHmd *)0)->Resolution), sizeof( ((OculusHmd *)0)->Resolution ) },
-	{ "ovrFovPort[2]", "eyeFov", (int)(&((OculusHmd *)0)->eyeFov), sizeof( ((OculusHmd *)0)->eyeFov ) },
-	{ "int", "RenderWidth", (int)(&((OculusHmd *)0)->RenderWidth), sizeof( ((OculusHmd *)0)->RenderWidth ) },
-	{ "int", "RenderHeight", (int)(&((OculusHmd *)0)->RenderHeight), sizeof( ((OculusHmd *)0)->RenderHeight ) },
+	{ "GLuint", "G_GLFrameBuffer", (int)(&((OculusHmd *)0)->G_GLFrameBuffer), sizeof( ((OculusHmd *)0)->G_GLFrameBuffer ) },
+	{ "GLuint", "G_GLDepthBuffer", (int)(&((OculusHmd *)0)->G_GLDepthBuffer), sizeof( ((OculusHmd *)0)->G_GLDepthBuffer ) },
+	{ "ovrTexture[2]", "G_OvrTextures", (int)(&((OculusHmd *)0)->G_OvrTextures), sizeof( ((OculusHmd *)0)->G_OvrTextures ) },
+	{ "ovrFovPort[2]", "G_ovrEyeFov", (int)(&((OculusHmd *)0)->G_ovrEyeFov), sizeof( ((OculusHmd *)0)->G_ovrEyeFov ) },
+	{ "ovrEyeRenderDesc[2]", "G_ovrEyeRenderDesc", (int)(&((OculusHmd *)0)->G_ovrEyeRenderDesc), sizeof( ((OculusHmd *)0)->G_ovrEyeRenderDesc ) },
+	{ "int", "G_ovrRenderWidth", (int)(&((OculusHmd *)0)->G_ovrRenderWidth), sizeof( ((OculusHmd *)0)->G_ovrRenderWidth ) },
+	{ "int", "G_ovrRenderHeight", (int)(&((OculusHmd *)0)->G_ovrRenderHeight), sizeof( ((OculusHmd *)0)->G_ovrRenderHeight ) },
 	{ NULL, 0 }
 };
 

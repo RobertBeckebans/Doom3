@@ -52,35 +52,41 @@ public:
 	OculusHmd();
 	~OculusHmd();
 
-	bool				Init();
+	int					Init();
 	void				Shutdown();
 
 	idVec3				GetHeadTrackingOrientation();
 	idVec3				GetHeadTrackingPosition();
 
-	bool				InitDriver();
-	bool				InitRenderTarget();
+	int					InitRendering();
 
 	bool				isDebughmd;
 	int					multiSamples;
 
-	GLuint				Framebuffer;
-	GLuint				rbo;
-	GLuint				RenderTargetTexture[2];
-	ovrTexture			EyeTexture[2];
-	ovrEyeRenderDesc	EyeRenderDesc[2];
+	int					GLSetupFrameBuffer();
+	GLuint				G_GLFrameBuffer;
+	GLuint				G_GLDepthBuffer;
+	ovrTexture			G_OvrTextures[2];
 
-	ovrvidmode_t		Resolution;
 	ovrHmd				Hmd = 0;
-	ovrFovPort			eyeFov[2];
+	ovrFovPort			G_ovrEyeFov[2];
 
-	int					GetRenderWidth();
-	int					GetRenderHeight();
-	idVec3				GetViewAdjustVector(int eye);
+	int					SetupView();
+	int					GetRenderWidth()	{ return G_ovrRenderWidth; }
+	int					GetRenderHeight()	{ return G_ovrRenderHeight; }
+	idVec3				GetViewAdjustVector(int id);
+	
+	int					FuncUpdateFrameBuffer(int idx);
 
 private:
-	int					RenderWidth;
-	int					RenderHeight;
+	ovrEyeRenderDesc	G_ovrEyeRenderDesc[2];
+	ovrTexture			FuncGenOvrTexture(int w, int h);
+	int					InitHmdPositionTracking();
+	int					G_ovrRenderWidth;
+	int					G_ovrRenderHeight;
+	GLuint				FuncGenGLTexture(int w, int h);
+	void				GLInitExtensions();
+	void*				GLGetProcAddress(const char* func) { return wglGetProcAddress(func); }
 };
 
 extern OculusHmd ovr;

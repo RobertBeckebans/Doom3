@@ -39,12 +39,18 @@ If you have questions concerning this license or the applicable additional terms
 
 using namespace OVR;
 
-/*
-====================
-OvrSystemLocal
+#define OVR2IDUNITS 2.5f
+#define PIXELDENSITY 1.0f
+#define DEBUGHMDTYPE ovrHmd_DK2
 
-====================
-*/
+// VR setting cvar definitions
+idCVar vr_enableOculusRiftRendering("vr_enableOculusRiftRendering", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable Oculus Rift SDK rendering path");
+idCVar vr_enableOculusRiftTracking("vr_enableOculusRiftTracking", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable Oculus Rift SDK head motion tracking");
+idCVar vr_enableLowPersistence("vr_enableLowPersistence", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable Oculus Rift low persistence display");
+idCVar vr_enableDynamicPrediction("vr_enableDynamicPrediction", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable Oculus Rift dynamic prediction");
+idCVar vr_enableVsync("vr_enableVsync", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable vsync");
+idCVar vr_enableMirror("vr_enableMirror", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable mirror to window mode");
+idCVar vr_enablezeroipd("vr_enablezeroipd", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Disable depth rendering");
 
 OculusHmd::OculusHmd()
 {
@@ -53,8 +59,9 @@ OculusHmd::OculusHmd()
 
 OculusHmd::~OculusHmd()
 {
-	Hmd = NULL;
+	this->Shutdown();
 }
+
 /*
 ====================
 OvrSystemLocal::Init
@@ -62,54 +69,80 @@ OvrSystemLocal::Init
 Init Oculus Rift HMD, get HMD properties and start head tracking
 ====================
 */
-bool OculusHmd::Init()
+int OculusHmd::Init()
 {
-	// Init the SDK
+	// Initialize the Oculus VR library
 	ovr_Initialize();
 
-	// Create Hmd device
-	Hmd = ovrHmd_Create(0);
-
-	// Check if we have real hardware or else create a debug HMD for testing
-	if (!Hmd)
-	{
-		Hmd = ovrHmd_CreateDebug(ovrHmd_DK1);
-		isDebughmd = true;
-
-		if (!Hmd)
+	if (!(Hmd = ovrHmd_Create(0))) {
+		common->Printf("Oculus HMD not found. Fall back to debug device.\n");
+		if (!(Hmd = ovrHmd_CreateDebug(DEBUGHMDTYPE))) {
+			isDebughmd = true;
+			Sys_Error("Error during debug HMD initialization");
 			return false;
+		}
 	}
 
-	// Set HMD Resolution description, this is the Hmd screen resolution
+	common->Printf("--- OVR Initialization Complete ---\n");
+	common->Printf("Device: %s - %s\n", Hmd->Manufacturer, Hmd->ProductName);
 
-	Resolution.description = "Oculus VR HMD";
-	Resolution.width = Hmd->Resolution.w;
-	Resolution.height = Hmd->Resolution.h;
-
-	ovrHmd_SetEnabledCaps(Hmd, ovrHmdCap_LowPersistence | ovrHmdCap_DynamicPrediction);	
-	ovrHmd_ConfigureTracking(Hmd, ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0);
-
-	float FovSideTanLimit = FovPort::Max(Hmd->MaxEyeFov[0], Hmd->MaxEyeFov[1]).GetMaxSideTan();
-	float FovSideTanMax = FovPort::Max(Hmd->DefaultEyeFov[0], Hmd->DefaultEyeFov[1]).GetMaxSideTan();
-
-	eyeFov[0] = Hmd->DefaultEyeFov[0];
-	eyeFov[1] = Hmd->DefaultEyeFov[1];
+	// Set Hardware caps.
+	unsigned hmdCaps;
 	
-	eyeFov[0] = OVR::FovPort::Min(eyeFov[0], FovPort(FovSideTanMax));
-	eyeFov[1] = OVR::FovPort::Min(eyeFov[1], FovPort(FovSideTanMax));
-
-	//Configure Stereo settings.
-	Sizei recommenedTex0Size = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Left, Hmd->DefaultEyeFov[0], 1.0f);
-	Sizei recommenedTex1Size = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Right, Hmd->DefaultEyeFov[1], 1.0f);
+	if (!vr_enableVsync.GetBool())
+	{
+		hmdCaps |= ovrHmdCap_NoVSync;
+		common->Printf("VSync: Disabled\n");
+	}
 	
-	//RenderWidth = Hmd->Resolution.w;
-	//RenderHeight = Hmd->Resolution.h;
+	if (vr_enableLowPersistence.GetBool())
+	{
+		hmdCaps |= ovrHmdCap_LowPersistence;
+		common->Printf("Low Persistence mode: Enabled\n");
+	}
+	
+	if (vr_enableDynamicPrediction.GetBool())
+	{
+		hmdCaps |= ovrHmdCap_DynamicPrediction;
+		common->Printf("Dynamic Prediction: Enabled\n");
+	}
 
-	RenderWidth = (recommenedTex0Size.w>recommenedTex1Size.w ? recommenedTex0Size.w : recommenedTex1Size.w);
-	RenderHeight = (recommenedTex0Size.h>recommenedTex1Size.h ? recommenedTex0Size.h : recommenedTex1Size.h);
+	if (!vr_enableMirror.GetBool())
+	{
+		hmdCaps |= ovrHmdCap_NoMirrorToWindow;
+		common->Printf("Mirror mode: Disabled\n");
+	}
 
-	return true;
+	// Do something if we are in extended mode
+	if ((Hmd->HmdCaps & ovrHmdCap_ExtendDesktop))
+	{
+		common->Printf("HMD Device in Extended display mode\n");
+	}
+
+	ovrHmd_SetEnabledCaps(Hmd, hmdCaps);
+
+	// Enable position and rotation tracking
+	if (vr_enableOculusRiftTracking.GetBool())
+	{
+		if (!InitHmdPositionTracking())
+			Sys_Error("Error during HMD head tracking initialization");
+	}
+
+	return 1;
 };
+
+int OculusHmd::InitRendering()
+{
+	GLInitExtensions();
+
+	if (!SetupView())
+	{
+		Sys_Error("Error during HMD rendereing initialization");
+		return 0;
+	}
+
+	return 1;
+}
 
 /*
 ====================
@@ -194,29 +227,11 @@ Create opengl texture
 =======================
 */
 
-static GLuint CreateTexture(int width, int height)
+GLuint OculusHmd::FuncGenGLTexture(int width, int height)
 {
-	/*
-	GLuint texid;
-	unsigned int* texdata;
-	const unsigned int size = (width * height) * 4;
-
-	texdata = (unsigned int*)new GLuint[(size * sizeof(unsigned int))];
-	ZeroMemory(texdata, size * sizeof(unsigned int));
-
-	glGenTextures(1, &texid);
-	glBindTexture(GL_TEXTURE_2D, texid);
-	glTexImage2D(GL_TEXTURE_2D, 0, 4, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texdata);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	delete[] texdata;
-	return texid;
-	*/
-	GLuint i;
-	glGenTextures(1, &i);
-	glBindTexture(GL_TEXTURE_2D, i);
+	GLuint _texture;
+	glGenTextures(1, &_texture);
+	glBindTexture(GL_TEXTURE_2D, _texture);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -224,7 +239,7 @@ static GLuint CreateTexture(int width, int height)
 	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	return i;
+	return _texture;
 }
 
 /*
@@ -234,7 +249,7 @@ CreateOculusTexture
 Generate an ovrTexture with our opengl texture
 =======================
 */
-static ovrTexture CreateOculusTexture(GLuint id, int width, int height)
+ovrTexture OculusHmd::FuncGenOvrTexture(int width, int height)
 {
 	ovrTexture tex;
 
@@ -245,15 +260,19 @@ static ovrTexture CreateOculusTexture(GLuint id, int width, int height)
 	texData->Header.API = ovrRenderAPI_OpenGL;
 	texData->Header.TextureSize = newRTSize;
 	texData->Header.RenderViewport = Recti(newRTSize);
-	texData->TexId = id;
+	texData->TexId = FuncGenGLTexture(width, height);
 
 	return tex;
 }
 
-void* GetFunction(const char* functionName)
-{
-	return wglGetProcAddress(functionName);
-}
+
+/*
+======================
+GLInitExtensions
+
+Init OpenGL extentions that are required by Doom3 OCulus Rift port and not the original code.
+======================
+*/
 
 PFNGLGENFRAMEBUFFERSPROC				glGenFramebuffers;
 PFNGLDELETEFRAMEBUFFERSPROC				glDeleteFramebuffers;
@@ -264,90 +283,23 @@ PFNGLBINDFRAMEBUFFERPROC				glBindFramebuffer;
 PFNGLGENRENDERBUFFERSPROC				glGenRenderBuffers;
 PFNGLBINDRENDERBUFFERPROC				glBindRenderbuffer;
 PFNGLRENDERBUFFERSTORAGEEXTPROC			glRenderbufferStorage;
+//PFNGLDELETERENDERBUFFERSPROC			glDeleteRenderbuffers;
 
-void InitGLExtensions()
+void OculusHmd::GLInitExtensions()
 {
 	if (glGenFramebuffers)
 		return;
 
-	glGenFramebuffers = (PFNGLGENFRAMEBUFFERSPROC)GetFunction("glGenFramebuffersEXT");
-	glDeleteFramebuffers = (PFNGLDELETEFRAMEBUFFERSPROC)GetFunction("glDeleteFramebuffersEXT");
-	glCheckFramebufferStatus = (PFNGLCHECKFRAMEBUFFERSTATUSPROC)GetFunction("glCheckFramebufferStatusEXT");
-	glFramebufferRenderbuffer = (PFNGLFRAMEBUFFERRENDERBUFFERPROC)GetFunction("glFramebufferRenderbufferEXT");
-	glFramebufferTexture2D = (PFNGLFRAMEBUFFERTEXTURE2DPROC)GetFunction("glFramebufferTexture2DEXT");
-	glBindFramebuffer = (PFNGLBINDFRAMEBUFFERPROC)GetFunction("glBindFramebufferEXT");
-	glGenRenderBuffers = (PFNGLGENRENDERBUFFERSPROC)GetFunction("glGenRenderbuffersEXT");
-	glBindRenderbuffer = (PFNGLBINDRENDERBUFFERPROC)GetFunction("glBindRenderbufferEXT");
-	glRenderbufferStorage = (PFNGLRENDERBUFFERSTORAGEEXTPROC)GetFunction("glRenderbufferStorageEXT");
-//    glDeleteRenderbuffers =             (PFNGLDELETERENDERBUFFERSPROC)             GetFunction("glDeleteRenderbuffersEXT");
-}
-
-/*
-=======================
-InitRenderTarget
-
-Create the render targets and setup opengl rendering to our window
-=======================
-*/
-
-bool OculusHmd::InitRenderTarget()
-{
-	InitGLExtensions();
-
-	glGenFramebuffers(1, &Framebuffer);
-	glGenRenderBuffers(1, &rbo);
-
-	for (int i = 0; i < 3; i++)
-	{
-		RenderTargetTexture[i] = CreateTexture(RenderWidth, RenderHeight);
-	}
-
-	EyeTexture[0] = CreateOculusTexture(RenderTargetTexture[0], RenderWidth, RenderHeight);
-	EyeTexture[1] = CreateOculusTexture(RenderTargetTexture[1], RenderWidth, RenderHeight);
-
-	eyeFov[0] = Hmd->DefaultEyeFov[0];
-	eyeFov[1] = Hmd->DefaultEyeFov[1];
-
-	unsigned distortionCaps = NULL;
-
-	if (!isDebughmd)
-		distortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette;
-
-	ovrGLConfig glcfg;
-	glcfg.OGL.Header.API = ovrRenderAPI_OpenGL;
-	glcfg.OGL.Header.RTSize = Sizei(Hmd->Resolution.w, Hmd->Resolution.h);
-	glcfg.OGL.Header.Multisample = 1;
-	glcfg.OGL.Window = win32.hWnd;
-	glcfg.OGL.DC = win32.hDC;
-
-	ovrBool result = ovrHmd_ConfigureRendering(Hmd, &glcfg.Config, distortionCaps, eyeFov, EyeRenderDesc);
-
-	return true;
-}
-
-/*
-=======================
-GetRenderWidth
-
-Get HMD rendering resolution width
-=======================
-*/
-
-int OculusHmd::GetRenderWidth()
-{
-	return RenderWidth;
-}
-
-/*
-=======================
-GetRenderHeight
-
-Get HMD rendering resolution height
-=======================
-*/
-int OculusHmd::GetRenderHeight()
-{
-	return RenderHeight;
+	glGenFramebuffers =				(PFNGLGENFRAMEBUFFERSPROC)GLGetProcAddress("glGenFramebuffersEXT");
+	glDeleteFramebuffers =			(PFNGLDELETEFRAMEBUFFERSPROC)GLGetProcAddress("glDeleteFramebuffersEXT");
+	glCheckFramebufferStatus =		(PFNGLCHECKFRAMEBUFFERSTATUSPROC)GLGetProcAddress("glCheckFramebufferStatusEXT");
+	glFramebufferRenderbuffer =		(PFNGLFRAMEBUFFERRENDERBUFFERPROC)GLGetProcAddress("glFramebufferRenderbufferEXT");
+	glFramebufferTexture2D =		(PFNGLFRAMEBUFFERTEXTURE2DPROC)GLGetProcAddress("glFramebufferTexture2DEXT");
+	glBindFramebuffer =				(PFNGLBINDFRAMEBUFFERPROC)GLGetProcAddress("glBindFramebufferEXT");
+	glGenRenderBuffers =			(PFNGLGENRENDERBUFFERSPROC)GLGetProcAddress("glGenRenderbuffersEXT");
+	glBindRenderbuffer =			(PFNGLBINDRENDERBUFFERPROC)GLGetProcAddress("glBindRenderbufferEXT");
+	glRenderbufferStorage =			(PFNGLRENDERBUFFERSTORAGEEXTPROC)GLGetProcAddress("glRenderbufferStorageEXT");
+	//glDeleteRenderbuffers =		(PFNGLDELETERENDERBUFFERSPROC)GLGetProcAddress("glDeleteRenderbuffersEXT");
 }
 
 /*
@@ -357,6 +309,7 @@ GetViewAdjustVector
 This is how much we shift the eyes left and right
 =======================
 */
+
 idVec3 OculusHmd::GetViewAdjustVector(int eye)
 {
 	// From http://idtech4.com/wp-content/uploads/2011/10/Doom-3-Multiplayer-Level-Editing-Guide.pdf
@@ -366,13 +319,130 @@ idVec3 OculusHmd::GetViewAdjustVector(int eye)
 
 	idVec3 a;
 
-	float scale = 2.5f;
-
-	a.x = (EyeRenderDesc[eye].ViewAdjust.x * 100) / scale;
-	a.y = (EyeRenderDesc[eye].ViewAdjust.y * 100) / scale;
-	a.z = (EyeRenderDesc[eye].ViewAdjust.z * 100) / scale;
+	a.x = (G_ovrEyeRenderDesc[eye].ViewAdjust.x * 100) / OVR2IDUNITS;
+	a.y = (G_ovrEyeRenderDesc[eye].ViewAdjust.y * 100) / OVR2IDUNITS;
+	a.z = (G_ovrEyeRenderDesc[eye].ViewAdjust.z * 100) / OVR2IDUNITS;
 
 	return a;
+}
+
+int OculusHmd::InitHmdPositionTracking()
+{
+	ovrHmd_ConfigureTracking(Hmd, ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0);
+	return 1;
+}
+
+int OculusHmd::FuncUpdateFrameBuffer(int idx)
+{
+	if (!G_GLFrameBuffer)
+	{
+		glGenFramebuffers(1, &G_GLFrameBuffer);
+		glGenRenderBuffers(1, &G_GLDepthBuffer);
+
+		glBindTexture(GL_TEXTURE_2D, ((ovrGLTextureData *)&ovr.G_OvrTextures[idx])->TexId);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	}
+
+	return 1;
+	/* create and attach the texture that will be used as a color buffer */
+	glBindTexture(GL_TEXTURE_2D, ((ovrGLTextureData *)&ovr.G_OvrTextures[idx])->TexId);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, G_ovrRenderWidth, G_ovrRenderHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ((ovrGLTextureData *)&ovr.G_OvrTextures[idx])->TexId, 0);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, G_GLFrameBuffer);
+	glBindRenderbuffer(GL_RENDERBUFFER, G_GLDepthBuffer);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, G_ovrRenderWidth, G_ovrRenderHeight);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, G_GLDepthBuffer);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		Sys_Error("Error updating framebuffer");
+		return 0;
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	return 1;
+}
+
+int MakePowerOfTwo(int num);
+
+int OculusHmd::SetupView()
+{
+	G_ovrEyeFov[0] = Hmd->DefaultEyeFov[0];
+	G_ovrEyeFov[1] = Hmd->DefaultEyeFov[1];
+
+	float FovSideTanLimit = FovPort::Max(Hmd->MaxEyeFov[0], Hmd->MaxEyeFov[1]).GetMaxSideTan();
+	float FovSideTanMax = FovPort::Max(Hmd->DefaultEyeFov[0], Hmd->DefaultEyeFov[1]).GetMaxSideTan();
+
+	G_ovrEyeFov[0] = FovPort::Min(G_ovrEyeFov[0], FovPort(FovSideTanMax));
+	G_ovrEyeFov[1] = FovPort::Min(G_ovrEyeFov[1], FovPort(FovSideTanMax));
+
+	if (vr_enablezeroipd.GetBool())
+	{
+		G_ovrEyeFov[0] = FovPort::Max(G_ovrEyeFov[0], G_ovrEyeFov[1]);
+		G_ovrEyeFov[1] = G_ovrEyeFov[0];
+
+		Sizei _textureSize = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Left, G_ovrEyeFov[0], PIXELDENSITY);
+
+		G_ovrRenderWidth = MakePowerOfTwo(_textureSize.w);
+		G_ovrRenderHeight = MakePowerOfTwo(_textureSize.h);
+
+		G_OvrTextures[0] = FuncGenOvrTexture(G_ovrRenderWidth, G_ovrRenderHeight);
+		G_OvrTextures[1] = G_OvrTextures[0];
+
+		FuncUpdateFrameBuffer(0);
+		FuncUpdateFrameBuffer(1);
+	}
+	else
+	{
+		Sizei _textureSizeLeft = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Left, G_ovrEyeFov[0], PIXELDENSITY);
+		Sizei _textureSizeRight = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Right, G_ovrEyeFov[0], PIXELDENSITY);
+
+		G_ovrRenderWidth = MakePowerOfTwo(_textureSizeLeft.w);
+		G_ovrRenderHeight = MakePowerOfTwo(_textureSizeLeft.h);
+
+		G_OvrTextures[0] = FuncGenOvrTexture(G_ovrRenderWidth, G_ovrRenderHeight);
+		G_OvrTextures[1] = FuncGenOvrTexture(G_ovrRenderWidth, G_ovrRenderHeight);
+
+		FuncUpdateFrameBuffer(0);
+		FuncUpdateFrameBuffer(1);
+	}
+
+
+	if (vr_enablezeroipd.GetBool())
+	{
+		// Remove IPD adjust
+		G_ovrEyeRenderDesc[0].ViewAdjust = Vector3f(0);
+		G_ovrEyeRenderDesc[1].ViewAdjust = Vector3f(0);
+	}
+
+	ovrGLConfig glcfg;
+	glcfg.OGL.Header.API = ovrRenderAPI_OpenGL;
+	glcfg.OGL.Header.RTSize = Sizei(Hmd->Resolution.w, Hmd->Resolution.h);
+	glcfg.OGL.Header.Multisample = 1;
+	glcfg.OGL.Window = win32.hWnd;
+	glcfg.OGL.DC = win32.hDC;
+
+	unsigned distortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette;
+	/*
+	if (SupportsSrgb)
+		distortionCaps |= ovrDistortionCap_SRGB;
+	if (PixelLuminanceOverdrive)
+		distortionCaps |= ovrDistortionCap_Overdrive;
+	if (TimewarpEnabled)
+		distortionCaps |= ovrDistortionCap_TimeWarp;
+	if (TimewarpNoJitEnabled)
+		distortionCaps |= ovrDistortionCap_ProfileNoTimewarpSpinWaits;
+	*/
+
+	if (!ovrHmd_ConfigureRendering(Hmd, &glcfg.Config, distortionCaps, G_ovrEyeFov, G_ovrEyeRenderDesc))
+	{
+		// Shutdown
+		return 0;
+	}
+
+	return 1;
 }
 
 // We will refer to this in the Doom3 code when we need stuff from the Hmd

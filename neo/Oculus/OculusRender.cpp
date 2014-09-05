@@ -31,6 +31,8 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
+#include "../extern/OculusSDK/LibOVR/Include/OVR_Kernel.h"
+#include "../extern/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h"
 #include "../renderer/tr_local.h"
 
 // This is a copy of Doom3 original render functions but with support for Oculus Rift
@@ -74,11 +76,11 @@ void OR_SetupProjection(idRenderSystemLocal &tr)
 		zNear *= 0.25;
 	}
 
-	ymax = zNear * ovr.eyeFov[tr.viewDef->eye].UpTan;
-	ymin = -zNear * ovr.eyeFov[tr.viewDef->eye].DownTan;
+	ymax = zNear * ovr.G_ovrEyeFov[tr.viewDef->eye].UpTan;
+	ymin = -zNear * ovr.G_ovrEyeFov[tr.viewDef->eye].DownTan;
 
-	xmax = zNear * ovr.eyeFov[tr.viewDef->eye].LeftTan;
-	xmin = -zNear * ovr.eyeFov[tr.viewDef->eye].RightTan;
+	xmax = zNear * ovr.G_ovrEyeFov[tr.viewDef->eye].LeftTan;
+	xmin = -zNear * ovr.G_ovrEyeFov[tr.viewDef->eye].RightTan;
 
 	width = xmax - xmin;
 	height = ymax - ymin;
@@ -178,16 +180,19 @@ static void	RB_SetBuffer(const void *data, int eye)
 {
 	const setBufferCommand_t	*cmd;
 	cmd = (const setBufferCommand_t *)data;
+	
+	glBindFramebuffer(GL_FRAMEBUFFER, ovr.G_GLFrameBuffer);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, ovr.Framebuffer);
-	glBindRenderbuffer(GL_RENDERBUFFER, ovr.rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, ovr.G_GLDepthBuffer);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, ovr.GetRenderWidth(), ovr.GetRenderHeight());
-
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, ovr.rbo);
-
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, ovr.G_GLDepthBuffer);
+	
 	backEnd.frameCount = cmd->frameCount;
 
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ovr.RenderTargetTexture[eye], 0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ((ovrGLTextureData *)&ovr.G_OvrTextures[eye])->TexId, 0);
+
+	ovr.FuncUpdateFrameBuffer(eye);
 
 	if (r_clear.GetFloat() || idStr::Length(r_clear.GetString()) != 1 || r_lockSurfaces.GetBool() || r_singleArea.GetBool() || r_showOverDraw.GetBool()) {
 		float c[3];
@@ -237,16 +242,6 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 
 	for (int i = 0; i < 2; i++)
 	{
-		if (false)
-		{
-			glClearColor(1.0f, 0.0f, 0.0f, 0.5f);
-			glClear(GL_COLOR_BUFFER_BIT);
-			qglBindTexture(GL_TEXTURE_2D, ovr.RenderTargetTexture[i]);
-			qglReadBuffer(GL_BACK);
-			qglCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0, 0, ovr.GetRenderWidth(), ovr.GetRenderHeight(), 0);
-			continue;
-		}
-
 		RB_SetDefaultGLState();
 
 		for (const emptyCommand_t * cmds = allCmds; cmds != NULL; cmds = (const emptyCommand_t *)cmds->next)
@@ -287,51 +282,24 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 			}
 			case RC_SET_BUFFER:
 				RB_SetBuffer(cmds, i);
+				//ovr.FuncUpdateFrameBuffer(i, ovr.GetRenderWidth(), ovr.GetRenderHeight());
 				break;
 			case RC_SWAP_BUFFERS:
 				// Ignore this. The Oculus SDK handle that
-				//RB_SwapBuffers( cmds );
+				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 				break;
 			case RC_COPY_RENDER:
-				RB_CopyRender(cmds);
+				//RB_CopyRender(cmds);
 				break;
 			default:
 				common->Error("RB_ExecuteBackEndCommands: bad commandId");
 				break;
 			}
 		}
-
-		// Draw debug
-		// This was to render debug information for each eyes
-		if (false)
-		{
-			glScissor((renderSystem->GetScreenWidth() / 2) - 2, (renderSystem->GetScreenHeight() / 2) - 2, 4, 2);
-			glClearColor(1.0f, 0.0f, 0.0f, 0.5f);
-			glClear(GL_COLOR_BUFFER_BIT);
-		}
-	
-		// Copy frame
-		
-		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		//glDeleteFramebuffers(1, &ovr.Framebuffer);
-
-		//glBindFramebuffer(GL_FRAMEBUFFER, ovr.Framebuffer);
-		//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ovr.RenderTargetTexture[i], 0);
-
-		//qglBindTexture(GL_TEXTURE_2D, ovr.RenderTargetTexture[i]);
-		//qglReadBuffer(GL_BACK);
-		//qglCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 0, 0, ovr.GetRenderWidth(), ovr.GetRenderHeight(), 0);
-		//qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		//qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		//qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		//qglTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-		//qglBindTexture(GL_TEXTURE_2D, 0);
 	}
 
 	// Done rendering. Send this off to the Oculus SDK
 	glViewport(0, 0, ovr.Hmd->Resolution.w, ovr.Hmd->Resolution.h);
 	glScissor(0, 0, ovr.Hmd->Resolution.w, ovr.Hmd->Resolution.h);
-
-	ovrHmd_EndFrame(ovr.Hmd, headPose, ovr.EyeTexture);
+	ovrHmd_EndFrame(ovr.Hmd, headPose, ovr.G_OvrTextures);
 }

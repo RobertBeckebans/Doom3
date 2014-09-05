@@ -768,7 +768,7 @@ RenderViewToViewport
 Converts from SCREEN_WIDTH / SCREEN_HEIGHT coordinates to current cropped pixel coordinates
 =====================
 */
-void idRenderSystemLocal::RenderViewToViewport( const renderView_t *renderView, idScreenRect *viewport )
+void idRenderSystemLocal::RenderViewToViewport(const renderView_t *renderView, idScreenRect *viewport)
 {
 	renderCrop_t	*rc = &renderCrops[currentRenderCrop];
 
@@ -776,13 +776,15 @@ void idRenderSystemLocal::RenderViewToViewport( const renderView_t *renderView, 
 	float hRatio = (float)rc->height / SCREEN_HEIGHT;
 
 	// OCULUS BEGIN
-	viewport->x1 = 0;
-	viewport->x2 = ovr.GetRenderWidth();
-	viewport->y1 = 0;
-	viewport->y2 = ovr.GetRenderHeight();
+	if (vr_enableOculusRiftRendering.GetBool())
+	{
+		viewport->x1 = 0;
+		viewport->x2 = ovr.GetRenderWidth();
+		viewport->y1 = 0;
+		viewport->y2 = ovr.GetRenderHeight();
+		return;
+	}
 	// OCULUS END
-
-	return;
 
 	viewport->x1 = idMath::Ftoi( rc->x + renderView->x * wRatio );
 	viewport->x2 = idMath::Ftoi( rc->x + floor( ( renderView->x + renderView->width ) * wRatio + 0.5f ) - 1 );
