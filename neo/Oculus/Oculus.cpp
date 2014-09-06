@@ -219,43 +219,18 @@ idVec3 OculusHmd::GetHeadTrackingPosition()
 
 /*
 =======================
-CreateTexture
-
-Create opengl texture
-=======================
-*/
-
-GLuint OculusHmd::FuncGenGLTexture(int width, int height)
-{
-	GLuint _texture;
-	glGenTextures(1, &_texture);
-	glBindTexture(GL_TEXTURE_2D, _texture);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	return _texture;
-}
-
-/*
-=======================
 CreateOculusTexture
 
 Generate an ovrTexture with our opengl texture
 =======================
 */
-ovrTexture OculusHmd::FuncGenOvrTexture(int eye)
+ovrTexture OculusHmd::Fn_GenOvrTexture(int eye)
 {
 	ovrTexture tex;
 
 	OVR::Sizei newRTSize(G_ovrRenderWidth, G_ovrRenderHeight);
 
 	ovrGLTextureData* texData = (ovrGLTextureData*)&tex;
-
-	EyeTexture[eye] = FuncGenGLTexture(G_FrameBufferWidth, G_FrameBufferHeight);
 
 	texData->Header.API = ovrRenderAPI_OpenGL;
 	texData->Header.TextureSize = newRTSize;
@@ -332,21 +307,23 @@ int OculusHmd::InitHmdPositionTracking()
 	return 1;
 }
 
-void OculusHmd::SelectBuffers(int eye, GLuint &fbo, GLuint &rbo)
+void OculusHmd::SelectBuffer(int idx, GLuint &fbo)
 {
-	if (eye == LEFTEYE)
+	if (idx == LEFTEYE)
 	{
 		fbo = G_GLFrameBuffer[0];
-		rbo = G_GLDepthBuffer[0];
 		return;
 	}
-	else if (eye == RIGHTEYE)
+	else if (idx == RIGHTEYE)
 	{
 		fbo = G_GLFrameBuffer[1];
-		rbo = G_GLDepthBuffer[1];
 		return;
 	}
-
+	else if (idx == GUI)
+	{
+		fbo = G_GLGuiFrameBuffer;
+		return;
+	}
 	return;
 }
 
@@ -357,12 +334,22 @@ int OculusHmd::Fn_SetupFrameBuffer(int idx)
 
 	}
 
+	//glBindTexture(GL_TEXTURE_2D, EyeTexture[idx]);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, G_FrameBufferWidth, G_FrameBufferHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
+
+	glGenTextures(1, &EyeTexture[idx]);
 	glBindTexture(GL_TEXTURE_2D, EyeTexture[idx]);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, G_FrameBufferWidth, G_FrameBufferHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, G_FrameBufferWidth, G_FrameBufferHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
 
 	glGenTextures(1, &G_GLDepthTexture[idx]);
 	glBindTexture(GL_TEXTURE_2D, G_GLDepthTexture[idx]);
@@ -396,12 +383,51 @@ int OculusHmd::Fn_SetupFrameBuffer(int idx)
 	return 1;
 }
 
-int MakePowerOfTwo(int num);
-
-GLuint OculusHmd::GetFrameBuffer(int i)
+int OculusHmd::Fn_SetupGuiFrameBuffer()
 {
-	return 0;
+	glGenTextures(1, &G_GLGuiTexture);
+	glBindTexture(GL_TEXTURE_2D, G_GLGuiTexture);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, G_FrameBufferWidth, G_FrameBufferHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	//glGenTextures(1, &G_GLDepthTexture[idx]);
+	//glBindTexture(GL_TEXTURE_2D, G_GLDepthTexture[idx]);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, G_FrameBufferWidth, G_FrameBufferHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+
+	glGenFramebuffers(1, &G_GLGuiFrameBuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, G_GLGuiFrameBuffer);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, G_GLGuiTexture, 0);
+	//glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, G_GLDepthTexture[idx], 0);
+
+	//glGenRenderBuffers(1, &G_GLDepthBuffer[idx]);
+	//glBindRenderbuffer(GL_FRAMEBUFFER, G_GLDepthBuffer[idx]);
+	//glRenderbufferStorage(GL_FRAMEBUFFER, GL_DEPTH24_STENCIL8_EXT, 256, 256);
+
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, G_GLDepthBuffer[idx]);
+	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, G_GLDepthBuffer[idx]);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+		Sys_Error("Error updating framebuffer");
+		return 0;
+	}
+
+	glBindFramebuffer(GL_FRAMEBUFFER, G_GLGuiFrameBuffer);
+	glClearColor(0.0, 0.0, 0.0, 0.0);
+	glClear(GL_COLOR_BUFFER_BIT); // | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	return 1;
 }
+
+int MakePowerOfTwo(int num);
 
 int OculusHmd::SetupView()
 {
@@ -427,11 +453,11 @@ int OculusHmd::SetupView()
 		G_FrameBufferWidth = G_ovrRenderWidth;
 		G_FrameBufferHeight = G_ovrRenderHeight;
 
-		G_OvrTextures[0] = FuncGenOvrTexture(0);
-		G_OvrTextures[1] = G_OvrTextures[0];
-		
 		Fn_SetupFrameBuffer(0);
 		Fn_SetupFrameBuffer(1);
+
+		G_OvrTextures[0] = Fn_GenOvrTexture(0);
+		G_OvrTextures[1] = G_OvrTextures[0];
 	}
 	else
 	{
@@ -441,14 +467,14 @@ int OculusHmd::SetupView()
 		G_ovrRenderWidth = _textureSizeLeft.w;
 		G_ovrRenderHeight = _textureSizeLeft.h;
 
-		G_OvrTextures[0] = FuncGenOvrTexture(0);
-		G_OvrTextures[1] = FuncGenOvrTexture(1);
-
 		G_FrameBufferWidth = G_ovrRenderWidth;
 		G_FrameBufferHeight = G_ovrRenderHeight;
 
 		Fn_SetupFrameBuffer(0);
 		Fn_SetupFrameBuffer(1);
+
+		G_OvrTextures[0] = Fn_GenOvrTexture(0);
+		G_OvrTextures[1] = Fn_GenOvrTexture(1);
 	}
 
 

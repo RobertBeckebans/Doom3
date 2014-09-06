@@ -44,6 +44,7 @@ If you have questions concerning this license or the applicable additional terms
 #define DEBUGHMDTYPE ovrHmd_DK2
 #define LEFTEYE 0
 #define RIGHTEYE 1
+#define GUI 2
 
 typedef struct ovrvidmode_t
 {
@@ -81,26 +82,28 @@ public:
 	int					GetRenderHeight()		{ return G_ovrRenderHeight; }
 	int					GetFrameBufferWidth()	{ return G_FrameBufferWidth; }
 	int					GetFrameBufferHeight()	{ return G_FrameBufferHeight; }
-	GLuint				GetFrameBuffer(int i);
-	void				SelectBuffers(int eye, GLuint &fbo, GLuint &rbo);
+	void				SelectBuffer(int i, GLuint &fbo);
 	idVec3				GetViewAdjustVector(int id);
 	
 private:
 	
-	int					GLSetupFrameBuffer();
+	int					GLSetupGuiFrameBuffer();
 	GLuint				G_GLFrameBuffer[2];
+	GLuint				G_GLGuiFrameBuffer;
 	GLuint				G_GLDepthBuffer[2];
 	GLuint				G_GLDepthTexture[2];
+	GLuint				G_GLGuiTexture;
 
 	ovrEyeRenderDesc	G_ovrEyeRenderDesc[2];
-	ovrTexture			FuncGenOvrTexture(int i);
+	ovrTexture			Fn_GenOvrTexture(int i);
 	int					Fn_SetupFrameBuffer(int idx);
+	int					Fn_SetupGuiFrameBuffer();
 	int					InitHmdPositionTracking();
 	int					G_ovrRenderWidth;
 	int					G_ovrRenderHeight;
 	int					G_FrameBufferWidth;
 	int					G_FrameBufferHeight;
-	GLuint				FuncGenGLTexture(int w, int h);
+
 	void				GLInitExtensions();
 	void*				GLGetProcAddress(const char* func) { return wglGetProcAddress(func); }
 };

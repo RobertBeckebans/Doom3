@@ -698,7 +698,7 @@ void idRenderWorldLocal::RenderSceneStereo(const renderView_t *renderView, int e
 
 	// Oculus. Draw for each eye on this pass
 	// close any gui drawing
-	tr.guiModel->EmitFullScreen(eye);
+	tr.guiModel->EmitFullScreen();
 	tr.guiModel->Clear();
 
 	int startTime = Sys_Milliseconds();
@@ -818,7 +818,7 @@ void idRenderWorldLocal::RenderScene( const renderView_t *renderView )
 	}
 
 	// close any gui drawing
-	tr.guiModel->EmitFullScreen(0);
+	tr.guiModel->EmitFullScreen();
 	tr.guiModel->Clear();
 
 	int startTime = Sys_Milliseconds();

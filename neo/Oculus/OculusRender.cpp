@@ -182,9 +182,8 @@ static void	RB_SetBuffer(const void *data, int eye)
 	cmd = (const setBufferCommand_t *)data;
 	
 	GLuint fbo;
-	GLuint rbo;
 
-	ovr.SelectBuffers(eye, fbo, rbo);
+	ovr.SelectBuffer(eye, fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	if (r_clear.GetFloat() || idStr::Length(r_clear.GetString()) != 1 || r_lockSurfaces.GetBool() || r_singleArea.GetBool() || r_showOverDraw.GetBool()) {
@@ -264,13 +263,11 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 				}
 				else
 				{
-					// HUD
-					if (i != eye)
-					{
-						// Wrong eye so skip the command
-						continue;
-					}
+					//GLuint fbo;
+					//ovr.SelectBuffer(eye, fbo);
+					//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 					RB_DrawView(cmds);
+					//RB_SetBuffer(cmds, i);
 				}
 
 				break;
@@ -280,12 +277,12 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 				break;
 			case RC_SWAP_BUFFERS:
 				// Ignore this. The Oculus SDK handle that
-				glBindRenderbuffer(GL_RENDERBUFFER, 0);
-				glBindTexture(GL_TEXTURE_2D, 0);
+				//glBindRenderbuffer(GL_RENDERBUFFER, 0);
+				//glBindTexture(GL_TEXTURE_2D, 0);
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 				break;
 			case RC_COPY_RENDER:
-				//RB_CopyRender(cmds);
+				RB_CopyRender(cmds);
 				break;
 			default:
 				common->Error("RB_ExecuteBackEndCommands: bad commandId");

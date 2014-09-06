@@ -49,7 +49,7 @@ public:
 
 	// OCULUS BEGIN
 	// Add eye selection support if we ever need it
-	void	EmitFullScreen(int eye);
+	void	EmitFullScreen();
 	// OCULUS END
 
 	// these calls are forwarded from the renderer

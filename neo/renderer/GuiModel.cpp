@@ -227,7 +227,7 @@ OCULUS
 Need to make some change here when I decide what to do with the 2d interface rendering. Damage effect also render on this so you cant just modify the view.
 ================
 */
-void idGuiModel::EmitFullScreen(int eye)
+void idGuiModel::EmitFullScreen()
 {
 
 	viewDef_t	*viewDef;
@@ -294,7 +294,7 @@ void idGuiModel::EmitFullScreen(int eye)
 	viewDef->numDrawSurfs = 0;
 
 
-	viewDef->eye = eye;
+	viewDef->eye = -1;
 
 	viewDef_t *oldViewDef = tr.viewDef;
 	tr.viewDef = viewDef;

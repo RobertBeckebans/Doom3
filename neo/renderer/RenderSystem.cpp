@@ -695,7 +695,7 @@ void idRenderSystemLocal::WriteDemoPics() {
 }
 
 void idRenderSystemLocal::DrawDemoPics() {
-	demoGuiModel->EmitFullScreen(0);
+	demoGuiModel->EmitFullScreen();
 }
 
 /*
@@ -715,8 +715,7 @@ void idRenderSystemLocal::EndFrame( int *frontEndMsec, int *backEndMsec ) {
 	// OCULUS BEGIN
 	// Draw for each eye
 	// close any gui drawing
-	guiModel->EmitFullScreen(0);
-	guiModel->EmitFullScreen(1);
+	guiModel->EmitFullScreen();
 	guiModel->Clear();
 	// OCULUS END
 
@@ -821,7 +820,7 @@ void	idRenderSystemLocal::CropRenderSize( int width, int height, bool makePowerO
 	}
 
 	// close any gui drawing before changing the size
-	guiModel->EmitFullScreen(0);
+	guiModel->EmitFullScreen();
 	guiModel->Clear();
 
 	if ( width < 1 || height < 1 ) {
@@ -905,7 +904,7 @@ void idRenderSystemLocal::UnCrop() {
 	}
 
 	// close any gui drawing
-	guiModel->EmitFullScreen(0);
+	guiModel->EmitFullScreen();
 	guiModel->Clear();
 
 	currentRenderCrop--;
@@ -929,7 +928,7 @@ void idRenderSystemLocal::CaptureRenderToImage( const char *imageName ) {
 	if ( !glConfig.isInitialized ) {
 		return;
 	}
-	guiModel->EmitFullScreen(0);
+	guiModel->EmitFullScreen();
 	guiModel->Clear();
 
 	if ( session->writeDemo ) {
@@ -972,7 +971,7 @@ void idRenderSystemLocal::CaptureRenderToFile( const char *fileName, bool fixAlp
 
 	renderCrop_t *rc = &renderCrops[currentRenderCrop];
 
-	guiModel->EmitFullScreen(0);
+	guiModel->EmitFullScreen();
 	guiModel->Clear();
 	R_IssueRenderCommands();
 
