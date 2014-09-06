@@ -39,6 +39,12 @@ If you have questions concerning this license or the applicable additional terms
 #undef strncmp
 #include "../extern/OculusSDK/LibOVR/Src/OVR_CAPI.h"
 
+#define OVR2IDUNITS 2.5f
+#define PIXELDENSITY 1.0f
+#define DEBUGHMDTYPE ovrHmd_DK2
+#define LEFTEYE 0
+#define RIGHTEYE 1
+
 typedef struct ovrvidmode_t
 {
     const char *description;
@@ -63,27 +69,37 @@ public:
 	bool				isDebughmd;
 	int					multiSamples;
 
-	int					GLSetupFrameBuffer();
-	GLuint				G_GLFrameBuffer;
-	GLuint				G_GLDepthBuffer;
 	ovrTexture			G_OvrTextures[2];
 
 	ovrHmd				Hmd = 0;
 	ovrFovPort			G_ovrEyeFov[2];
 
+	GLuint				EyeTexture[2];
+
 	int					SetupView();
-	int					GetRenderWidth()	{ return G_ovrRenderWidth; }
-	int					GetRenderHeight()	{ return G_ovrRenderHeight; }
+	int					GetRenderWidth()		{ return G_ovrRenderWidth; }
+	int					GetRenderHeight()		{ return G_ovrRenderHeight; }
+	int					GetFrameBufferWidth()	{ return G_FrameBufferWidth; }
+	int					GetFrameBufferHeight()	{ return G_FrameBufferHeight; }
+	GLuint				GetFrameBuffer(int i);
+	void				SelectBuffers(int eye, GLuint &fbo, GLuint &rbo);
 	idVec3				GetViewAdjustVector(int id);
 	
-	int					FuncUpdateFrameBuffer(int idx);
-
 private:
+	
+	int					GLSetupFrameBuffer();
+	GLuint				G_GLFrameBuffer[2];
+	GLuint				G_GLDepthBuffer[2];
+	GLuint				G_GLDepthTexture[2];
+
 	ovrEyeRenderDesc	G_ovrEyeRenderDesc[2];
-	ovrTexture			FuncGenOvrTexture(int w, int h);
+	ovrTexture			FuncGenOvrTexture(int i);
+	int					Fn_SetupFrameBuffer(int idx);
 	int					InitHmdPositionTracking();
 	int					G_ovrRenderWidth;
 	int					G_ovrRenderHeight;
+	int					G_FrameBufferWidth;
+	int					G_FrameBufferHeight;
 	GLuint				FuncGenGLTexture(int w, int h);
 	void				GLInitExtensions();
 	void*				GLGetProcAddress(const char* func) { return wglGetProcAddress(func); }

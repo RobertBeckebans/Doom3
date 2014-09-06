@@ -4058,13 +4058,17 @@ static classVariableInfo_t ovrvidmode_t_typeInfo[] = {
 static classVariableInfo_t OculusHmd_typeInfo[] = {
 	{ "bool", "isDebughmd", (int)(&((OculusHmd *)0)->isDebughmd), sizeof( ((OculusHmd *)0)->isDebughmd ) },
 	{ "int", "multiSamples", (int)(&((OculusHmd *)0)->multiSamples), sizeof( ((OculusHmd *)0)->multiSamples ) },
-	{ "GLuint", "G_GLFrameBuffer", (int)(&((OculusHmd *)0)->G_GLFrameBuffer), sizeof( ((OculusHmd *)0)->G_GLFrameBuffer ) },
-	{ "GLuint", "G_GLDepthBuffer", (int)(&((OculusHmd *)0)->G_GLDepthBuffer), sizeof( ((OculusHmd *)0)->G_GLDepthBuffer ) },
 	{ "ovrTexture[2]", "G_OvrTextures", (int)(&((OculusHmd *)0)->G_OvrTextures), sizeof( ((OculusHmd *)0)->G_OvrTextures ) },
 	{ "ovrFovPort[2]", "G_ovrEyeFov", (int)(&((OculusHmd *)0)->G_ovrEyeFov), sizeof( ((OculusHmd *)0)->G_ovrEyeFov ) },
+	{ "GLuint[2]", "EyeTexture", (int)(&((OculusHmd *)0)->EyeTexture), sizeof( ((OculusHmd *)0)->EyeTexture ) },
+	{ "GLuint[2]", "G_GLFrameBuffer", (int)(&((OculusHmd *)0)->G_GLFrameBuffer), sizeof( ((OculusHmd *)0)->G_GLFrameBuffer ) },
+	{ "GLuint[2]", "G_GLDepthBuffer", (int)(&((OculusHmd *)0)->G_GLDepthBuffer), sizeof( ((OculusHmd *)0)->G_GLDepthBuffer ) },
+	{ "GLuint[2]", "G_GLDepthTexture", (int)(&((OculusHmd *)0)->G_GLDepthTexture), sizeof( ((OculusHmd *)0)->G_GLDepthTexture ) },
 	{ "ovrEyeRenderDesc[2]", "G_ovrEyeRenderDesc", (int)(&((OculusHmd *)0)->G_ovrEyeRenderDesc), sizeof( ((OculusHmd *)0)->G_ovrEyeRenderDesc ) },
 	{ "int", "G_ovrRenderWidth", (int)(&((OculusHmd *)0)->G_ovrRenderWidth), sizeof( ((OculusHmd *)0)->G_ovrRenderWidth ) },
 	{ "int", "G_ovrRenderHeight", (int)(&((OculusHmd *)0)->G_ovrRenderHeight), sizeof( ((OculusHmd *)0)->G_ovrRenderHeight ) },
+	{ "int", "G_FrameBufferWidth", (int)(&((OculusHmd *)0)->G_FrameBufferWidth), sizeof( ((OculusHmd *)0)->G_FrameBufferWidth ) },
+	{ "int", "G_FrameBufferHeight", (int)(&((OculusHmd *)0)->G_FrameBufferHeight), sizeof( ((OculusHmd *)0)->G_FrameBufferHeight ) },
 	{ NULL, 0 }
 };
 

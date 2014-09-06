@@ -181,18 +181,11 @@ static void	RB_SetBuffer(const void *data, int eye)
 	const setBufferCommand_t	*cmd;
 	cmd = (const setBufferCommand_t *)data;
 	
-	glBindFramebuffer(GL_FRAMEBUFFER, ovr.G_GLFrameBuffer);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	GLuint fbo;
+	GLuint rbo;
 
-	glBindRenderbuffer(GL_RENDERBUFFER, ovr.G_GLDepthBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, ovr.GetRenderWidth(), ovr.GetRenderHeight());
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, ovr.G_GLDepthBuffer);
-	
-	backEnd.frameCount = cmd->frameCount;
-
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ((ovrGLTextureData *)&ovr.G_OvrTextures[eye])->TexId, 0);
-
-	ovr.FuncUpdateFrameBuffer(eye);
+	ovr.SelectBuffers(eye, fbo, rbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 	if (r_clear.GetFloat() || idStr::Length(r_clear.GetString()) != 1 || r_lockSurfaces.GetBool() || r_singleArea.GetBool() || r_showOverDraw.GetBool()) {
 		float c[3];
@@ -208,8 +201,10 @@ static void	RB_SetBuffer(const void *data, int eye)
 		else {
 			qglClearColor(0.4f, 0.0f, 0.25f, 1.0f);
 		}
-		qglClear(GL_COLOR_BUFFER_BIT);
+		qglClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
+
+	backEnd.frameCount = cmd->frameCount;
 
 	return;
 }
@@ -232,7 +227,7 @@ RBO_ExecuteBackEndCommands
 void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 {
 	// needed for editor rendering
-	RB_SetDefaultGLState();
+	//RB_SetDefaultGLState();
 
 	// upload any image loads that have completed
 	globalImages->CompleteBackgroundImageLoads();
@@ -282,10 +277,11 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 			}
 			case RC_SET_BUFFER:
 				RB_SetBuffer(cmds, i);
-				//ovr.FuncUpdateFrameBuffer(i, ovr.GetRenderWidth(), ovr.GetRenderHeight());
 				break;
 			case RC_SWAP_BUFFERS:
 				// Ignore this. The Oculus SDK handle that
+				glBindRenderbuffer(GL_RENDERBUFFER, 0);
+				glBindTexture(GL_TEXTURE_2D, 0);
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 				break;
 			case RC_COPY_RENDER:

@@ -744,8 +744,6 @@ static bool GLW_CreateOculusWindow(glimpParms_t parms)
 		return false;
 	}
 
-	ovrHmd_AttachToWindow(ovr.Hmd, win32.hWnd, NULL, NULL);
-
 	::SetTimer(win32.hWnd, 0, 100, NULL);
 
 	ShowWindow(win32.hWnd, SW_SHOW);
