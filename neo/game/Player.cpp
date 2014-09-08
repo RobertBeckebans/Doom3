@@ -4441,11 +4441,15 @@ void idPlayer::UpdateFocus( void ) {
 	}
 
 	start = GetEyePosition();
-	end = start + viewAngles.ToForward() * 80.0f;
+
+	// OCULUS BEGIN
+	//end = start + viewAngles.ToForward() * 80.0f;
+	end = start + (viewAngles + aimangles).ToForward() * 80.0f;
+	// OCULUS END
 
 	// player identification -> names to the hud
 	if ( gameLocal.isMultiplayer && entityNumber == gameLocal.localClientNum ) {
-		idVec3 end = start + viewAngles.ToForward() * 768.0f;
+		idVec3 end = start + (viewAngles + aimangles).ToForward() * 768.0f;
 		gameLocal.clip.TracePoint( trace, start, end, MASK_SHOT_BOUNDINGBOX, this );
 		int iclient = -1;
 		if ( ( trace.fraction < 1.0f ) && ( trace.c.entityNum < MAX_CLIENTS ) ) {
@@ -7183,7 +7187,8 @@ void idPlayer::CalculateViewWeaponPos( idVec3 &origin, idMat3 &axis ) {
 
 	// OCULUS BEGIN
 	//const idMat3 &viewAxis = firstPersonViewAxis;
-	const idMat3 &viewAxis = aimAngles.ToMat3();
+	idAngles dir = viewAngles + aimangles;
+	const idMat3 &viewAxis = dir.ToMat3();
 	// OCULUS END
 
 	// these cvars are just for hand tweaking before moving a value to the weapon def
@@ -8646,14 +8651,37 @@ idPlayer::UpdateAimAngles
 ==============
 */
 
+void ClampAngle(float &a)
+{
+	float top = 30.0f;
+
+	if (a >= top)
+		a = top;
+
+	if (a <= -top)
+		a = -top;
+}
+
 void idPlayer::UpdateAimAngles()
 {
-	idVec3 start = GetEyePosition();
-	const float scale = 50.0f;
+	const float scale = 0.08f;
 
-	aimAngles = viewAngles;
-	aimAngles.pitch += usercmd.mposy / scale;
-	aimAngles.yaw += -usercmd.mposx / scale;
+	mxDelta = usercmd.mx - previousmx;
+	myDelta = usercmd.my - previousmy;
+
+	if (mxDelta != 0 || myDelta != 0)
+	{
+		aimangles.yaw -= scale * (float)mxDelta;
+		aimangles.pitch -= scale * -(float)myDelta;
+
+		ClampAngle(aimangles.pitch);
+		ClampAngle(aimangles.yaw);
+
+		//common->Printf("UpdateAimAngles: [pitch: %0.4f yaw: %0.4f] [pitch: %0.4f yaw: %0.4f]\n", aimangles.pitch, aimangles.yaw, viewAngles.pitch, viewAngles.yaw);
+	}
+
+	previousmx = usercmd.mx;
+	previousmy = usercmd.my;
 }
 
 /*
@@ -8667,12 +8695,14 @@ void idPlayer::UpdateAimPointer()
 	trace_t tr;
 	idVec3 start = GetEyePosition();
 
-	if (!weapon.GetEntity()->ShowCrosshair() || AI_RELOAD || AI_ONLADDER || AI_DEAD || weapon.GetEntity()->IsHidden())
+	if (!weapon.GetEntity()->ShowCrosshair() || GuiActive() || AI_RELOAD || AI_ONLADDER || AI_DEAD || weapon.GetEntity()->IsHidden())
 	{
 		return;
 	}
 
-	gameLocal.clip.TracePoint(tr, start, (start + aimAngles.ToForward() * 96.0f), CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
+	idAngles dir = viewAngles + aimangles;
+
+	gameLocal.clip.TracePoint(tr, start, (start + dir.ToForward() * 96.0f), CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
 	gameRenderWorld->DebugSphere(colorOrange, idSphere(tr.endpos, 0.5f));
 }
 
@@ -8720,7 +8750,8 @@ void idPlayer::UpdateLaserSight()
 	idVec3	&target = *reinterpret_cast<idVec3 *>(&laserSightRenderEntity.shaderParms[SHADERPARM_BEAM_END_X]);
 
 	trace_t tr;
-	gameLocal.clip.TracePoint(tr, laserSightRenderEntity.origin, (laserSightRenderEntity.origin + aimAngles.ToForward() * 128.0f), CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
+	idAngles dir = viewAngles + aimangles;
+	gameLocal.clip.TracePoint(tr, laserSightRenderEntity.origin, (laserSightRenderEntity.origin + dir.ToForward() * 128.0f), CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
 	target = tr.endpos;
 
 	laserSightRenderEntity.shaderParms[SHADERPARM_BEAM_WIDTH] = vr_laserSightWidth.GetFloat();

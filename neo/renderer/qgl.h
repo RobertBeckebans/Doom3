@@ -121,6 +121,8 @@ extern PFNGLBINDFRAMEBUFFEREXTPROC			glBindFramebuffer;
 extern PFNGLGENRENDERBUFFERSPROC			glGenRenderbuffers;
 extern PFNGLBINDRENDERBUFFERPROC			glBindRenderbuffer;
 extern PFNGLRENDERBUFFERSTORAGEEXTPROC		glRenderbufferStorage;
+//extern PFNGLDRAWBUFFERSPROC					glDrawBuffers;
+//extern PFNGLBLITFRAMEBUFFERPROC				glBlitFramebuffer;
 
 // OCULUS END
 

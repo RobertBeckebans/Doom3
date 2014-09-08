@@ -178,11 +178,11 @@ RB_SetBuffer
 */
 static void	RB_SetBuffer(const void *data, int eye)
 {
+	GLuint fbo;
+
 	const setBufferCommand_t	*cmd;
 	cmd = (const setBufferCommand_t *)data;
 	
-	GLuint fbo;
-
 	ovr.SelectBuffer(eye, fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
@@ -225,6 +225,8 @@ RBO_ExecuteBackEndCommands
 
 void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 {
+	GLuint fbo;
+
 	// needed for editor rendering
 	//RB_SetDefaultGLState();
 
@@ -233,6 +235,8 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 
 	ovrPosef headPose[2];
 	ovrFrameTiming hmdFrameTiming = ovrHmd_BeginFrame(ovr.Hmd, 0);
+
+	bool needGuiDraw = true;
 
 	for (int i = 0; i < 2; i++)
 	{
@@ -263,11 +267,14 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 				}
 				else
 				{
-					//GLuint fbo;
-					//ovr.SelectBuffer(eye, fbo);
-					//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-					RB_DrawView(cmds);
-					//RB_SetBuffer(cmds, i);
+					if (needGuiDraw)
+					{
+						//ovr.SelectBuffer(GUI_TARGET, fbo);
+						//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+						RB_DrawView(cmds);
+						//RB_SetBuffer(cmds, i);
+						//needGuiDraw = false;
+					}
 				}
 
 				break;
@@ -282,7 +289,7 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 				break;
 			case RC_COPY_RENDER:
-				RB_CopyRender(cmds);
+				//RB_CopyRender(cmds);
 				break;
 			default:
 				common->Error("RB_ExecuteBackEndCommands: bad commandId");
@@ -290,6 +297,22 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 			}
 		}
 	}
+
+	// Copy the GUI Framebuffer. Need to draw to a plane in the viewport instead at some point
+	/*
+	ovr.SelectBuffer(GUI_TARGET, fbo);
+	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
+	glReadBuffer(GL_COLOR_ATTACHMENT0);
+
+	ovr.SelectBuffer(LEFT_EYE_TARGET, fbo);
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
+	glDrawBuffer(GL_COLOR_ATTACHMENT0);
+
+	glBlitFramebuffer(0, 0, ovr.GetFrameBufferWidth(), ovr.GetFrameBufferHeight(),
+		0, 0, ovr.GetFrameBufferWidth(), ovr.GetFrameBufferHeight(),
+		GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT,
+		GL_NEAREST);
+	*/
 
 	// Done rendering. Send this off to the Oculus SDK
 	glViewport(0, 0, ovr.Hmd->Resolution.w, ovr.Hmd->Resolution.h);

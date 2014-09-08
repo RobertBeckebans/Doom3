@@ -39,6 +39,7 @@ Icon
 build/
 base/
 d3xp/
+vr/
 hd/
 perfected/
 neo/extern/OculusSDK/
@@ -52,3 +53,8 @@ sikkmod/
 *.ipch
 *.~1~
 *.user
+RUN_DOOM3_VR_Debug.bat
+RUN_DOOM3_VR_sikkmod.bat
+RUN_DOOM3_VR_Release.bat
+DOOM3_VR_Release.exe
+DOOM3_VR_Debug.exe

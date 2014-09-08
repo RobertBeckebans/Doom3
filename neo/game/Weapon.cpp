@@ -2983,12 +2983,9 @@ void idWeapon::Event_LaunchProjectiles( int num_projectiles, float spread, float
 				dir = playerViewAxis[ 0 ] + playerViewAxis[ 2 ] * ( ang * idMath::Sin( spin ) ) - playerViewAxis[ 1 ] * ( ang * idMath::Cos( spin ) );
 
 				// OCULUS BEGIN
-				const float scale = 50.0f;
 				idPlayer *player;
 				player = gameLocal.GetLocalPlayer();
-				idAngles aimAngle = dir.ToAngles();
-				aimAngle.pitch += player->usercmd.mposy / scale;
-				aimAngle.yaw += -player->usercmd.mposx / scale;
+				idAngles aimAngle = dir.ToAngles() + player->aimangles;
 				dir = aimAngle.ToForward();
 				// OCULUS END
 
@@ -3013,12 +3010,9 @@ void idWeapon::Event_LaunchProjectiles( int num_projectiles, float spread, float
 			dir = playerViewAxis[0] + playerViewAxis[2] * (ang * idMath::Sin(spin)) - playerViewAxis[1] * (ang * idMath::Cos(spin));
 			
 			// OCULUS BEGIN
-			const float scale = 50.0f;
 			idPlayer *player;
 			player = gameLocal.GetLocalPlayer();
-			idAngles aimAngle = dir.ToAngles();
-			aimAngle.pitch += player->usercmd.mposy / scale;
-			aimAngle.yaw += -player->usercmd.mposx / scale;
+			idAngles aimAngle = dir.ToAngles() + player->aimangles;
 			dir = aimAngle.ToForward();
 			// OCULUS END
 

@@ -214,7 +214,11 @@ public:
 	qhandle_t				laserSightHandle;
 	renderEntity_t			aimPointerRenderEntity;
 	qhandle_t				aimPointerHandle;
-	idAngles				aimAngles;
+	idAngles				aimangles;
+	int						previousmx;
+	int						previousmy;
+	int						mxDelta;
+	int						myDelta;
 	// END
 
 	bool					noclip;

@@ -71,9 +71,9 @@ int OculusHmd::Init()
 	ovr_Initialize();
 
 	if (!(Hmd = ovrHmd_Create(0))) {
+		isDebughmd = true;
 		common->Printf("Oculus HMD not found. Fall back to debug device.\n");
 		if (!(Hmd = ovrHmd_CreateDebug(DEBUGHMDTYPE))) {
-			isDebughmd = true;
 			Sys_Error("Error during debug HMD initialization");
 			return false;
 		}
@@ -258,7 +258,8 @@ PFNGLBINDFRAMEBUFFERPROC				glBindFramebuffer;
 PFNGLGENRENDERBUFFERSPROC				glGenRenderBuffers;
 PFNGLBINDRENDERBUFFERPROC				glBindRenderbuffer;
 PFNGLRENDERBUFFERSTORAGEEXTPROC			glRenderbufferStorage;
-//PFNGLDELETERENDERBUFFERSPROC			glDeleteRenderbuffers;
+//PFNGLDRAWBUFFERSPROC					glDrawBuffers;
+//PFNGLBLITFRAMEBUFFERPROC				glBlitFramebuffer;
 
 void OculusHmd::GLInitExtensions()
 {
@@ -274,6 +275,8 @@ void OculusHmd::GLInitExtensions()
 	glGenRenderBuffers =			(PFNGLGENRENDERBUFFERSPROC)GLGetProcAddress("glGenRenderbuffersEXT");
 	glBindRenderbuffer =			(PFNGLBINDRENDERBUFFERPROC)GLGetProcAddress("glBindRenderbufferEXT");
 	glRenderbufferStorage =			(PFNGLRENDERBUFFERSTORAGEEXTPROC)GLGetProcAddress("glRenderbufferStorageEXT");
+	//glDrawBuffers =				(PFNGLDRAWBUFFERSPROC)GLGetProcAddress("glDrawBuffersEXT");
+	//glBlitFramebuffer =			(PFNGLBLITFRAMEBUFFERPROC)GLGetProcAddress("glBlitFramebufferEXT");
 	//glDeleteRenderbuffers =		(PFNGLDELETERENDERBUFFERSPROC)GLGetProcAddress("glDeleteRenderbuffersEXT");
 }
 
@@ -309,17 +312,17 @@ int OculusHmd::InitHmdPositionTracking()
 
 void OculusHmd::SelectBuffer(int idx, GLuint &fbo)
 {
-	if (idx == LEFTEYE)
+	if (idx == LEFT_EYE_TARGET)
 	{
 		fbo = G_GLFrameBuffer[0];
 		return;
 	}
-	else if (idx == RIGHTEYE)
+	else if (idx == RIGHT_EYE_TARGET)
 	{
 		fbo = G_GLFrameBuffer[1];
 		return;
 	}
-	else if (idx == GUI)
+	else if (idx == GUI_TARGET)
 	{
 		fbo = G_GLGuiFrameBuffer;
 		return;
@@ -333,13 +336,6 @@ int OculusHmd::Fn_SetupFrameBuffer(int idx)
 	{
 
 	}
-
-	//glBindTexture(GL_TEXTURE_2D, EyeTexture[idx]);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, G_FrameBufferWidth, G_FrameBufferHeight, 0, GL_BGRA, GL_UNSIGNED_BYTE, 0);
 
 	glGenTextures(1, &EyeTexture[idx]);
 	glBindTexture(GL_TEXTURE_2D, EyeTexture[idx]);
@@ -385,6 +381,8 @@ int OculusHmd::Fn_SetupFrameBuffer(int idx)
 
 int OculusHmd::Fn_SetupGuiFrameBuffer()
 {
+	int idx = 2;
+
 	glGenTextures(1, &G_GLGuiTexture);
 	glBindTexture(GL_TEXTURE_2D, G_GLGuiTexture);
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -395,21 +393,21 @@ int OculusHmd::Fn_SetupGuiFrameBuffer()
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, G_FrameBufferWidth, G_FrameBufferHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
-	//glGenTextures(1, &G_GLDepthTexture[idx]);
-	//glBindTexture(GL_TEXTURE_2D, G_GLDepthTexture[idx]);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, G_FrameBufferWidth, G_FrameBufferHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+	glGenTextures(1, &G_GLDepthTexture[idx]);
+	glBindTexture(GL_TEXTURE_2D, G_GLDepthTexture[idx]);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, G_FrameBufferWidth, G_FrameBufferHeight, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 
 	glGenFramebuffers(1, &G_GLGuiFrameBuffer);
 	glBindFramebuffer(GL_FRAMEBUFFER, G_GLGuiFrameBuffer);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, G_GLGuiTexture, 0);
-	//glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, G_GLDepthTexture[idx], 0);
+	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, G_GLDepthTexture[idx], 0);
 
-	//glGenRenderBuffers(1, &G_GLDepthBuffer[idx]);
-	//glBindRenderbuffer(GL_FRAMEBUFFER, G_GLDepthBuffer[idx]);
-	//glRenderbufferStorage(GL_FRAMEBUFFER, GL_DEPTH24_STENCIL8_EXT, 256, 256);
+	glGenRenderBuffers(1, &G_GLDepthBuffer[idx]);
+	glBindRenderbuffer(GL_FRAMEBUFFER, G_GLDepthBuffer[idx]);
+	glRenderbufferStorage(GL_FRAMEBUFFER, GL_DEPTH24_STENCIL8_EXT, 256, 256);
 
-	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, G_GLDepthBuffer[idx]);
-	//glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, G_GLDepthBuffer[idx]);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, G_GLDepthBuffer[idx]);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, G_GLDepthBuffer[idx]);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		Sys_Error("Error updating framebuffer");
@@ -418,7 +416,7 @@ int OculusHmd::Fn_SetupGuiFrameBuffer()
 
 	glBindFramebuffer(GL_FRAMEBUFFER, G_GLGuiFrameBuffer);
 	glClearColor(0.0, 0.0, 0.0, 0.0);
-	glClear(GL_COLOR_BUFFER_BIT); // | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
@@ -455,6 +453,7 @@ int OculusHmd::SetupView()
 
 		Fn_SetupFrameBuffer(0);
 		Fn_SetupFrameBuffer(1);
+		Fn_SetupGuiFrameBuffer();
 
 		G_OvrTextures[0] = Fn_GenOvrTexture(0);
 		G_OvrTextures[1] = G_OvrTextures[0];
@@ -472,6 +471,7 @@ int OculusHmd::SetupView()
 
 		Fn_SetupFrameBuffer(0);
 		Fn_SetupFrameBuffer(1);
+		Fn_SetupGuiFrameBuffer();
 
 		G_OvrTextures[0] = Fn_GenOvrTexture(0);
 		G_OvrTextures[1] = Fn_GenOvrTexture(1);
@@ -493,6 +493,7 @@ int OculusHmd::SetupView()
 	glcfg.OGL.DC = win32.hDC;
 
 	unsigned distortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette;
+
 	/*
 	if (SupportsSrgb)
 		distortionCaps |= ovrDistortionCap_SRGB;

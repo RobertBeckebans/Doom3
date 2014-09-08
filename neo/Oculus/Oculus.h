@@ -42,9 +42,9 @@ If you have questions concerning this license or the applicable additional terms
 #define OVR2IDUNITS 2.5f
 #define PIXELDENSITY 1.0f
 #define DEBUGHMDTYPE ovrHmd_DK2
-#define LEFTEYE 0
-#define RIGHTEYE 1
-#define GUI 2
+#define LEFT_EYE_TARGET 0
+#define RIGHT_EYE_TARGET 1
+#define GUI_TARGET 2
 
 typedef struct ovrvidmode_t
 {
@@ -90,8 +90,8 @@ private:
 	int					GLSetupGuiFrameBuffer();
 	GLuint				G_GLFrameBuffer[2];
 	GLuint				G_GLGuiFrameBuffer;
-	GLuint				G_GLDepthBuffer[2];
-	GLuint				G_GLDepthTexture[2];
+	GLuint				G_GLDepthBuffer[3];
+	GLuint				G_GLDepthTexture[3];
 	GLuint				G_GLGuiTexture;
 
 	ovrEyeRenderDesc	G_ovrEyeRenderDesc[2];
