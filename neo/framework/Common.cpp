@@ -29,6 +29,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
+#include "../oculus/Oculus.h"
 #include "../renderer/Image.h"
 
 #define	MAX_PRINT_MSG_SIZE	4096

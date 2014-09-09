@@ -101,11 +101,6 @@ public:
 	virtual void			RemoveDecals( qhandle_t entityHandle );
 
 	virtual void			SetRenderView( const renderView_t *renderView );
-	
-	// OCULUS BEGIN
-	virtual	void			RenderSceneStereo( const renderView_t *renderView, int eye );
-	//OCULUS END
-
 	virtual	void			RenderScene(const renderView_t *renderView);
 
 	virtual	int				NumAreas( void ) const;
@@ -262,6 +257,10 @@ public:
 	//-------------------------------
 	// tr_light.c
 	void					CreateLightDefInteractions( idRenderLightLocal *ldef );
+
+	// OCULUS BEGIN
+	virtual	void			RenderSceneStereo(const renderView_t *renderView, int eye);
+	//OCULUS END
 };
 
 #endif /* !__RENDERWORLDLOCAL_H__ */

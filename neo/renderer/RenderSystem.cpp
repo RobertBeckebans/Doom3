@@ -28,6 +28,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
+#include "../oculus/Oculus.h"
 #include "tr_local.h"
 
 idRenderSystemLocal	tr;
@@ -712,12 +713,9 @@ void idRenderSystemLocal::EndFrame( int *frontEndMsec, int *backEndMsec ) {
 		return;
 	}
 
-	// OCULUS BEGIN
-	// Draw for each eye
 	// close any gui drawing
 	guiModel->EmitFullScreen();
 	guiModel->Clear();
-	// OCULUS END
 
 	// save out timing information
 	if ( frontEndMsec ) {

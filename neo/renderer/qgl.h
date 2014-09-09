@@ -72,11 +72,6 @@ If you have questions concerning this license or the applicable additional terms
 // http://oss.sgi.com/projects/ogl-sample/ABI/
 #ifndef GL_GLEXT_VERSION
 
-// OCULUS BEGIN
-// Use updated glext
-// #include "../extern/glext/GL/glext.h"
-// OCULUS END
-
 #endif
 
 typedef void (*GLExtension_t)(void);

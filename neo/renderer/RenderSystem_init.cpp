@@ -29,6 +29,8 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
+#include "../Oculus/Oculus.h"
+
 #include "tr_local.h"
 
 // Vista OpenGL wrapper check

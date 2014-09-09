@@ -7,9 +7,9 @@
 
 	This file has been generated with the Type Info Generator v1.0 (c) 2004 id Software
 
-	1168 constants
-	129 enums
-	530 classes/structs/unions
+	1124 constants
+	122 enums
+	508 classes/structs/unions
 	36 templates
 	6 max inheritance level for 'idPlayer'
 
@@ -312,50 +312,6 @@ static constantInfo_t constantInfo[] = {
 	{ "int", "INHIBIT_SESSION", "0" },
 	{ "int", "INHIBIT_ASYNC", "1" },
 	{ "const int", "MAX_BUFFERED_USERCMD", "64" },
-	{ "int", "ovrHmd_None", "0" },
-	{ "int", "ovrHmd_DK1", "3" },
-	{ "int", "ovrHmd_DKHD", "4" },
-	{ "int", "ovrHmd_DK2", "6" },
-	{ "int", "ovrHmd_Other", "7" },
-	{ "int", "ovrHmdCap_Present", "1" },
-	{ "int", "ovrHmdCap_Available", "2" },
-	{ "int", "ovrHmdCap_Captured", "4" },
-	{ "int", "ovrHmdCap_ExtendDesktop", "8" },
-	{ "int", "ovrHmdCap_NoMirrorToWindow", "8192" },
-	{ "int", "ovrHmdCap_DisplayOff", "64" },
-	{ "int", "ovrHmdCap_LowPersistence", "128" },
-	{ "int", "ovrHmdCap_DynamicPrediction", "512" },
-	{ "int", "ovrHmdCap_NoVSync", "4096" },
-	{ "int", "ovrHmdCap_Writable_Mask", "13296" },
-	{ "int", "ovrHmdCap_Service_Mask", "9200" },
-	{ "int", "ovrTrackingCap_Orientation", "16" },
-	{ "int", "ovrTrackingCap_MagYawCorrection", "32" },
-	{ "int", "ovrTrackingCap_Position", "64" },
-	{ "int", "ovrTrackingCap_Idle", "256" },
-	{ "int", "ovrDistortionCap_Chromatic", "1" },
-	{ "int", "ovrDistortionCap_TimeWarp", "2" },
-	{ "int", "ovrDistortionCap_Vignette", "8" },
-	{ "int", "ovrDistortionCap_NoRestore", "16" },
-	{ "int", "ovrDistortionCap_FlipInput", "32" },
-	{ "int", "ovrDistortionCap_SRGB", "64" },
-	{ "int", "ovrDistortionCap_Overdrive", "128" },
-	{ "int", "ovrDistortionCap_HqDistortion", "256" },
-	{ "int", "ovrDistortionCap_ProfileNoTimewarpSpinWaits", "65536" },
-	{ "int", "ovrEye_Left", "0" },
-	{ "int", "ovrEye_Right", "1" },
-	{ "int", "ovrEye_Count", "2" },
-	{ "int", "ovrStatus_OrientationTracked", "1" },
-	{ "int", "ovrStatus_PositionTracked", "2" },
-	{ "int", "ovrStatus_CameraPoseTracked", "4" },
-	{ "int", "ovrStatus_PositionConnected", "32" },
-	{ "int", "ovrStatus_HmdConnected", "128" },
-	{ "int", "ovrRenderAPI_None", "0" },
-	{ "int", "ovrRenderAPI_OpenGL", "1" },
-	{ "int", "ovrRenderAPI_Android_GLES", "2" },
-	{ "int", "ovrRenderAPI_D3D9", "3" },
-	{ "int", "ovrRenderAPI_D3D10", "4" },
-	{ "int", "ovrRenderAPI_D3D11", "5" },
-	{ "int", "ovrRenderAPI_Count", "6" },
 	{ "int", "DECL_TABLE", "0" },
 	{ "int", "DECL_MATERIAL", "1" },
 	{ "int", "DECL_SKIN", "2" },
@@ -1534,78 +1490,6 @@ static enumValueInfo_t inhibit_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t ovrHmdType_typeInfo[] = {
-	{ "ovrHmd_None", 0 },
-	{ "ovrHmd_DK1", 3 },
-	{ "ovrHmd_DKHD", 4 },
-	{ "ovrHmd_DK2", 6 },
-	{ "ovrHmd_Other", 7 },
-	{ NULL, 0 }
-};
-
-static enumValueInfo_t ovrHmdCaps_typeInfo[] = {
-	{ "ovrHmdCap_Present", 1 },
-	{ "ovrHmdCap_Available", 2 },
-	{ "ovrHmdCap_Captured", 4 },
-	{ "ovrHmdCap_ExtendDesktop", 8 },
-	{ "ovrHmdCap_NoMirrorToWindow", 8192 },
-	{ "ovrHmdCap_DisplayOff", 64 },
-	{ "ovrHmdCap_LowPersistence", 128 },
-	{ "ovrHmdCap_DynamicPrediction", 512 },
-	{ "ovrHmdCap_NoVSync", 4096 },
-	{ "ovrHmdCap_Writable_Mask", 13296 },
-	{ "ovrHmdCap_Service_Mask", 9200 },
-	{ NULL, 0 }
-};
-
-static enumValueInfo_t ovrTrackingCaps_typeInfo[] = {
-	{ "ovrTrackingCap_Orientation", 16 },
-	{ "ovrTrackingCap_MagYawCorrection", 32 },
-	{ "ovrTrackingCap_Position", 64 },
-	{ "ovrTrackingCap_Idle", 256 },
-	{ NULL, 0 }
-};
-
-static enumValueInfo_t ovrDistortionCaps_typeInfo[] = {
-	{ "ovrDistortionCap_Chromatic", 1 },
-	{ "ovrDistortionCap_TimeWarp", 2 },
-	{ "ovrDistortionCap_Vignette", 8 },
-	{ "ovrDistortionCap_NoRestore", 16 },
-	{ "ovrDistortionCap_FlipInput", 32 },
-	{ "ovrDistortionCap_SRGB", 64 },
-	{ "ovrDistortionCap_Overdrive", 128 },
-	{ "ovrDistortionCap_HqDistortion", 256 },
-	{ "ovrDistortionCap_ProfileNoTimewarpSpinWaits", 65536 },
-	{ NULL, 0 }
-};
-
-static enumValueInfo_t ovrEyeType_typeInfo[] = {
-	{ "ovrEye_Left", 0 },
-	{ "ovrEye_Right", 1 },
-	{ "ovrEye_Count", 2 },
-	{ NULL, 0 }
-};
-
-static enumValueInfo_t ovrStatusBits_typeInfo[] = {
-	{ "ovrStatus_OrientationTracked", 1 },
-	{ "ovrStatus_PositionTracked", 2 },
-	{ "ovrStatus_CameraPoseTracked", 4 },
-	{ "ovrStatus_PositionConnected", 32 },
-	{ "ovrStatus_HmdConnected", 128 },
-	{ NULL, 0 }
-};
-
-static enumValueInfo_t ovrRenderAPIType_typeInfo[] = {
-	{ "ovrRenderAPI_None", 0 },
-	{ "ovrRenderAPI_OpenGL", 1 },
-	{ "ovrRenderAPI_Android_GLES", 2 },
-	{ "ovrRenderAPI_D3D9", 3 },
-	{ "ovrRenderAPI_D3D10", 4 },
-	{ "ovrRenderAPI_D3D11", 5 },
-	{ "ovrRenderAPI_Count", 6 },
-	{ NULL, 0 }
-};
-
 static enumValueInfo_t declType_t_typeInfo[] = {
 	{ "DECL_TABLE", 0 },
 	{ "DECL_MATERIAL", 1 },
@@ -1633,7 +1517,7 @@ static enumValueInfo_t declState_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t enum_41_typeInfo[] = {
+static enumValueInfo_t enum_34_typeInfo[] = {
 	{ "FX_LIGHT", 0 },
 	{ "FX_PARTICLE", 1 },
 	{ "FX_DECAL", 2 },
@@ -1696,7 +1580,7 @@ static enumValueInfo_t declAFJointMod_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t idAFVector_enum_48_typeInfo[] = {
+static enumValueInfo_t idAFVector_enum_41_typeInfo[] = {
 	{ "VEC_COORDS", 0 },
 	{ "VEC_JOINT", 1 },
 	{ "VEC_BONECENTER", 2 },
@@ -1704,7 +1588,7 @@ static enumValueInfo_t idAFVector_enum_48_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t idDeclAF_Constraint_enum_49_typeInfo[] = {
+static enumValueInfo_t idDeclAF_Constraint_enum_42_typeInfo[] = {
 	{ "LIMIT_NONE", -1 },
 	{ "LIMIT_CONE", 0 },
 	{ "LIMIT_PYRAMID", 1 },
@@ -1981,7 +1865,7 @@ static enumValueInfo_t escReply_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t enum_73_typeInfo[] = {
+static enumValueInfo_t enum_66_typeInfo[] = {
 	{ "TEST_PARTICLE_MODEL", 0 },
 	{ "TEST_PARTICLE_IMPACT", 1 },
 	{ "TEST_PARTICLE_MUZZLE", 2 },
@@ -2079,7 +1963,7 @@ static enumValueInfo_t AFJointModType_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t enum_79_typeInfo[] = {
+static enumValueInfo_t enum_72_typeInfo[] = {
 	{ "PATHTYPE_WALK", 0 },
 	{ "PATHTYPE_WALKOFFLEDGE", 1 },
 	{ "PATHTYPE_BARRIERJUMP", 2 },
@@ -2181,7 +2065,7 @@ static enumValueInfo_t idMultiplayerGame_vote_result_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t enum_88_typeInfo[] = {
+static enumValueInfo_t enum_81_typeInfo[] = {
 	{ "GAME_RELIABLE_MESSAGE_INIT_DECL_REMAP", 0 },
 	{ "GAME_RELIABLE_MESSAGE_REMAP_DECL", 1 },
 	{ "GAME_RELIABLE_MESSAGE_SPAWN_PLAYER", 2 },
@@ -2304,7 +2188,7 @@ static enumValueInfo_t constraintType_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t enum_98_typeInfo[] = {
+static enumValueInfo_t enum_91_typeInfo[] = {
 	{ "TH_ALL", -1 },
 	{ "TH_THINK", 1 },
 	{ "TH_PHYSICS", 2 },
@@ -2329,26 +2213,26 @@ static enumValueInfo_t signalNum_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t idEntity_enum_100_typeInfo[] = {
+static enumValueInfo_t idEntity_enum_93_typeInfo[] = {
 	{ "EVENT_STARTSOUNDSHADER", 0 },
 	{ "EVENT_STOPSOUNDSHADER", 1 },
 	{ "EVENT_MAXEVENTS", 2 },
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t idAnimatedEntity_enum_101_typeInfo[] = {
+static enumValueInfo_t idAnimatedEntity_enum_94_typeInfo[] = {
 	{ "EVENT_ADD_DAMAGE_EFFECT", 2 },
 	{ "EVENT_MAXEVENTS", 3 },
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t idPlayerStart_enum_102_typeInfo[] = {
+static enumValueInfo_t idPlayerStart_enum_95_typeInfo[] = {
 	{ "EVENT_TELEPORTPLAYER", 2 },
 	{ "EVENT_MAXEVENTS", 3 },
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t idProjectile_enum_103_typeInfo[] = {
+static enumValueInfo_t idProjectile_enum_96_typeInfo[] = {
 	{ "EVENT_DAMAGE_EFFECT", 2 },
 	{ "EVENT_MAXEVENTS", 3 },
 	{ NULL, 0 }
@@ -2373,7 +2257,7 @@ static enumValueInfo_t weaponStatus_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t idWeapon_enum_106_typeInfo[] = {
+static enumValueInfo_t idWeapon_enum_99_typeInfo[] = {
 	{ "EVENT_RELOAD", 2 },
 	{ "EVENT_ENDRELOAD", 3 },
 	{ "EVENT_CHANGESKIN", 4 },
@@ -2381,13 +2265,13 @@ static enumValueInfo_t idWeapon_enum_106_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t idLight_enum_107_typeInfo[] = {
+static enumValueInfo_t idLight_enum_100_typeInfo[] = {
 	{ "EVENT_BECOMEBROKEN", 2 },
 	{ "EVENT_MAXEVENTS", 3 },
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t idItem_enum_108_typeInfo[] = {
+static enumValueInfo_t idItem_enum_101_typeInfo[] = {
 	{ "EVENT_PICKUP", 2 },
 	{ "EVENT_RESPAWN", 3 },
 	{ "EVENT_RESPAWNFX", 4 },
@@ -2402,7 +2286,7 @@ static enumValueInfo_t playerIconType_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t enum_110_typeInfo[] = {
+static enumValueInfo_t enum_103_typeInfo[] = {
 	{ "BERSERK", 0 },
 	{ "INVISIBILITY", 1 },
 	{ "MEGAHEALTH", 2 },
@@ -2411,7 +2295,7 @@ static enumValueInfo_t enum_110_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t enum_111_typeInfo[] = {
+static enumValueInfo_t enum_104_typeInfo[] = {
 	{ "SPEED", 0 },
 	{ "PROJECTILE_DAMAGE", 1 },
 	{ "MELEE_DAMAGE", 2 },
@@ -2419,7 +2303,7 @@ static enumValueInfo_t enum_111_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t enum_112_typeInfo[] = {
+static enumValueInfo_t enum_105_typeInfo[] = {
 	{ "INFLUENCE_NONE", 0 },
 	{ "INFLUENCE_LEVEL1", 1 },
 	{ "INFLUENCE_LEVEL2", 2 },
@@ -2427,7 +2311,7 @@ static enumValueInfo_t enum_112_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t idPlayer_enum_113_typeInfo[] = {
+static enumValueInfo_t idPlayer_enum_106_typeInfo[] = {
 	{ "EVENT_IMPULSE", 2 },
 	{ "EVENT_EXIT_TELEPORTER", 3 },
 	{ "EVENT_ABORT_TELEPORTER", 4 },
@@ -2484,7 +2368,7 @@ static enumValueInfo_t moverState_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t idExplodingBarrel_enum_119_typeInfo[] = {
+static enumValueInfo_t idExplodingBarrel_enum_112_typeInfo[] = {
 	{ "EVENT_EXPLODE", 2 },
 	{ "EVENT_MAXEVENTS", 3 },
 	{ NULL, 0 }
@@ -2498,7 +2382,7 @@ static enumValueInfo_t idExplodingBarrel_explode_state_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t idSecurityCamera_enum_121_typeInfo[] = {
+static enumValueInfo_t idSecurityCamera_enum_114_typeInfo[] = {
 	{ "SCANNING", 0 },
 	{ "LOSINGINTEREST", 1 },
 	{ "ALERT", 2 },
@@ -2506,7 +2390,7 @@ static enumValueInfo_t idSecurityCamera_enum_121_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t idBrittleFracture_enum_122_typeInfo[] = {
+static enumValueInfo_t idBrittleFracture_enum_115_typeInfo[] = {
 	{ "EVENT_PROJECT_DECAL", 2 },
 	{ "EVENT_SHATTER", 3 },
 	{ "EVENT_MAXEVENTS", 4 },
@@ -2573,7 +2457,7 @@ static enumValueInfo_t stopEvent_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static enumValueInfo_t enum_128_typeInfo[] = {
+static enumValueInfo_t enum_121_typeInfo[] = {
 	{ "OP_RETURN", 0 },
 	{ "OP_UINC_F", 1 },
 	{ "OP_UINCP_F", 2 },
@@ -2734,24 +2618,17 @@ static enumTypeInfo_t enumTypeInfo[] = {
 	{ "dlMime_t", dlMime_t_typeInfo },
 	{ "findFile_t", findFile_t_typeInfo },
 	{ "inhibit_t", inhibit_t_typeInfo },
-	{ "ovrHmdType", ovrHmdType_typeInfo },
-	{ "ovrHmdCaps", ovrHmdCaps_typeInfo },
-	{ "ovrTrackingCaps", ovrTrackingCaps_typeInfo },
-	{ "ovrDistortionCaps", ovrDistortionCaps_typeInfo },
-	{ "ovrEyeType", ovrEyeType_typeInfo },
-	{ "ovrStatusBits", ovrStatusBits_typeInfo },
-	{ "ovrRenderAPIType", ovrRenderAPIType_typeInfo },
 	{ "declType_t", declType_t_typeInfo },
 	{ "declState_t", declState_t_typeInfo },
-	{ "enum_41", enum_41_typeInfo },
+	{ "enum_34", enum_34_typeInfo },
 	{ "prtDistribution_t", prtDistribution_t_typeInfo },
 	{ "prtDirection_t", prtDirection_t_typeInfo },
 	{ "prtCustomPth_t", prtCustomPth_t_typeInfo },
 	{ "prtOrientation_t", prtOrientation_t_typeInfo },
 	{ "declAFConstraintType_t", declAFConstraintType_t_typeInfo },
 	{ "declAFJointMod_t", declAFJointMod_t_typeInfo },
-	{ "idAFVector::enum_48", idAFVector_enum_48_typeInfo },
-	{ "idDeclAF_Constraint::enum_49", idDeclAF_Constraint_enum_49_typeInfo },
+	{ "idAFVector::enum_41", idAFVector_enum_41_typeInfo },
+	{ "idDeclAF_Constraint::enum_42", idDeclAF_Constraint_enum_42_typeInfo },
 	{ "cinStatus_t", cinStatus_t_typeInfo },
 	{ "textureFilter_t", textureFilter_t_typeInfo },
 	{ "textureRepeat_t", textureRepeat_t_typeInfo },
@@ -2775,13 +2652,13 @@ static enumTypeInfo_t enumTypeInfo[] = {
 	{ "contactType_t", contactType_t_typeInfo },
 	{ "allowReply_t", allowReply_t_typeInfo },
 	{ "escReply_t", escReply_t_typeInfo },
-	{ "enum_73", enum_73_typeInfo },
+	{ "enum_66", enum_66_typeInfo },
 	{ "etype_t", etype_t_typeInfo },
 	{ "idVarDef::initialized_t", idVarDef_initialized_t_typeInfo },
 	{ "jointModTransform_t", jointModTransform_t_typeInfo },
 	{ "frameCommandType_t", frameCommandType_t_typeInfo },
 	{ "AFJointModType_t", AFJointModType_t_typeInfo },
-	{ "enum_79", enum_79_typeInfo },
+	{ "enum_72", enum_72_typeInfo },
 	{ "pvsType_t", pvsType_t_typeInfo },
 	{ "gameType_t", gameType_t_typeInfo },
 	{ "playerVote_t", playerVote_t_typeInfo },
@@ -2790,7 +2667,7 @@ static enumTypeInfo_t enumTypeInfo[] = {
 	{ "idMultiplayerGame::msg_evt_t", idMultiplayerGame_msg_evt_t_typeInfo },
 	{ "idMultiplayerGame::vote_flags_t", idMultiplayerGame_vote_flags_t_typeInfo },
 	{ "idMultiplayerGame::vote_result_t", idMultiplayerGame_vote_result_t_typeInfo },
-	{ "enum_88", enum_88_typeInfo },
+	{ "enum_81", enum_81_typeInfo },
 	{ "gameState_t", gameState_t_typeInfo },
 	{ "idEventQueue::outOfOrderBehaviour_t", idEventQueue_outOfOrderBehaviour_t_typeInfo },
 	{ "gameSoundChannel_t", gameSoundChannel_t_typeInfo },
@@ -2800,37 +2677,37 @@ static enumTypeInfo_t enumTypeInfo[] = {
 	{ "pmtype_t", pmtype_t_typeInfo },
 	{ "waterLevel_t", waterLevel_t_typeInfo },
 	{ "constraintType_t", constraintType_t_typeInfo },
-	{ "enum_98", enum_98_typeInfo },
+	{ "enum_91", enum_91_typeInfo },
 	{ "signalNum_t", signalNum_t_typeInfo },
-	{ "idEntity::enum_100", idEntity_enum_100_typeInfo },
-	{ "idAnimatedEntity::enum_101", idAnimatedEntity_enum_101_typeInfo },
-	{ "idPlayerStart::enum_102", idPlayerStart_enum_102_typeInfo },
-	{ "idProjectile::enum_103", idProjectile_enum_103_typeInfo },
+	{ "idEntity::enum_93", idEntity_enum_93_typeInfo },
+	{ "idAnimatedEntity::enum_94", idAnimatedEntity_enum_94_typeInfo },
+	{ "idPlayerStart::enum_95", idPlayerStart_enum_95_typeInfo },
+	{ "idProjectile::enum_96", idProjectile_enum_96_typeInfo },
 	{ "idProjectile::projectileState_t", idProjectile_projectileState_t_typeInfo },
 	{ "weaponStatus_t", weaponStatus_t_typeInfo },
-	{ "idWeapon::enum_106", idWeapon_enum_106_typeInfo },
-	{ "idLight::enum_107", idLight_enum_107_typeInfo },
-	{ "idItem::enum_108", idItem_enum_108_typeInfo },
+	{ "idWeapon::enum_99", idWeapon_enum_99_typeInfo },
+	{ "idLight::enum_100", idLight_enum_100_typeInfo },
+	{ "idItem::enum_101", idItem_enum_101_typeInfo },
 	{ "playerIconType_t", playerIconType_t_typeInfo },
-	{ "enum_110", enum_110_typeInfo },
-	{ "enum_111", enum_111_typeInfo },
-	{ "enum_112", enum_112_typeInfo },
-	{ "idPlayer::enum_113", idPlayer_enum_113_typeInfo },
+	{ "enum_103", enum_103_typeInfo },
+	{ "enum_104", enum_104_typeInfo },
+	{ "enum_105", enum_105_typeInfo },
+	{ "idPlayer::enum_106", idPlayer_enum_106_typeInfo },
 	{ "idMover::moveStage_t", idMover_moveStage_t_typeInfo },
 	{ "idMover::moverCommand_t", idMover_moverCommand_t_typeInfo },
 	{ "idMover::moverDir_t", idMover_moverDir_t_typeInfo },
 	{ "idElevator::elevatorState_t", idElevator_elevatorState_t_typeInfo },
 	{ "moverState_t", moverState_t_typeInfo },
-	{ "idExplodingBarrel::enum_119", idExplodingBarrel_enum_119_typeInfo },
+	{ "idExplodingBarrel::enum_112", idExplodingBarrel_enum_112_typeInfo },
 	{ "idExplodingBarrel::explode_state_t", idExplodingBarrel_explode_state_t_typeInfo },
-	{ "idSecurityCamera::enum_121", idSecurityCamera_enum_121_typeInfo },
-	{ "idBrittleFracture::enum_122", idBrittleFracture_enum_122_typeInfo },
+	{ "idSecurityCamera::enum_114", idSecurityCamera_enum_114_typeInfo },
+	{ "idBrittleFracture::enum_115", idBrittleFracture_enum_115_typeInfo },
 	{ "moveType_t", moveType_t_typeInfo },
 	{ "moveCommand_t", moveCommand_t_typeInfo },
 	{ "talkState_t", talkState_t_typeInfo },
 	{ "moveStatus_t", moveStatus_t_typeInfo },
 	{ "stopEvent_t", stopEvent_t_typeInfo },
-	{ "enum_128", enum_128_typeInfo },
+	{ "enum_121", enum_121_typeInfo },
 	{ NULL, NULL }
 };
 
@@ -3887,197 +3764,6 @@ static classVariableInfo_t idUsercmdGen_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static classVariableInfo_t ovrVector2i_typeInfo[] = {
-	{ "int", "x", (int)(&((ovrVector2i *)0)->x), sizeof( ((ovrVector2i *)0)->x ) },
-	{ "int", "y", (int)(&((ovrVector2i *)0)->y), sizeof( ((ovrVector2i *)0)->y ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrSizei_typeInfo[] = {
-	{ "int", "w", (int)(&((ovrSizei *)0)->w), sizeof( ((ovrSizei *)0)->w ) },
-	{ "int", "h", (int)(&((ovrSizei *)0)->h), sizeof( ((ovrSizei *)0)->h ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrRecti_typeInfo[] = {
-	{ "ovrVector2i", "Pos", (int)(&((ovrRecti *)0)->Pos), sizeof( ((ovrRecti *)0)->Pos ) },
-	{ "ovrSizei", "Size", (int)(&((ovrRecti *)0)->Size), sizeof( ((ovrRecti *)0)->Size ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrQuatf_typeInfo[] = {
-	{ "float", "x", (int)(&((ovrQuatf *)0)->x), sizeof( ((ovrQuatf *)0)->x ) },
-	{ "float", "y", (int)(&((ovrQuatf *)0)->y), sizeof( ((ovrQuatf *)0)->y ) },
-	{ "float", "z", (int)(&((ovrQuatf *)0)->z), sizeof( ((ovrQuatf *)0)->z ) },
-	{ "float", "w", (int)(&((ovrQuatf *)0)->w), sizeof( ((ovrQuatf *)0)->w ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrVector2f_typeInfo[] = {
-	{ "float", "x", (int)(&((ovrVector2f *)0)->x), sizeof( ((ovrVector2f *)0)->x ) },
-	{ "float", "y", (int)(&((ovrVector2f *)0)->y), sizeof( ((ovrVector2f *)0)->y ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrVector3f_typeInfo[] = {
-	{ "float", "x", (int)(&((ovrVector3f *)0)->x), sizeof( ((ovrVector3f *)0)->x ) },
-	{ "float", "y", (int)(&((ovrVector3f *)0)->y), sizeof( ((ovrVector3f *)0)->y ) },
-	{ "float", "z", (int)(&((ovrVector3f *)0)->z), sizeof( ((ovrVector3f *)0)->z ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrMatrix4f_typeInfo[] = {
-	{ "float[16]", "M", (int)(&((ovrMatrix4f *)0)->M), sizeof( ((ovrMatrix4f *)0)->M ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrPosef_typeInfo[] = {
-	{ "ovrQuatf", "Orientation", (int)(&((ovrPosef *)0)->Orientation), sizeof( ((ovrPosef *)0)->Orientation ) },
-	{ "ovrVector3f", "Position", (int)(&((ovrPosef *)0)->Position), sizeof( ((ovrPosef *)0)->Position ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrPoseStatef_typeInfo[] = {
-	{ "ovrPosef", "ThePose", (int)(&((ovrPoseStatef *)0)->ThePose), sizeof( ((ovrPoseStatef *)0)->ThePose ) },
-	{ "ovrVector3f", "AngularVelocity", (int)(&((ovrPoseStatef *)0)->AngularVelocity), sizeof( ((ovrPoseStatef *)0)->AngularVelocity ) },
-	{ "ovrVector3f", "LinearVelocity", (int)(&((ovrPoseStatef *)0)->LinearVelocity), sizeof( ((ovrPoseStatef *)0)->LinearVelocity ) },
-	{ "ovrVector3f", "AngularAcceleration", (int)(&((ovrPoseStatef *)0)->AngularAcceleration), sizeof( ((ovrPoseStatef *)0)->AngularAcceleration ) },
-	{ "ovrVector3f", "LinearAcceleration", (int)(&((ovrPoseStatef *)0)->LinearAcceleration), sizeof( ((ovrPoseStatef *)0)->LinearAcceleration ) },
-	{ "double", "TimeInSeconds", (int)(&((ovrPoseStatef *)0)->TimeInSeconds), sizeof( ((ovrPoseStatef *)0)->TimeInSeconds ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrFovPort_typeInfo[] = {
-	{ "float", "UpTan", (int)(&((ovrFovPort *)0)->UpTan), sizeof( ((ovrFovPort *)0)->UpTan ) },
-	{ "float", "DownTan", (int)(&((ovrFovPort *)0)->DownTan), sizeof( ((ovrFovPort *)0)->DownTan ) },
-	{ "float", "LeftTan", (int)(&((ovrFovPort *)0)->LeftTan), sizeof( ((ovrFovPort *)0)->LeftTan ) },
-	{ "float", "RightTan", (int)(&((ovrFovPort *)0)->RightTan), sizeof( ((ovrFovPort *)0)->RightTan ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrHmdDesc_typeInfo[] = {
-	{ "ovrHmdStruct *", "Handle", (int)(&((ovrHmdDesc *)0)->Handle), sizeof( ((ovrHmdDesc *)0)->Handle ) },
-	{ "ovrHmdType", "Type", (int)(&((ovrHmdDesc *)0)->Type), sizeof( ((ovrHmdDesc *)0)->Type ) },
-	{ "const char *", "ProductName", (int)(&((ovrHmdDesc *)0)->ProductName), sizeof( ((ovrHmdDesc *)0)->ProductName ) },
-	{ "const char *", "Manufacturer", (int)(&((ovrHmdDesc *)0)->Manufacturer), sizeof( ((ovrHmdDesc *)0)->Manufacturer ) },
-	{ "short", "VendorId", (int)(&((ovrHmdDesc *)0)->VendorId), sizeof( ((ovrHmdDesc *)0)->VendorId ) },
-	{ "short", "ProductId", (int)(&((ovrHmdDesc *)0)->ProductId), sizeof( ((ovrHmdDesc *)0)->ProductId ) },
-	{ "char[24]", "SerialNumber", (int)(&((ovrHmdDesc *)0)->SerialNumber), sizeof( ((ovrHmdDesc *)0)->SerialNumber ) },
-	{ "short", "FirmwareMajor", (int)(&((ovrHmdDesc *)0)->FirmwareMajor), sizeof( ((ovrHmdDesc *)0)->FirmwareMajor ) },
-	{ "short", "FirmwareMinor", (int)(&((ovrHmdDesc *)0)->FirmwareMinor), sizeof( ((ovrHmdDesc *)0)->FirmwareMinor ) },
-	{ "float", "CameraFrustumHFovInRadians", (int)(&((ovrHmdDesc *)0)->CameraFrustumHFovInRadians), sizeof( ((ovrHmdDesc *)0)->CameraFrustumHFovInRadians ) },
-	{ "float", "CameraFrustumVFovInRadians", (int)(&((ovrHmdDesc *)0)->CameraFrustumVFovInRadians), sizeof( ((ovrHmdDesc *)0)->CameraFrustumVFovInRadians ) },
-	{ "float", "CameraFrustumNearZInMeters", (int)(&((ovrHmdDesc *)0)->CameraFrustumNearZInMeters), sizeof( ((ovrHmdDesc *)0)->CameraFrustumNearZInMeters ) },
-	{ "float", "CameraFrustumFarZInMeters", (int)(&((ovrHmdDesc *)0)->CameraFrustumFarZInMeters), sizeof( ((ovrHmdDesc *)0)->CameraFrustumFarZInMeters ) },
-	{ "unsigned int", "HmdCaps", (int)(&((ovrHmdDesc *)0)->HmdCaps), sizeof( ((ovrHmdDesc *)0)->HmdCaps ) },
-	{ "unsigned int", "TrackingCaps", (int)(&((ovrHmdDesc *)0)->TrackingCaps), sizeof( ((ovrHmdDesc *)0)->TrackingCaps ) },
-	{ "unsigned int", "DistortionCaps", (int)(&((ovrHmdDesc *)0)->DistortionCaps), sizeof( ((ovrHmdDesc *)0)->DistortionCaps ) },
-	{ "ovrFovPort[2]", "DefaultEyeFov", (int)(&((ovrHmdDesc *)0)->DefaultEyeFov), sizeof( ((ovrHmdDesc *)0)->DefaultEyeFov ) },
-	{ "ovrFovPort[2]", "MaxEyeFov", (int)(&((ovrHmdDesc *)0)->MaxEyeFov), sizeof( ((ovrHmdDesc *)0)->MaxEyeFov ) },
-	{ "ovrEyeType[2]", "EyeRenderOrder", (int)(&((ovrHmdDesc *)0)->EyeRenderOrder), sizeof( ((ovrHmdDesc *)0)->EyeRenderOrder ) },
-	{ "ovrSizei", "Resolution", (int)(&((ovrHmdDesc *)0)->Resolution), sizeof( ((ovrHmdDesc *)0)->Resolution ) },
-	{ "ovrVector2i", "WindowsPos", (int)(&((ovrHmdDesc *)0)->WindowsPos), sizeof( ((ovrHmdDesc *)0)->WindowsPos ) },
-	{ "const char *", "DisplayDeviceName", (int)(&((ovrHmdDesc *)0)->DisplayDeviceName), sizeof( ((ovrHmdDesc *)0)->DisplayDeviceName ) },
-	{ "int", "DisplayId", (int)(&((ovrHmdDesc *)0)->DisplayId), sizeof( ((ovrHmdDesc *)0)->DisplayId ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrSensorData_typeInfo[] = {
-	{ "ovrVector3f", "Accelerometer", (int)(&((ovrSensorData *)0)->Accelerometer), sizeof( ((ovrSensorData *)0)->Accelerometer ) },
-	{ "ovrVector3f", "Gyro", (int)(&((ovrSensorData *)0)->Gyro), sizeof( ((ovrSensorData *)0)->Gyro ) },
-	{ "ovrVector3f", "Magnetometer", (int)(&((ovrSensorData *)0)->Magnetometer), sizeof( ((ovrSensorData *)0)->Magnetometer ) },
-	{ "float", "Temperature", (int)(&((ovrSensorData *)0)->Temperature), sizeof( ((ovrSensorData *)0)->Temperature ) },
-	{ "float", "TimeInSeconds", (int)(&((ovrSensorData *)0)->TimeInSeconds), sizeof( ((ovrSensorData *)0)->TimeInSeconds ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrTrackingState_typeInfo[] = {
-	{ "ovrPoseStatef", "HeadPose", (int)(&((ovrTrackingState *)0)->HeadPose), sizeof( ((ovrTrackingState *)0)->HeadPose ) },
-	{ "ovrPosef", "CameraPose", (int)(&((ovrTrackingState *)0)->CameraPose), sizeof( ((ovrTrackingState *)0)->CameraPose ) },
-	{ "ovrPosef", "LeveledCameraPose", (int)(&((ovrTrackingState *)0)->LeveledCameraPose), sizeof( ((ovrTrackingState *)0)->LeveledCameraPose ) },
-	{ "ovrSensorData", "RawSensorData", (int)(&((ovrTrackingState *)0)->RawSensorData), sizeof( ((ovrTrackingState *)0)->RawSensorData ) },
-	{ "unsigned int", "StatusFlags", (int)(&((ovrTrackingState *)0)->StatusFlags), sizeof( ((ovrTrackingState *)0)->StatusFlags ) },
-	{ "double", "LastVisionProcessingTime", (int)(&((ovrTrackingState *)0)->LastVisionProcessingTime), sizeof( ((ovrTrackingState *)0)->LastVisionProcessingTime ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrFrameTiming_typeInfo[] = {
-	{ "float", "DeltaSeconds", (int)(&((ovrFrameTiming *)0)->DeltaSeconds), sizeof( ((ovrFrameTiming *)0)->DeltaSeconds ) },
-	{ "double", "ThisFrameSeconds", (int)(&((ovrFrameTiming *)0)->ThisFrameSeconds), sizeof( ((ovrFrameTiming *)0)->ThisFrameSeconds ) },
-	{ "double", "TimewarpPointSeconds", (int)(&((ovrFrameTiming *)0)->TimewarpPointSeconds), sizeof( ((ovrFrameTiming *)0)->TimewarpPointSeconds ) },
-	{ "double", "NextFrameSeconds", (int)(&((ovrFrameTiming *)0)->NextFrameSeconds), sizeof( ((ovrFrameTiming *)0)->NextFrameSeconds ) },
-	{ "double", "ScanoutMidpointSeconds", (int)(&((ovrFrameTiming *)0)->ScanoutMidpointSeconds), sizeof( ((ovrFrameTiming *)0)->ScanoutMidpointSeconds ) },
-	{ "double[2]", "EyeScanoutSeconds", (int)(&((ovrFrameTiming *)0)->EyeScanoutSeconds), sizeof( ((ovrFrameTiming *)0)->EyeScanoutSeconds ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrEyeRenderDesc_typeInfo[] = {
-	{ "ovrEyeType", "Eye", (int)(&((ovrEyeRenderDesc *)0)->Eye), sizeof( ((ovrEyeRenderDesc *)0)->Eye ) },
-	{ "ovrFovPort", "Fov", (int)(&((ovrEyeRenderDesc *)0)->Fov), sizeof( ((ovrEyeRenderDesc *)0)->Fov ) },
-	{ "ovrRecti", "DistortedViewport", (int)(&((ovrEyeRenderDesc *)0)->DistortedViewport), sizeof( ((ovrEyeRenderDesc *)0)->DistortedViewport ) },
-	{ "ovrVector2f", "PixelsPerTanAngleAtCenter", (int)(&((ovrEyeRenderDesc *)0)->PixelsPerTanAngleAtCenter), sizeof( ((ovrEyeRenderDesc *)0)->PixelsPerTanAngleAtCenter ) },
-	{ "ovrVector3f", "ViewAdjust", (int)(&((ovrEyeRenderDesc *)0)->ViewAdjust), sizeof( ((ovrEyeRenderDesc *)0)->ViewAdjust ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrRenderAPIConfigHeader_typeInfo[] = {
-	{ "ovrRenderAPIType", "API", (int)(&((ovrRenderAPIConfigHeader *)0)->API), sizeof( ((ovrRenderAPIConfigHeader *)0)->API ) },
-	{ "ovrSizei", "RTSize", (int)(&((ovrRenderAPIConfigHeader *)0)->RTSize), sizeof( ((ovrRenderAPIConfigHeader *)0)->RTSize ) },
-	{ "int", "Multisample", (int)(&((ovrRenderAPIConfigHeader *)0)->Multisample), sizeof( ((ovrRenderAPIConfigHeader *)0)->Multisample ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrRenderAPIConfig_typeInfo[] = {
-	{ "ovrRenderAPIConfigHeader", "Header", (int)(&((ovrRenderAPIConfig *)0)->Header), sizeof( ((ovrRenderAPIConfig *)0)->Header ) },
-	{ "uintptr_t[8]", "PlatformData", (int)(&((ovrRenderAPIConfig *)0)->PlatformData), sizeof( ((ovrRenderAPIConfig *)0)->PlatformData ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrTextureHeader_typeInfo[] = {
-	{ "ovrRenderAPIType", "API", (int)(&((ovrTextureHeader *)0)->API), sizeof( ((ovrTextureHeader *)0)->API ) },
-	{ "ovrSizei", "TextureSize", (int)(&((ovrTextureHeader *)0)->TextureSize), sizeof( ((ovrTextureHeader *)0)->TextureSize ) },
-	{ "ovrRecti", "RenderViewport", (int)(&((ovrTextureHeader *)0)->RenderViewport), sizeof( ((ovrTextureHeader *)0)->RenderViewport ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrTexture_typeInfo[] = {
-	{ "ovrTextureHeader", "Header", (int)(&((ovrTexture *)0)->Header), sizeof( ((ovrTexture *)0)->Header ) },
-	{ "uintptr_t[8]", "PlatformData", (int)(&((ovrTexture *)0)->PlatformData), sizeof( ((ovrTexture *)0)->PlatformData ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t ovrvidmode_t_typeInfo[] = {
-	{ "const char *", "description", (int)(&((ovrvidmode_t *)0)->description), sizeof( ((ovrvidmode_t *)0)->description ) },
-	{ "int", "width", (int)(&((ovrvidmode_t *)0)->width), sizeof( ((ovrvidmode_t *)0)->width ) },
-	{ "int", "height", (int)(&((ovrvidmode_t *)0)->height), sizeof( ((ovrvidmode_t *)0)->height ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t OculusHmd_typeInfo[] = {
-	{ "bool", "isDebughmd", (int)(&((OculusHmd *)0)->isDebughmd), sizeof( ((OculusHmd *)0)->isDebughmd ) },
-	{ "int", "multiSamples", (int)(&((OculusHmd *)0)->multiSamples), sizeof( ((OculusHmd *)0)->multiSamples ) },
-	{ "ovrTexture[2]", "G_OvrTextures", (int)(&((OculusHmd *)0)->G_OvrTextures), sizeof( ((OculusHmd *)0)->G_OvrTextures ) },
-	{ "ovrFovPort[2]", "G_ovrEyeFov", (int)(&((OculusHmd *)0)->G_ovrEyeFov), sizeof( ((OculusHmd *)0)->G_ovrEyeFov ) },
-	{ "GLuint[2]", "EyeTexture", (int)(&((OculusHmd *)0)->EyeTexture), sizeof( ((OculusHmd *)0)->EyeTexture ) },
-	{ "GLuint[2]", "G_GLFrameBuffer", (int)(&((OculusHmd *)0)->G_GLFrameBuffer), sizeof( ((OculusHmd *)0)->G_GLFrameBuffer ) },
-	{ "GLuint", "G_GLGuiFrameBuffer", (int)(&((OculusHmd *)0)->G_GLGuiFrameBuffer), sizeof( ((OculusHmd *)0)->G_GLGuiFrameBuffer ) },
-	{ "GLuint[3]", "G_GLDepthBuffer", (int)(&((OculusHmd *)0)->G_GLDepthBuffer), sizeof( ((OculusHmd *)0)->G_GLDepthBuffer ) },
-	{ "GLuint[3]", "G_GLDepthTexture", (int)(&((OculusHmd *)0)->G_GLDepthTexture), sizeof( ((OculusHmd *)0)->G_GLDepthTexture ) },
-	{ "GLuint", "G_GLGuiTexture", (int)(&((OculusHmd *)0)->G_GLGuiTexture), sizeof( ((OculusHmd *)0)->G_GLGuiTexture ) },
-	{ "ovrEyeRenderDesc[2]", "G_ovrEyeRenderDesc", (int)(&((OculusHmd *)0)->G_ovrEyeRenderDesc), sizeof( ((OculusHmd *)0)->G_ovrEyeRenderDesc ) },
-	{ "int", "G_ovrRenderWidth", (int)(&((OculusHmd *)0)->G_ovrRenderWidth), sizeof( ((OculusHmd *)0)->G_ovrRenderWidth ) },
-	{ "int", "G_ovrRenderHeight", (int)(&((OculusHmd *)0)->G_ovrRenderHeight), sizeof( ((OculusHmd *)0)->G_ovrRenderHeight ) },
-	{ "int", "G_FrameBufferWidth", (int)(&((OculusHmd *)0)->G_FrameBufferWidth), sizeof( ((OculusHmd *)0)->G_FrameBufferWidth ) },
-	{ "int", "G_FrameBufferHeight", (int)(&((OculusHmd *)0)->G_FrameBufferHeight), sizeof( ((OculusHmd *)0)->G_FrameBufferHeight ) },
-	{ NULL, 0 }
-};
-
-static classVariableInfo_t XinputGamePad_typeInfo[] = {
-	{ "int", "id", (int)(&((XinputGamePad *)0)->id), sizeof( ((XinputGamePad *)0)->id ) },
-	{ "XINPUT_STATE", "state", (int)(&((XinputGamePad *)0)->state), sizeof( ((XinputGamePad *)0)->state ) },
-	{ NULL, 0 }
-};
-
 static classVariableInfo_t idDeclBase_typeInfo[] = {
 	{ NULL, 0 }
 };
@@ -4225,7 +3911,7 @@ static classVariableInfo_t idDeclParticle_typeInfo[] = {
 };
 
 static classVariableInfo_t idAFVector_typeInfo[] = {
-	{ "idAFVector::enum_48", "type", (int)(&((idAFVector *)0)->type), sizeof( ((idAFVector *)0)->type ) },
+	{ "idAFVector::enum_41", "type", (int)(&((idAFVector *)0)->type), sizeof( ((idAFVector *)0)->type ) },
 	{ "idStr", "joint1", (int)(&((idAFVector *)0)->joint1), sizeof( ((idAFVector *)0)->joint1 ) },
 	{ "idStr", "joint2", (int)(&((idAFVector *)0)->joint2), sizeof( ((idAFVector *)0)->joint2 ) },
 	{ "mutable idVec3", "vec", (int)(&((idAFVector *)0)->vec), sizeof( ((idAFVector *)0)->vec ) },
@@ -4274,7 +3960,7 @@ static classVariableInfo_t idDeclAF_Constraint_typeInfo[] = {
 	{ "idAFVector", "anchor2", (int)(&((idDeclAF_Constraint *)0)->anchor2), sizeof( ((idDeclAF_Constraint *)0)->anchor2 ) },
 	{ "idAFVector[2]", "shaft", (int)(&((idDeclAF_Constraint *)0)->shaft), sizeof( ((idDeclAF_Constraint *)0)->shaft ) },
 	{ "idAFVector", "axis", (int)(&((idDeclAF_Constraint *)0)->axis), sizeof( ((idDeclAF_Constraint *)0)->axis ) },
-	{ "idDeclAF_Constraint::enum_49", "limit", (int)(&((idDeclAF_Constraint *)0)->limit), sizeof( ((idDeclAF_Constraint *)0)->limit ) },
+	{ "idDeclAF_Constraint::enum_42", "limit", (int)(&((idDeclAF_Constraint *)0)->limit), sizeof( ((idDeclAF_Constraint *)0)->limit ) },
 	{ "idAFVector", "limitAxis", (int)(&((idDeclAF_Constraint *)0)->limitAxis), sizeof( ((idDeclAF_Constraint *)0)->limitAxis ) },
 	{ "float[3]", "limitAngles", (int)(&((idDeclAF_Constraint *)0)->limitAngles), sizeof( ((idDeclAF_Constraint *)0)->limitAngles ) },
 	{ NULL, 0 }
@@ -5283,11 +4969,11 @@ static classVariableInfo_t frameLookup_t_typeInfo[] = {
 	{ NULL, 0 }
 };
 
-static classVariableInfo_t class_276_class_276_typeInfo[] = {
-//	{ "const idSoundShader *", "soundShader", (int)(&((class_276::class_276 *)0)->soundShader), sizeof( ((class_276::class_276 *)0)->soundShader ) },
-//	{ "const function_t *", "function", (int)(&((class_276::class_276 *)0)->function), sizeof( ((class_276::class_276 *)0)->function ) },
-//	{ "const idDeclSkin *", "skin", (int)(&((class_276::class_276 *)0)->skin), sizeof( ((class_276::class_276 *)0)->skin ) },
-//	{ "int", "index", (int)(&((class_276::class_276 *)0)->index), sizeof( ((class_276::class_276 *)0)->index ) },
+static classVariableInfo_t class_254_class_254_typeInfo[] = {
+//	{ "const idSoundShader *", "soundShader", (int)(&((class_254::class_254 *)0)->soundShader), sizeof( ((class_254::class_254 *)0)->soundShader ) },
+//	{ "const function_t *", "function", (int)(&((class_254::class_254 *)0)->function), sizeof( ((class_254::class_254 *)0)->function ) },
+//	{ "const idDeclSkin *", "skin", (int)(&((class_254::class_254 *)0)->skin), sizeof( ((class_254::class_254 *)0)->skin ) },
+//	{ "int", "index", (int)(&((class_254::class_254 *)0)->index), sizeof( ((class_254::class_254 *)0)->index ) },
 	{ NULL, 0 }
 };
 
@@ -8362,28 +8048,6 @@ static classTypeInfo_t classTypeInfo[] = {
 	{ "idFileSystem", "", sizeof(idFileSystem), idFileSystem_typeInfo },
 	{ "usercmd_t", "", sizeof(usercmd_t), usercmd_t_typeInfo },
 	{ "idUsercmdGen", "", sizeof(idUsercmdGen), idUsercmdGen_typeInfo },
-	{ "ovrVector2i", "", sizeof(ovrVector2i), ovrVector2i_typeInfo },
-	{ "ovrSizei", "", sizeof(ovrSizei), ovrSizei_typeInfo },
-	{ "ovrRecti", "", sizeof(ovrRecti), ovrRecti_typeInfo },
-	{ "ovrQuatf", "", sizeof(ovrQuatf), ovrQuatf_typeInfo },
-	{ "ovrVector2f", "", sizeof(ovrVector2f), ovrVector2f_typeInfo },
-	{ "ovrVector3f", "", sizeof(ovrVector3f), ovrVector3f_typeInfo },
-	{ "ovrMatrix4f", "", sizeof(ovrMatrix4f), ovrMatrix4f_typeInfo },
-	{ "ovrPosef", "", sizeof(ovrPosef), ovrPosef_typeInfo },
-	{ "ovrPoseStatef", "", sizeof(ovrPoseStatef), ovrPoseStatef_typeInfo },
-	{ "ovrFovPort", "", sizeof(ovrFovPort), ovrFovPort_typeInfo },
-	{ "ovrHmdDesc", "", sizeof(ovrHmdDesc), ovrHmdDesc_typeInfo },
-	{ "ovrSensorData", "", sizeof(ovrSensorData), ovrSensorData_typeInfo },
-	{ "ovrTrackingState", "", sizeof(ovrTrackingState), ovrTrackingState_typeInfo },
-	{ "ovrFrameTiming", "", sizeof(ovrFrameTiming), ovrFrameTiming_typeInfo },
-	{ "ovrEyeRenderDesc", "", sizeof(ovrEyeRenderDesc), ovrEyeRenderDesc_typeInfo },
-	{ "ovrRenderAPIConfigHeader", "", sizeof(ovrRenderAPIConfigHeader), ovrRenderAPIConfigHeader_typeInfo },
-	{ "ovrRenderAPIConfig", "", sizeof(ovrRenderAPIConfig), ovrRenderAPIConfig_typeInfo },
-	{ "ovrTextureHeader", "", sizeof(ovrTextureHeader), ovrTextureHeader_typeInfo },
-	{ "ovrTexture", "", sizeof(ovrTexture), ovrTexture_typeInfo },
-	{ "ovrvidmode_t", "", sizeof(ovrvidmode_t), ovrvidmode_t_typeInfo },
-	{ "OculusHmd", "", sizeof(OculusHmd), OculusHmd_typeInfo },
-	{ "XinputGamePad", "", sizeof(XinputGamePad), XinputGamePad_typeInfo },
 	{ "idDeclBase", "", sizeof(idDeclBase), idDeclBase_typeInfo },
 	{ "idDecl", "", sizeof(idDecl), idDecl_typeInfo },
 	{ "idDeclManager", "", sizeof(idDeclManager), idDeclManager_typeInfo },
@@ -8498,7 +8162,7 @@ static classTypeInfo_t classTypeInfo[] = {
 	{ "jointInfo_t", "", sizeof(jointInfo_t), jointInfo_t_typeInfo },
 	{ "jointMod_t", "", sizeof(jointMod_t), jointMod_t_typeInfo },
 	{ "frameLookup_t", "", sizeof(frameLookup_t), frameLookup_t_typeInfo },
-//	{ "class_276::class_276", "", sizeof(class_276::class_276), class_276_class_276_typeInfo },
+//	{ "class_254::class_254", "", sizeof(class_254::class_254), class_254_class_254_typeInfo },
 	{ "frameCommand_t", "", sizeof(frameCommand_t), frameCommand_t_typeInfo },
 	{ "animFlags_t", "", sizeof(animFlags_t), animFlags_t_typeInfo },
 	{ "idMD5Anim", "", sizeof(idMD5Anim), idMD5Anim_typeInfo },

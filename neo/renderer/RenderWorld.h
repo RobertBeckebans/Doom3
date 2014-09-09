@@ -323,9 +323,6 @@ public:
 	// rendering a scene may actually render multiple subviews for mirrors and portals, and
 	// may render composite textures for gui console screens and light projections
 	// It would also be acceptable to render a scene multiple times, for "rear view mirrors", etc
-	// OCULUS BEGIN
-	virtual void			RenderSceneStereo( const renderView_t *renderView, int eye) = 0;
-	// OCULUS END
 	virtual void			RenderScene(const renderView_t *renderView) = 0;
 
 	//-------------- Portal Area Information -----------------
@@ -423,6 +420,10 @@ public:
 
 	// Text drawing for debug visualization.
 	virtual void			DrawText( const char *text, const idVec3 &origin, float scale, const idVec4 &color, const idMat3 &viewAxis, const int align = 1, const int lifetime = 0, bool depthTest = false ) = 0;
+
+	// OCULUS BEGIN
+	virtual void			RenderSceneStereo(const renderView_t *renderView, int eye) = 0;
+	// OCULUS END
 };
 
 #endif /* !__RENDERWORLD_H__ */

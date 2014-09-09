@@ -31,6 +31,8 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
+#include "../oculus/Oculus.h"
+
 #include "../extern/OculusSDK/LibOVR/Include/OVR_Kernel.h"
 #include "../extern/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h"
 #include "../renderer/tr_local.h"

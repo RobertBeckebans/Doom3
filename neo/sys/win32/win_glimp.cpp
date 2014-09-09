@@ -43,9 +43,8 @@ If you have questions concerning this license or the applicable additional terms
 #include "../../idlib/precompiled.h"
 #pragma hdrstop
 
+#include "../../oculus/Oculus.h"
 #include "win_local.h"
-//#include "rc/AFEditor_resource.h"
-//#include "rc/doom_resource.h"
 #include "../../renderer/tr_local.h"
 
 static void		GLW_InitExtensions( void );

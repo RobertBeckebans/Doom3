@@ -46,11 +46,7 @@ public:
 	void	ReadFromDemo( idDemoFile *demo );	
 	
 	void	EmitToCurrentView( float modelMatrix[16], bool depthHack );
-
-	// OCULUS BEGIN
-	// Add eye selection support if we ever need it
 	void	EmitFullScreen();
-	// OCULUS END
 
 	// these calls are forwarded from the renderer
 	void	SetColor( float r, float g, float b, float a );

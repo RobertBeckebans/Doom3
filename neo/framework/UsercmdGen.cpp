@@ -29,6 +29,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
+#include "../oculus/Oculus.h"
 #include "Session_local.h"
 
 /*
@@ -53,10 +54,6 @@ bool usercmd_t::operator==( const usercmd_t &rhs ) const {
 			forwardmove == rhs.forwardmove &&
 			rightmove == rhs.rightmove &&
 			upmove == rhs.upmove &&
-			// OCULUS BEGIN
-			//mposx == rhs.mposx &&
-			//mposy == rhs.mposy &&
-			// OCULUS END
 			angles[0] == rhs.angles[0] &&
 			angles[1] == rhs.angles[1] &&
 			angles[2] == rhs.angles[2] &&

@@ -43,6 +43,7 @@ vr/
 hd/
 perfected/
 neo/extern/OculusSDK/
+neo/extern/SDL2-2.0.3/
 sikkmod/
 
 *.opensdf

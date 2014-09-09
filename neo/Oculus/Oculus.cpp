@@ -31,6 +31,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
+#include "Oculus.h"
 #include "../sys/win32/win_local.h"
 
 #include "../extern/OculusSDK/LibOVR/Include/OVR_Kernel.h"
@@ -358,7 +359,9 @@ int OculusHmd::Fn_SetupFrameBuffer(int idx)
 
 	glGenRenderBuffers(1, &G_GLDepthBuffer[idx]);
 	glBindRenderbuffer(GL_FRAMEBUFFER, G_GLDepthBuffer[idx]);
-	glRenderbufferStorage(GL_FRAMEBUFFER, GL_DEPTH24_STENCIL8_EXT, 256, 256);
+	//glRenderbufferStorage(GL_FRAMEBUFFER, GL_DEPTH24_STENCIL8_EXT, 256, 256);
+	glRenderbufferStorage(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_EXT, 128, 128);
+
 
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, G_GLDepthBuffer[idx]);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT_EXT, GL_RENDERBUFFER_EXT, G_GLDepthBuffer[idx]);
