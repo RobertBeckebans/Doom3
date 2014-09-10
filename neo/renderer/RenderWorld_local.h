@@ -257,10 +257,6 @@ public:
 	//-------------------------------
 	// tr_light.c
 	void					CreateLightDefInteractions( idRenderLightLocal *ldef );
-
-	// OCULUS BEGIN
-	virtual	void			RenderSceneStereo(const renderView_t *renderView, int eye);
-	//OCULUS END
 };
 
 #endif /* !__RENDERWORLDLOCAL_H__ */

@@ -227,8 +227,6 @@ RBO_ExecuteBackEndCommands
 
 void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 {
-	GLuint fbo;
-
 	// needed for editor rendering
 	//RB_SetDefaultGLState();
 
@@ -271,11 +269,7 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 				{
 					if (needGuiDraw)
 					{
-						//ovr.SelectBuffer(GUI_TARGET, fbo);
-						//glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 						RB_DrawView(cmds);
-						//RB_SetBuffer(cmds, i);
-						//needGuiDraw = false;
 					}
 				}
 
@@ -286,11 +280,10 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 				break;
 			case RC_SWAP_BUFFERS:
 				// Ignore this. The Oculus SDK handle that
-				//glBindRenderbuffer(GL_RENDERBUFFER, 0);
-				//glBindTexture(GL_TEXTURE_2D, 0);
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
 				break;
 			case RC_COPY_RENDER:
+				// This look ugly
 				//RB_CopyRender(cmds);
 				break;
 			default:
@@ -300,24 +293,126 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 		}
 	}
 
-	// Copy the GUI Framebuffer. Need to draw to a plane in the viewport instead at some point
-	/*
-	ovr.SelectBuffer(GUI_TARGET, fbo);
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, fbo);
-	glReadBuffer(GL_COLOR_ATTACHMENT0);
-
-	ovr.SelectBuffer(LEFT_EYE_TARGET, fbo);
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
-	glDrawBuffer(GL_COLOR_ATTACHMENT0);
-
-	glBlitFramebuffer(0, 0, ovr.GetFrameBufferWidth(), ovr.GetFrameBufferHeight(),
-		0, 0, ovr.GetFrameBufferWidth(), ovr.GetFrameBufferHeight(),
-		GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT,
-		GL_NEAREST);
-	*/
-
 	// Done rendering. Send this off to the Oculus SDK
 	glViewport(0, 0, ovr.Hmd->Resolution.w, ovr.Hmd->Resolution.h);
 	glScissor(0, 0, ovr.Hmd->Resolution.w, ovr.Hmd->Resolution.h);
 	ovrHmd_EndFrame(ovr.Hmd, headPose, ovr.G_OvrTextures);
 }
+
+/*
+====================
+Fn_OculusRenderScene
+
+Draw a 3D view into a part of the window, then return
+to 2D drawing.
+
+Rendering a scene may require multiple views to be rendered
+to handle mirrors,
+====================
+*/
+
+void Fn_OculusRenderScene(const renderView_t *renderView, idRenderWorldLocal *renderWorld, int eye)
+{
+	renderView_t	copy;
+
+	if (!glConfig.isInitialized)
+	{
+		return;
+	}
+
+	copy = *renderView;
+
+	// skip front end rendering work, which will result
+	// in only gui drawing
+	if (r_skipFrontEnd.GetBool()) {
+		return;
+	}
+
+	if (renderView->fov_x <= 0 || renderView->fov_y <= 0) {
+		common->Error("idRenderWorld::RenderScene: bad FOVs: %f, %f", renderView->fov_x, renderView->fov_y);
+	}
+
+	// Oculus. Draw for each eye on this pass
+	// close any gui drawing
+	tr.guiModel->EmitFullScreen();
+	tr.guiModel->Clear();
+
+	int startTime = Sys_Milliseconds();
+
+	// setup view parms for the initial view
+	//
+	viewDef_t *parms = (viewDef_t *)R_ClearedFrameAlloc(sizeof(*parms));
+	parms->renderView = *renderView;
+	parms->renderView.forceUpdate = true;
+	parms->eye = eye;
+
+	if (eye == 0)
+		parms->renderView.vieworg += ovr.GetViewAdjustVector(0).x * parms->renderView.viewaxis[1];
+	else if (eye == 1)
+		parms->renderView.vieworg += ovr.GetViewAdjustVector(1).x * parms->renderView.viewaxis[1];
+
+	if (tr.takingScreenshot) {
+		parms->renderView.forceUpdate = true;
+	}
+
+	// set up viewport, adjusted for resolution and OpenGL style 0 at the bottom
+	tr.RenderViewToViewport(&parms->renderView, &parms->viewport);
+
+	// the scissor bounds may be shrunk in subviews even if
+	// the viewport stays the same
+	// this scissor range is local inside the viewport
+	parms->scissor.x1 = 0;
+	parms->scissor.y1 = 0;
+	parms->scissor.x2 = parms->viewport.x2 - parms->viewport.x1;
+	parms->scissor.y2 = parms->viewport.y2 - parms->viewport.y1;
+
+	parms->isSubview = false;
+	parms->initialViewAreaOrigin = renderView->vieworg;
+	parms->floatTime = parms->renderView.time * 0.001f;
+	parms->renderWorld = renderWorld;
+
+	// use this time for any subsequent 2D rendering, so damage blobs/etc 
+	// can use level time
+	tr.frameShaderTime = parms->floatTime;
+
+	// see if the view needs to reverse the culling sense in mirrors
+	// or environment cube sides
+	idVec3	cross;
+	cross = parms->renderView.viewaxis[1].Cross(parms->renderView.viewaxis[2]);
+	if (cross * parms->renderView.viewaxis[0] > 0) {
+		parms->isMirror = false;
+	}
+	else {
+		parms->isMirror = true;
+	}
+
+	if (r_lockSurfaces.GetBool()) {
+		R_LockSurfaceScene(parms);
+		return;
+	}
+
+	// save this world for use by some console commands
+	tr.primaryWorld = renderWorld;
+	tr.primaryRenderView = *renderView;
+	tr.primaryView = parms;
+
+	// rendering this view may cause other views to be rendered
+	// for mirrors / portals / shadows / environment maps
+	// this will also cause any necessary entities and lights to be
+	// updated to the demo file
+	R_RenderView(parms);
+
+	// now write delete commands for any modified-but-not-visible entities, and
+	// add the renderView command to the demo
+	if (session->writeDemo) {
+		renderWorld->WriteRenderView(renderView);
+	}
+
+	int endTime = Sys_Milliseconds();
+
+	tr.pc.frontEndMsec += endTime - startTime;
+
+	// prepare for any 2D drawing after this
+	tr.guiModel->Clear();
+}
+// OCULUS END

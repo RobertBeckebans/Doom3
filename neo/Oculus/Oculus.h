@@ -41,7 +41,7 @@ If you have questions concerning this license or the applicable additional terms
 
 #define OVR2IDUNITS 2.5f
 #define PIXELDENSITY 1.0f
-#define DEBUGHMDTYPE ovrHmd_DK2
+#define DEBUGHMDTYPE ovrHmd_DK1
 #define LEFT_EYE_TARGET 0
 #define RIGHT_EYE_TARGET 1
 #define GUI_TARGET 2
@@ -87,17 +87,16 @@ public:
 	
 private:
 	
-	int					GLSetupGuiFrameBuffer();
+	//int				GLSetupGuiFrameBuffer();
 	GLuint				G_GLFrameBuffer[2];
-	GLuint				G_GLGuiFrameBuffer;
-	GLuint				G_GLDepthBuffer[3];
-	GLuint				G_GLDepthTexture[3];
-	GLuint				G_GLGuiTexture;
+	//GLuint			G_GLGuiFrameBuffer;
+	GLuint				G_GLDepthTexture[2];
+	//GLuint			G_GLGuiTexture;
 
 	ovrEyeRenderDesc	G_ovrEyeRenderDesc[2];
 	ovrTexture			Fn_GenOvrTexture(int i);
 	int					Fn_SetupFrameBuffer(int idx);
-	int					Fn_SetupGuiFrameBuffer();
+	//int				Fn_SetupGuiFrameBuffer();
 	int					InitHmdPositionTracking();
 	int					G_ovrRenderWidth;
 	int					G_ovrRenderHeight;

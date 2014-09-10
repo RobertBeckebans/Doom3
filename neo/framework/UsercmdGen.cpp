@@ -849,21 +849,23 @@ void idUsercmdGenLocal::MakeCurrentOculus(void)
 	}
 
 	idVec3 finalviewangles = viewangles;
+	idVec3 ovrangles = ovr.GetHeadTrackingOrientation();
+
+	printf("viewangles: [%.4f, %.4f, %.4f]", viewangles.x, viewangles.y, viewangles.z);
+	printf("ovrangles: [%.4f, %.4f, %.4f]", ovrangles.x, ovrangles.y, ovrangles.z);
 
 	if (vr_enableOculusRiftRendering.GetBool() && !ovr.isDebughmd)
-		finalviewangles += ovr.GetHeadTrackingOrientation();
+		finalviewangles += ovrangles;
+
+	printf("finalviewangles: [%.4f, %.4f, %.4f]", finalviewangles.x, finalviewangles.y, finalviewangles.z);
 
 	for (i = 0; i < 3; i++)
 	{
 		cmd.angles[i] = ANGLE2SHORT(finalviewangles[i]);
 	}
-
-
+	
 	cmd.mx = continuousMouseX;
 	cmd.my = continuousMouseY;
-
-	//cmd.mposx = aimoffsets.x;
-	//cmd.mposy = aimoffsets.y;
 
 	flags = cmd.flags;
 	impulse = cmd.impulse;
