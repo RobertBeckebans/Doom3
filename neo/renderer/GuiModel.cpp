@@ -29,6 +29,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
+#include "../Oculus/Oculus.h"
 #include "tr_local.h"
 
 
@@ -272,6 +273,11 @@ void idGuiModel::EmitFullScreen()
 		viewDef->scissor.y2 = tr.viewDef->scissor.y2;
 	}
 
+	idVec3 p = ovr.GetHeadTrackingPosition();
+	idVec3 r = ovr.GetHeadTrackingOrientation();
+
+	const float scale = 1;
+
 	viewDef->floatTime = tr.frameShaderTime;
 
 	// qglOrtho( 0, 640, 480, 0, 0, 1 );		// always assume 640x480 virtual coordinates
@@ -279,22 +285,31 @@ void idGuiModel::EmitFullScreen()
 	viewDef->projectionMatrix[0] = 2.0f / 640;
 	viewDef->projectionMatrix[5] = -2.0f / 480;
 	viewDef->projectionMatrix[10] = -2.0f / 1.0f;
+		
 	viewDef->projectionMatrix[12] = -1.0f;
 	viewDef->projectionMatrix[13] = 1.0f;
 	viewDef->projectionMatrix[14] = -1.0f;
 	viewDef->projectionMatrix[15] = 1.0f;
 
+	//viewDef->projectionMatrix[12] = -p.x - 1.0f;
+	//viewDef->projectionMatrix[13] = -p.y + 1.0f;
+	//viewDef->projectionMatrix[14] = -1.0f;
+	//viewDef->projectionMatrix[15] = p.z + 2.0f;
+
 	viewDef->worldSpace.modelViewMatrix[0] = 1.0f;
 	viewDef->worldSpace.modelViewMatrix[5] = 1.0f;
 	viewDef->worldSpace.modelViewMatrix[10] = 1.0f;
 	viewDef->worldSpace.modelViewMatrix[15] = 1.0f;
-	
+
+	float *modelMatrix = viewDef->worldSpace.modelMatrix;
+
+	modelMatrix[12] = 1.0f;
+	//modelMatrix[13] = (p.y * scale) + 1;
+	//modelMatrix[15] = p.z + 2.0f;
+
 	viewDef->maxDrawSurfs = surfaces.Num();
 	viewDef->drawSurfs = (drawSurf_t **)R_FrameAlloc( viewDef->maxDrawSurfs * sizeof( viewDef->drawSurfs[0] ) );
 	viewDef->numDrawSurfs = 0;
-
-
-	viewDef->eye = -1;
 
 	viewDef_t *oldViewDef = tr.viewDef;
 	tr.viewDef = viewDef;

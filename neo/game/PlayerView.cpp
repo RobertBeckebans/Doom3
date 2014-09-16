@@ -700,12 +700,14 @@ idPlayerView::RenderPlayerView
 */
 void idPlayerView::RenderPlayerView( idUserInterface *hud )
 {
-
 	const renderView_t *view = player->GetRenderView();
 
-	if ( g_skipViewEffects.GetBool() ) {
+	if ( g_skipViewEffects.GetBool() )
+	{
 		SingleView( hud, view );
-	} else {
+	}
+	else
+	{
 		if ( player->GetInfluenceMaterial() || player->GetInfluenceEntity() ) {
 			InfluenceVision( hud, view );
 		} else if ( gameLocal.time < dvFinishTime ) {
@@ -721,6 +723,11 @@ void idPlayerView::RenderPlayerView( idUserInterface *hud )
 	if ( net_clientLagOMeter.GetBool() && lagoMaterial && gameLocal.isClient ) {
 		renderSystem->SetColor4( 1.0f, 1.0f, 1.0f, 1.0f );
 		renderSystem->DrawStretchPic( 10.0f, 380.0f, 64.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, lagoMaterial );
-	}	
+	}
+#ifdef _DEBUG
+	const idMaterial* currentMaterial;
+	currentMaterial = declManager->FindMaterial( "_currentRender" );
+	renderSystem->DrawStretchPic( 0, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, 0, 1, 1, 0, currentMaterial );
+#endif
 }
 

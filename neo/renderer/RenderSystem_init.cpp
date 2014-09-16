@@ -2315,12 +2315,15 @@ bool idRenderSystemLocal::IsFullScreen( void ) const {
 	return glConfig.isFullscreen;
 }
 
+// OCULUS BEGIN
 /*
 ========================
 idRenderSystemLocal::GetScreenWidth
 ========================
 */
 int idRenderSystemLocal::GetScreenWidth( void ) const {
+	if (vr_enableOculusRiftRendering.GetBool())
+		return ovr.GetRenderWidth();
 	return glConfig.vidWidth;
 }
 
@@ -2330,9 +2333,11 @@ idRenderSystemLocal::GetScreenHeight
 ========================
 */
 int idRenderSystemLocal::GetScreenHeight( void ) const {
+	if (vr_enableOculusRiftRendering.GetBool())
+		return ovr.GetRenderHeight();
 	return glConfig.vidHeight;
 }
-
+// OCULUS END
 /*
 ========================
 idRenderSystemLocal::GetCardCaps

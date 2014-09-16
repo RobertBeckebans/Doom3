@@ -45,6 +45,7 @@ perfected/
 neo/extern/OculusSDK/
 neo/extern/SDL2-2.0.3/
 sikkmod/
+q4base/
 
 *.opensdf
 *.sdf
@@ -59,3 +60,6 @@ RUN_DOOM3_VR_sikkmod.bat
 RUN_DOOM3_VR_Release.bat
 DOOM3_VR_Release.exe
 DOOM3_VR_Debug.exe
+RUN_DOOM3_VR_Q4.bat
+neo/_MayaImport.props
+neo/_OculusVR.props

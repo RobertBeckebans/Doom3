@@ -49,6 +49,16 @@ idCVar vr_enableVsync("vr_enableVsync", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCH
 idCVar vr_enableMirror("vr_enableMirror", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable mirror to window mode");
 idCVar vr_enablezeroipd("vr_enablezeroipd", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Disable depth rendering");
 
+/*
+=================
+ovrHmd_RecenterPose_f
+=================
+*/
+static void ovrHmd_RecenterPose_f(const idCmdArgs &args)
+{
+	ovrHmd_RecenterPose(ovr.Hmd);
+}
+
 OculusHmd::OculusHmd()
 {
 
@@ -125,8 +135,47 @@ int OculusHmd::Init()
 			Sys_Error("Error during HMD head tracking initialization");
 	}
 
+	G_ovrEyeFov[0] = Hmd->DefaultEyeFov[0];
+	G_ovrEyeFov[1] = Hmd->DefaultEyeFov[1];
+
+	float FovSideTanLimit = FovPort::Max(Hmd->MaxEyeFov[0], Hmd->MaxEyeFov[1]).GetMaxSideTan();
+	float FovSideTanMax = FovPort::Max(Hmd->DefaultEyeFov[0], Hmd->DefaultEyeFov[1]).GetMaxSideTan();
+
+	G_ovrEyeFov[0] = FovPort::Min(G_ovrEyeFov[0], FovPort(FovSideTanMax));
+	G_ovrEyeFov[1] = FovPort::Min(G_ovrEyeFov[1], FovPort(FovSideTanMax));
+
+
+	Sizei _textureSizeLeft = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Left, G_ovrEyeFov[0], PIXELDENSITY);
+	Sizei _textureSizeRight = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Right, G_ovrEyeFov[1], PIXELDENSITY);
+
+	G_ovrRenderWidth = _textureSizeLeft.w;
+	G_ovrRenderHeight = _textureSizeLeft.h;
+
+	// Init the _scratch texture for each eyes
+
+	cmdSystem->AddCommand("OvrHmd_RecenterPose", ovrHmd_RecenterPose_f, CMD_FL_SYSTEM, "Recenter the Hmd position tracking");
+
 	return 1;
 };
+
+void GenTexture(GLuint &tex)
+{
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 16, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+}
+
+void OculusHmd::Fn_InitScratch()
+{
+	GenTexture(Scratch[0]);
+	GenTexture(Scratch[1]);
+	GenTexture(currentRenderImage[0]);
+	GenTexture(currentRenderImage[1]);
+}
 
 int OculusHmd::InitRendering()
 {
@@ -256,11 +305,9 @@ PFNGLCHECKFRAMEBUFFERSTATUSPROC			glCheckFramebufferStatus;
 PFNGLFRAMEBUFFERRENDERBUFFERPROC		glFramebufferRenderbuffer;
 PFNGLFRAMEBUFFERTEXTURE2DPROC			glFramebufferTexture2D;
 PFNGLBINDFRAMEBUFFERPROC				glBindFramebuffer;
-PFNGLGENRENDERBUFFERSPROC				glGenRenderBuffers;
+PFNGLGENRENDERBUFFERSPROC				glGenRenderbuffers;
 PFNGLBINDRENDERBUFFERPROC				glBindRenderbuffer;
 PFNGLRENDERBUFFERSTORAGEEXTPROC			glRenderbufferStorage;
-//PFNGLDRAWBUFFERSPROC					glDrawBuffers;
-//PFNGLBLITFRAMEBUFFERPROC				glBlitFramebuffer;
 
 void OculusHmd::GLInitExtensions()
 {
@@ -273,12 +320,9 @@ void OculusHmd::GLInitExtensions()
 	glFramebufferRenderbuffer =		(PFNGLFRAMEBUFFERRENDERBUFFERPROC)GLGetProcAddress("glFramebufferRenderbufferEXT");
 	glFramebufferTexture2D =		(PFNGLFRAMEBUFFERTEXTURE2DPROC)GLGetProcAddress("glFramebufferTexture2DEXT");
 	glBindFramebuffer =				(PFNGLBINDFRAMEBUFFERPROC)GLGetProcAddress("glBindFramebufferEXT");
-	glGenRenderBuffers =			(PFNGLGENRENDERBUFFERSPROC)GLGetProcAddress("glGenRenderbuffersEXT");
+	glGenRenderbuffers =			(PFNGLGENRENDERBUFFERSPROC)GLGetProcAddress("glGenRenderbuffersEXT");
 	glBindRenderbuffer =			(PFNGLBINDRENDERBUFFERPROC)GLGetProcAddress("glBindRenderbufferEXT");
 	glRenderbufferStorage =			(PFNGLRENDERBUFFERSTORAGEEXTPROC)GLGetProcAddress("glRenderbufferStorageEXT");
-	//glDrawBuffers =				(PFNGLDRAWBUFFERSPROC)GLGetProcAddress("glDrawBuffersEXT");
-	//glBlitFramebuffer =			(PFNGLBLITFRAMEBUFFERPROC)GLGetProcAddress("glBlitFramebufferEXT");
-	//glDeleteRenderbuffers =		(PFNGLDELETERENDERBUFFERSPROC)GLGetProcAddress("glDeleteRenderbuffersEXT");
 }
 
 /*
@@ -291,11 +335,6 @@ This is how much we shift the eyes left and right
 
 idVec3 OculusHmd::GetViewAdjustVector(int eye)
 {
-	// From http://idtech4.com/wp-content/uploads/2011/10/Doom-3-Multiplayer-Level-Editing-Guide.pdf
-	//  DOOM 3 player models stand to a total of 74 game units
-	// 74 / 6 = 12.33 so 1 Doom unit equal 1 inch equal 2.5 cm i guess 
-	// Make this a cvar so people can adjust
-
 	idVec3 a;
 
 	a.x = (G_ovrEyeRenderDesc[eye].ViewAdjust.x * 100) / OVR2IDUNITS;
@@ -346,18 +385,26 @@ int OculusHmd::Fn_SetupFrameBuffer(int idx)
 	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, G_FrameBufferWidth, G_FrameBufferHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 
-	glGenTextures(1, &G_GLDepthTexture[idx]);
-	glBindTexture(GL_TEXTURE_2D, G_GLDepthTexture[idx]);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, G_FrameBufferWidth, G_FrameBufferHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
+	GLuint rbo = 0;
+	glGenRenderbuffers(1, &rbo);
+	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, G_FrameBufferWidth, G_FrameBufferHeight);
+	glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+
+	//glGenTextures(1, &G_GLDepthTexture[idx]);
+	//glBindTexture(GL_TEXTURE_2D, G_GLDepthTexture[idx]);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, G_FrameBufferWidth, G_FrameBufferHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, G_GLFrameBuffer[idx]);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, EyeTexture[idx], 0);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_TEXTURE_2D, G_GLDepthTexture[idx], 0);
+	//glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, G_GLDepthTexture[idx], 0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, rbo);
 
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
 		Sys_Error("Error in Fn_SetupFrameBuffer. Framebuffer is invalid.");
@@ -371,7 +418,6 @@ int OculusHmd::Fn_SetupFrameBuffer(int idx)
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
 	return 1;
 }
 
@@ -379,49 +425,27 @@ extern int MakePowerOfTwo(int num);
 
 int OculusHmd::SetupView()
 {
-	G_ovrEyeFov[0] = Hmd->DefaultEyeFov[0];
-	G_ovrEyeFov[1] = Hmd->DefaultEyeFov[1];
-
-	float FovSideTanLimit = FovPort::Max(Hmd->MaxEyeFov[0], Hmd->MaxEyeFov[1]).GetMaxSideTan();
-	float FovSideTanMax = FovPort::Max(Hmd->DefaultEyeFov[0], Hmd->DefaultEyeFov[1]).GetMaxSideTan();
-
-	G_ovrEyeFov[0] = FovPort::Min(G_ovrEyeFov[0], FovPort(FovSideTanMax));
-	G_ovrEyeFov[1] = FovPort::Min(G_ovrEyeFov[1], FovPort(FovSideTanMax));
+	// Gen scratch render textures
+	Fn_InitScratch();
 
 	if (vr_enablezeroipd.GetBool())
 	{
-		G_ovrEyeFov[0] = FovPort::Max(G_ovrEyeFov[0], G_ovrEyeFov[1]);
-		G_ovrEyeFov[1] = G_ovrEyeFov[0];
-
-		Sizei _textureSize = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Left, G_ovrEyeFov[0], PIXELDENSITY);
-
-		G_ovrRenderWidth = _textureSize.w;
-		G_ovrRenderHeight = _textureSize.h;
-
 		G_FrameBufferWidth = G_ovrRenderWidth;
 		G_FrameBufferHeight = G_ovrRenderHeight;
 
 		Fn_SetupFrameBuffer(0);
 		Fn_SetupFrameBuffer(1);
-		//Fn_SetupGuiFrameBuffer();
 
 		G_OvrTextures[0] = Fn_GenOvrTexture(0);
 		G_OvrTextures[1] = G_OvrTextures[0];
 	}
 	else
 	{
-		Sizei _textureSizeLeft = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Left, G_ovrEyeFov[0], PIXELDENSITY);
-		Sizei _textureSizeRight = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Right, G_ovrEyeFov[0], PIXELDENSITY);
-
-		G_ovrRenderWidth = _textureSizeLeft.w;
-		G_ovrRenderHeight = _textureSizeLeft.h;
-
 		G_FrameBufferWidth = G_ovrRenderWidth;
 		G_FrameBufferHeight = G_ovrRenderHeight;
 
 		Fn_SetupFrameBuffer(0);
 		Fn_SetupFrameBuffer(1);
-		//Fn_SetupGuiFrameBuffer();
 
 		G_OvrTextures[0] = Fn_GenOvrTexture(0);
 		G_OvrTextures[1] = Fn_GenOvrTexture(1);
@@ -442,7 +466,10 @@ int OculusHmd::SetupView()
 	glcfg.OGL.Window = win32.hWnd;
 	glcfg.OGL.DC = win32.hDC;
 
-	unsigned distortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette;
+	unsigned distortionCaps = NULL;
+	
+	if (!isDebughmd)
+		distortionCaps = ovrDistortionCap_Chromatic | ovrDistortionCap_Vignette;
 
 	/*
 	if (SupportsSrgb)

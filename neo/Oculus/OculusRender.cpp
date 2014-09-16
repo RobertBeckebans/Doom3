@@ -185,8 +185,10 @@ static void	RB_SetBuffer(const void *data, int eye)
 	const setBufferCommand_t	*cmd;
 	cmd = (const setBufferCommand_t *)data;
 	
+	ovr.SetCurrentFrambufferIndex(eye);
 	ovr.SelectBuffer(eye, fbo);
-	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 
 	if (r_clear.GetFloat() || idStr::Length(r_clear.GetString()) != 1 || r_lockSurfaces.GetBool() || r_singleArea.GetBool() || r_showOverDraw.GetBool()) {
 		float c[3];
@@ -209,13 +211,15 @@ static void	RB_SetBuffer(const void *data, int eye)
 
 	return;
 }
+
 /*
 =============
-RB_CopyRender
+RBO_CopyRender
 
 Copy part of the current framebuffer to an image
 =============
 */
+
 const void RB_CopyRender(const void *data);
 
 /*
@@ -225,78 +229,133 @@ RBO_ExecuteBackEndCommands
 =============
 */
 
+void SaveImage(const char *filename, GLuint image, int width, int height)
+{
+	glBindTexture(GL_TEXTURE_2D, image);
+	glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 0, 0, width, height, 0);
+	glPixelStorei(GL_PACK_ALIGNMENT, 1);
+	BYTE *buffer = (BYTE*) malloc(sizeof(BYTE) * width * height * 4);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, buffer);
+	R_WriteTGA(filename, buffer, width, height, true);
+	free(buffer);
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
 void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 {
-	// needed for editor rendering
-	//RB_SetDefaultGLState();
-
-	// upload any image loads that have completed
-	globalImages->CompleteBackgroundImageLoads();
+	int	c_draw3d = 0;
+	int c_draw2d = 0;
+	int c_setBuffers = 0;
+	int c_swapBuffers = 0;
+	int c_copyRenders = 0;
 
 	ovrPosef headPose[2];
 	ovrFrameTiming hmdFrameTiming = ovrHmd_BeginFrame(ovr.Hmd, 0);
 
 	bool needGuiDraw = true;
 
+	//Sys_DebugPrintf("ExecuteBackEndCommands\n");
+
 	for (int i = 0; i < 2; i++)
 	{
+		// upload any image loads that have completed
+		globalImages->CompleteBackgroundImageLoads();
+
+		GLuint fbo;
+		ovr.SelectBuffer(ovr.GetCurrentFrambufferIndex(), fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
 		RB_SetDefaultGLState();
+
+		// Set render to texture targets
+		globalImages->scratchImage->texnum = ovr.Scratch[i];
+		//globalImages->currentRenderImage->texnum = ovr.currentRenderImage[i];
+
+		//Sys_DebugPrintf("Eye %d: Start | ", i);
 
 		for (const emptyCommand_t * cmds = allCmds; cmds != NULL; cmds = (const emptyCommand_t *)cmds->next)
 		{
 			switch (cmds->commandId)
 			{
 			case RC_NOP:
+				//Sys_DebugPrintf("Eye %d: NOP | ", i);
 				break;
 			case RC_DRAW_VIEW:
 			{
 				// Always left first. Oculus recommend that we let the HMD tell you what to render first so TODO
 				int eye = ((const drawSurfsCommand_t *)cmds)->viewDef->eye;
-
 				headPose[i] = ovrHmd_GetEyePose(ovr.Hmd, (ovrEyeType)i);
 
-				if (((const drawSurfsCommand_t *)cmds)->viewDef->viewEntitys)
-				{			
+				if (((const drawSurfsCommand_t *)cmds)->viewDef->viewEntitys) {			
 					// World
-					if (i != eye)
-					{
+					if (i != eye) {
 						// Wrong eye so skip the command
 						continue;
 					}
+					//Sys_DebugPrintf("Eye %d: Draw3d | ", i);
 					RB_DrawView(cmds);
-				}
-				else
-				{
-					if (needGuiDraw)
-					{
-						RB_DrawView(cmds);
+					c_draw3d++;
+					
+#ifdef _DEBUG
+					if (i == RIGHT_EYE_TARGET && true) {
+						glScissor(128,128,64,64);
+						glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
+						glClear(GL_COLOR_BUFFER_BIT);
+						glScissor(0, 0, renderSystem->GetScreenWidth(), renderSystem->GetScreenHeight());
 					}
+#endif
+				} else {
+					//Sys_DebugPrintf("Eye %d: Draw2d | ", i);
+					RB_DrawView(cmds);
+					c_draw2d++;
 				}
 
 				break;
 			}
 			case RC_SET_BUFFER:
+				//Sys_DebugPrintf("Eye %d: Set buffer | ", i);
 				RB_SetBuffer(cmds, i);
+				c_setBuffers++;
 				break;
 			case RC_SWAP_BUFFERS:
-				// Ignore this. The Oculus SDK handle that
+				//Sys_DebugPrintf("Eye %d: Swap buffers | ", i);
 				glBindFramebuffer(GL_FRAMEBUFFER, 0);
+				c_swapBuffers++;
 				break;
 			case RC_COPY_RENDER:
-				// This look ugly
-				//RB_CopyRender(cmds);
+				//Sys_DebugPrintf("Eye %d: Copy | ", i);
+				RB_CopyRender(cmds);
+				c_copyRenders++;
 				break;
 			default:
 				common->Error("RB_ExecuteBackEndCommands: bad commandId");
 				break;
 			}
 		}
+		//Sys_DebugPrintf("Eye %d: End\n", i);
 	}
+	//Sys_DebugPrintf("Finish\n");
 
 	// Done rendering. Send this off to the Oculus SDK
 	glViewport(0, 0, ovr.Hmd->Resolution.w, ovr.Hmd->Resolution.h);
 	glScissor(0, 0, ovr.Hmd->Resolution.w, ovr.Hmd->Resolution.h);
 	ovrHmd_EndFrame(ovr.Hmd, headPose, ovr.G_OvrTextures);
+	//glViewport(0, 0, ovr.GetFrameBufferWidth(), ovr.GetFrameBufferHeight());
+
+	// go back to the default texture so the editor doesn't mess up a bound image
+	qglBindTexture( GL_TEXTURE_2D, 0 );
+	backEnd.glState.tmu[0].current2DMap = -1;
+
+#ifdef _DEBUG
+	if (false)
+	{
+		int scratchWidth = globalImages->scratchImage->uploadWidth;
+		int scratchHeight = globalImages->scratchImage->uploadHeight;
+
+		SaveImage("tmp/left_scratch.tga", ovr.Scratch[0], scratchWidth, scratchHeight);
+		SaveImage("tmp/right_scratch.tga", ovr.Scratch[1], scratchWidth, scratchHeight);
+	}
+#endif
 }
 
 /*

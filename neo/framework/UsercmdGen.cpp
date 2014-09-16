@@ -850,14 +850,16 @@ void idUsercmdGenLocal::MakeCurrentOculus(void)
 
 	idVec3 finalviewangles = viewangles;
 	idVec3 ovrangles = ovr.GetHeadTrackingOrientation();
+	//idVec3 ovrposition = ovr.GetHeadTrackingPosition();
 
-	printf("viewangles: [%.4f, %.4f, %.4f]", viewangles.x, viewangles.y, viewangles.z);
-	printf("ovrangles: [%.4f, %.4f, %.4f]", ovrangles.x, ovrangles.y, ovrangles.z);
+	//Sys_DebugPrintf("viewangles: [%.4f, %.4f, %.4f]\n", viewangles.x, viewangles.y, viewangles.z);
+	//Sys_DebugPrintf("ovrangles: [%.4f, %.4f, %.4f]\n", ovrangles.x, ovrangles.y, ovrangles.z);
+	//Sys_DebugPrintf("ovrposition: [%.4f, %.4f, %.4f]\n", ovrposition.x, ovrposition.y, ovrposition.z);
 
 	if (vr_enableOculusRiftRendering.GetBool() && !ovr.isDebughmd)
 		finalviewangles += ovrangles;
 
-	printf("finalviewangles: [%.4f, %.4f, %.4f]", finalviewangles.x, finalviewangles.y, finalviewangles.z);
+	//Sys_DebugPrintf("finalviewangles: [%.4f, %.4f, %.4f]\n", finalviewangles.x, finalviewangles.y, finalviewangles.z);
 
 	for (i = 0; i < 3; i++)
 	{

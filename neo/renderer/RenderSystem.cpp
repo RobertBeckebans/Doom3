@@ -772,17 +772,6 @@ void idRenderSystemLocal::RenderViewToViewport(const renderView_t *renderView, i
 	float wRatio = (float)rc->width / SCREEN_WIDTH;
 	float hRatio = (float)rc->height / SCREEN_HEIGHT;
 
-	// OCULUS BEGIN
-	if (vr_enableOculusRiftRendering.GetBool())
-	{
-		viewport->x1 = 0;
-		viewport->x2 = ovr.GetRenderWidth();
-		viewport->y1 = 0;
-		viewport->y2 = ovr.GetRenderHeight();
-		return;
-	}
-	// OCULUS END
-
 	viewport->x1 = idMath::Ftoi( rc->x + renderView->x * wRatio );
 	viewport->x2 = idMath::Ftoi( rc->x + floor( ( renderView->x + renderView->width ) * wRatio + 0.5f ) - 1 );
 	viewport->y1 = idMath::Ftoi( ( rc->y + rc->height ) - floor( ( renderView->y + renderView->height ) * hRatio + 0.5f ) );
@@ -812,7 +801,7 @@ so if you specify a power of two size for a texture copy, it may be shrunk
 down, but still valid.
 ================
 */
-void	idRenderSystemLocal::CropRenderSize( int width, int height, bool makePowerOfTwo, bool forceDimensions ) {
+void idRenderSystemLocal::CropRenderSize( int width, int height, bool makePowerOfTwo, bool forceDimensions ) {
 	if ( !glConfig.isInitialized ) {
 		return;
 	}
@@ -864,7 +853,7 @@ void	idRenderSystemLocal::CropRenderSize( int width, int height, bool makePowerO
 	}
 
 	renderCrop_t	*rc = &renderCrops[currentRenderCrop];
-
+	
 	// we might want to clip these to the crop window instead
 	while ( width > glConfig.vidWidth ) {
 		width >>= 1;
@@ -872,7 +861,7 @@ void	idRenderSystemLocal::CropRenderSize( int width, int height, bool makePowerO
 	while ( height > glConfig.vidHeight ) {
 		height >>= 1;
 	}
-
+	
 	if ( currentRenderCrop == MAX_RENDER_CROPS ) {
 		common->Error( "idRenderSystemLocal::CropRenderSize: currentRenderCrop == MAX_RENDER_CROPS" );
 	}

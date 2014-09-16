@@ -41,7 +41,7 @@ If you have questions concerning this license or the applicable additional terms
 
 #define OVR2IDUNITS 2.5f
 #define PIXELDENSITY 1.0f
-#define DEBUGHMDTYPE ovrHmd_DK1
+#define DEBUGHMDTYPE ovrHmd_DK2
 #define LEFT_EYE_TARGET 0
 #define RIGHT_EYE_TARGET 1
 #define GUI_TARGET 2
@@ -71,11 +71,15 @@ public:
 	int					multiSamples;
 
 	ovrTexture			G_OvrTextures[2];
+	GLuint				EyeTexture[2];
+	GLuint				Scratch[2];
+	GLuint				currentRenderImage[2];
 
-	ovrHmd				Hmd = 0;
+	ovrHmd				Hmd;
 	ovrFovPort			G_ovrEyeFov[2];
 
-	GLuint				EyeTexture[2];
+	int					GetCurrentFrambufferIndex() { return currentEye; }
+	void				SetCurrentFrambufferIndex(int i) { currentEye = i; }
 
 	int					SetupView();
 	int					GetRenderWidth()		{ return G_ovrRenderWidth; }
@@ -86,23 +90,20 @@ public:
 	idVec3				GetViewAdjustVector(int id);
 	
 private:
-	
-	//int				GLSetupGuiFrameBuffer();
+	int					currentEye;
 	GLuint				G_GLFrameBuffer[2];
-	//GLuint			G_GLGuiFrameBuffer;
 	GLuint				G_GLDepthTexture[2];
-	//GLuint			G_GLGuiTexture;
 
 	ovrEyeRenderDesc	G_ovrEyeRenderDesc[2];
 	ovrTexture			Fn_GenOvrTexture(int i);
 	int					Fn_SetupFrameBuffer(int idx);
-	//int				Fn_SetupGuiFrameBuffer();
 	int					InitHmdPositionTracking();
 	int					G_ovrRenderWidth;
 	int					G_ovrRenderHeight;
 	int					G_FrameBufferWidth;
 	int					G_FrameBufferHeight;
 
+	void				Fn_InitScratch();
 	void				GLInitExtensions();
 	void*				GLGetProcAddress(const char* func) { return wglGetProcAddress(func); }
 };

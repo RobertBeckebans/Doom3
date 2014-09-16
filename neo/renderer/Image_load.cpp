@@ -29,6 +29,7 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
+#include "../Oculus/Oculus.h"
 #include "tr_local.h"
 
 /*
@@ -1850,9 +1851,11 @@ void idImage::BindFragment() {
 CopyFramebuffer
 ====================
 */
+extern void SaveImage(const char *filename, GLuint image, int width, int height);
+
 void idImage::CopyFramebuffer( int x, int y, int imageWidth, int imageHeight, bool useOversizedBuffer ) {
 	Bind();
-
+	
 	if ( cvarSystem->GetCVarBool( "g_lowresFullscreenFX" ) ) {
 		imageWidth = 512;
 		imageHeight = 512;
@@ -1867,7 +1870,30 @@ void idImage::CopyFramebuffer( int x, int y, int imageWidth, int imageHeight, bo
 	GetDownsize( imageWidth, imageHeight );
 	GetDownsize( potWidth, potHeight );
 
-	//qglReadBuffer( GL_BACK );
+
+	if (vr_enableOculusRiftRendering.GetBool()) {
+		GLuint fbo;
+		ovr.SelectBuffer(ovr.GetCurrentFrambufferIndex(), fbo);
+		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+
+		if (strcmp(this->imgName, "_scratch") == 0)
+		{
+			uploadWidth = potWidth;
+			uploadHeight = potHeight;
+
+			qglCopyTexImage2D( GL_TEXTURE_2D, 0, GL_RGB8, x, y, imageWidth, imageHeight, 0 );
+			qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+			qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+
+			qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+			qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+
+			backEnd.c_copyFrameBuffer++;
+			return;
+		}
+	} else {
+		qglReadBuffer(GL_BACK);
+	}
 
 	// only resize if the current dimensions can't hold it at all,
 	// otherwise subview renderings could thrash this
@@ -1897,6 +1923,7 @@ void idImage::CopyFramebuffer( int x, int y, int imageWidth, int imageHeight, bo
 	} else {
 		// otherwise, just subimage upload it so that drivers can tell we are going to be changing
 		// it and don't try and do a texture compression or some other silliness
+
 		qglCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, x, y, imageWidth, imageHeight );
 	}
 
@@ -1907,6 +1934,7 @@ void idImage::CopyFramebuffer( int x, int y, int imageWidth, int imageHeight, bo
 	if ( imageHeight != potHeight ) {
 		qglCopyTexSubImage2D( GL_TEXTURE_2D, 0, 0, imageHeight, x, y+imageHeight-1, imageWidth, 1 );
 	}
+
 
 	qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 	qglTexParameterf( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
