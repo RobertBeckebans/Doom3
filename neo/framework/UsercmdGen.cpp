@@ -29,7 +29,6 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
-#include "../oculus/Oculus.h"
 #include "Session_local.h"
 
 /*
@@ -676,19 +675,19 @@ void idUsercmdGenLocal::MouseMove( void ) {
 	}
 
 	if ( !ButtonState( UB_STRAFE ) ) {
-		//viewangles[YAW] -= m_yaw.GetFloat() * mx;
+		viewangles[YAW] -= m_yaw.GetFloat() * mx;
 	} else {
 		cmd.rightmove = idMath::ClampChar( (int)(cmd.rightmove + strafeMx) );
 	}
 
 	if ( !ButtonState( UB_STRAFE ) && ( cmd.buttons & BUTTON_MLOOK ) ) {
-		//viewangles[PITCH] += m_pitch.GetFloat() * my;
+		viewangles[PITCH] += m_pitch.GetFloat() * my;
 	} else {
 		cmd.forwardmove = idMath::ClampChar( (int)(cmd.forwardmove - strafeMy) );
 	}
 
 	// OCULUS BEGIN
-
+	/*
 	const float scale = 0.022f;
 
 	if (aimangles[YAW] <= 30.0f || aimangles[YAW] >= -30.0f)
@@ -708,7 +707,7 @@ void idUsercmdGenLocal::MouseMove( void ) {
 
 	ClampAngle(aimangles[YAW]);
 	ClampAngle(aimangles[PITCH]);
-	
+	*/
 	// Sys_DebugPrintf("Usercmd aimangles: [Yaw: %0.4f Pitch: %0.4f] viewangles: [Yaw: %0.4f Pitch: %0.4f]\n", aimangles[YAW], aimangles[PITCH], viewangles[YAW], viewangles[PITCH]);
 	// OCULUS END
 }
@@ -848,22 +847,27 @@ void idUsercmdGenLocal::MakeCurrentOculus(void)
 		mouseDy = 0;
 	}
 
-	idVec3 finalviewangles = viewangles;
-	idVec3 ovrangles = ovr.GetHeadTrackingOrientation();
-	//idVec3 ovrposition = ovr.GetHeadTrackingPosition();
+	//idVec3 finalviewangles = viewangles;
+	//idAngles ovrangles = oculus->GetHeadTrackingOrientation();
+	//idVec3 ovrposition = oculus->GetHeadTrackingPosition();
 
 	//Sys_DebugPrintf("viewangles: [%.4f, %.4f, %.4f]\n", viewangles.x, viewangles.y, viewangles.z);
 	//Sys_DebugPrintf("ovrangles: [%.4f, %.4f, %.4f]\n", ovrangles.x, ovrangles.y, ovrangles.z);
 	//Sys_DebugPrintf("ovrposition: [%.4f, %.4f, %.4f]\n", ovrposition.x, ovrposition.y, ovrposition.z);
 
-	if (vr_enableOculusRiftRendering.GetBool() && !ovr.isDebughmd)
-		finalviewangles += ovrangles;
+	/*
+	if (vr_enableOculusRiftRendering.GetBool() && !oculus->isDebughmd)
+	{
+		finalviewangles.x += ovrangles.pitch;
+		finalviewangles.y += ovrangles.yaw;
+		finalviewangles.z += ovrangles.roll;
+	}*/
 
 	//Sys_DebugPrintf("finalviewangles: [%.4f, %.4f, %.4f]\n", finalviewangles.x, finalviewangles.y, finalviewangles.z);
 
 	for (i = 0; i < 3; i++)
 	{
-		cmd.angles[i] = ANGLE2SHORT(finalviewangles[i]);
+		cmd.angles[i] = ANGLE2SHORT(viewangles[i]);
 	}
 	
 	cmd.mx = continuousMouseX;
@@ -878,8 +882,8 @@ void idUsercmdGenLocal::MakeCurrentOculus(void)
 void idUsercmdGenLocal::MakeCurrent( void ) {
 
 	// OCULUS BEGIN
-	MakeCurrentOculus();
-	return;
+	//MakeCurrentOculus();
+	//return;
 	// OCULUS END
 
 	idVec3		oldAngles;

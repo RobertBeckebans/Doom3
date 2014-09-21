@@ -65,7 +65,7 @@
       <UniqueIdentifier>{b3166d25-0562-49da-bc8d-961006fe1785}</UniqueIdentifier>
     </Filter>
     <Filter Include="Oculus">
-      <UniqueIdentifier>{0503e167-ac1e-4956-8ef9-28a03abd21ef}</UniqueIdentifier>
+      <UniqueIdentifier>{800d1b0a-76fa-41b4-87ef-69abfb4ad2ca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -538,9 +538,6 @@
       <Filter>Sys</Filter>
     </ClInclude>
     <ClInclude Include="Oculus\Oculus.h">
-      <Filter>Oculus</Filter>
-    </ClInclude>
-    <ClInclude Include="Oculus\InputDevices.h">
       <Filter>Oculus</Filter>
     </ClInclude>
   </ItemGroup>
@@ -1271,13 +1268,10 @@
     <ClCompile Include="sys\win32\dxerr.cpp">
       <Filter>Sys</Filter>
     </ClCompile>
-    <ClCompile Include="Oculus\Oculus.cpp">
-      <Filter>Oculus</Filter>
-    </ClCompile>
     <ClCompile Include="Oculus\OculusRender.cpp">
       <Filter>Oculus</Filter>
     </ClCompile>
-    <ClCompile Include="Oculus\InputDevices.cpp">
+    <ClCompile Include="Oculus\Oculus.cpp">
       <Filter>Oculus</Filter>
     </ClCompile>
   </ItemGroup>

@@ -336,7 +336,9 @@ typedef struct {
 	idDeclManager *				declManager;			// declaration manager
 	idAASFileManager *			AASFileManager;			// AAS file manager
 	idCollisionModelManager *	collisionModelManager;	// collision model manager
-
+	// OCULUS BEGIN
+	Oculus *					oculus;
+	// OCULUS END
 } gameImport_t;
 
 typedef struct {

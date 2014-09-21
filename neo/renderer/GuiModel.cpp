@@ -29,7 +29,6 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
-#include "../Oculus/Oculus.h"
 #include "tr_local.h"
 
 
@@ -273,8 +272,8 @@ void idGuiModel::EmitFullScreen()
 		viewDef->scissor.y2 = tr.viewDef->scissor.y2;
 	}
 
-	idVec3 p = ovr.GetHeadTrackingPosition();
-	idVec3 r = ovr.GetHeadTrackingOrientation();
+	idVec3 p = oculus->GetHeadTrackingPosition();
+	//idVec3 r = oculus->GetHeadTrackingOrientation();
 
 	const float scale = 1;
 

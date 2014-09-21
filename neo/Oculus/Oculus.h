@@ -28,6 +28,9 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
+#ifndef __OCULUS_H__
+#define __OCULUS_H__
+
 // Enable Oculus HMD Code
 #define ENABLE_OCULUS_HMD
 
@@ -40,34 +43,33 @@ If you have questions concerning this license or the applicable additional terms
 #include "../extern/OculusSDK/LibOVR/Src/OVR_CAPI.h"
 
 #define OVR2IDUNITS 2.5f
-#define PIXELDENSITY 1.0f
+#define PIXELDENSITY 1.5f
 #define DEBUGHMDTYPE ovrHmd_DK2
 #define LEFT_EYE_TARGET 0
 #define RIGHT_EYE_TARGET 1
 #define GUI_TARGET 2
 
-typedef struct ovrvidmode_t
-{
-    const char *description;
-    int         width, height;
-} ovrvidmode_t;
-
-class OculusHmd
+class Oculus
 {
 public:
 
-	OculusHmd();
-	~OculusHmd();
+	virtual				~Oculus() {};
+	
+	virtual int			Init( void ) = 0;
+	virtual int			InitPositionTracking( void ) = 0;
+	virtual void		InitScratch( void ) = 0;
+	virtual void		InitOpenGL( void ) = 0;
 
-	int					Init();
-	void				Shutdown();
+	virtual void		Shutdown( void ) = 0;
 
-	idVec3				GetHeadTrackingOrientation();
-	idVec3				GetHeadTrackingPosition();
+	virtual idAngles	GetHeadTrackingOrientation( void ) = 0;
+	virtual idVec3		GetHeadTrackingPosition( void ) = 0;
 
-	int					InitRendering();
+	virtual bool		isMotionTrackingEnabled( void ) = 0;
 
 	bool				isDebughmd;
+	bool				isActivated;
+
 	int					multiSamples;
 
 	ovrTexture			G_OvrTextures[2];
@@ -81,15 +83,16 @@ public:
 	int					GetCurrentFrambufferIndex() { return currentEye; }
 	void				SetCurrentFrambufferIndex(int i) { currentEye = i; }
 
-	int					SetupView();
+	virtual int			SetupView();
 	int					GetRenderWidth()		{ return G_ovrRenderWidth; }
 	int					GetRenderHeight()		{ return G_ovrRenderHeight; }
 	int					GetFrameBufferWidth()	{ return G_FrameBufferWidth; }
 	int					GetFrameBufferHeight()	{ return G_FrameBufferHeight; }
-	void				SelectBuffer(int i, GLuint &fbo);
+	virtual void		SelectBuffer(int i, GLuint &fbo);
 	idVec3				GetViewAdjustVector(int id);
 	
-private:
+protected:
+
 	int					currentEye;
 	GLuint				G_GLFrameBuffer[2];
 	GLuint				G_GLDepthTexture[2];
@@ -97,15 +100,23 @@ private:
 	ovrEyeRenderDesc	G_ovrEyeRenderDesc[2];
 	ovrTexture			Fn_GenOvrTexture(int i);
 	int					Fn_SetupFrameBuffer(int idx);
-	int					InitHmdPositionTracking();
 	int					G_ovrRenderWidth;
 	int					G_ovrRenderHeight;
 	int					G_FrameBufferWidth;
 	int					G_FrameBufferHeight;
 
-	void				Fn_InitScratch();
-	void				GLInitExtensions();
 	void*				GLGetProcAddress(const char* func) { return wglGetProcAddress(func); }
+
+// Windows
+#ifdef WIN32
+public:
+	virtual int			InitRendering(HWND h, HDC dc) = 0;
+protected:
+	HWND				hWnd;
+	HDC					dc;
+#endif
 };
 
-extern OculusHmd ovr;
+extern Oculus * oculus;
+
+#endif /* __OCULUS_H__ */

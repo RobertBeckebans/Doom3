@@ -31,8 +31,6 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
-#include "../oculus/Oculus.h"
-
 #include "../extern/OculusSDK/LibOVR/Include/OVR_Kernel.h"
 #include "../extern/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h"
 #include "../renderer/tr_local.h"
@@ -78,11 +76,11 @@ void OR_SetupProjection(idRenderSystemLocal &tr)
 		zNear *= 0.25;
 	}
 
-	ymax = zNear * ovr.G_ovrEyeFov[tr.viewDef->eye].UpTan;
-	ymin = -zNear * ovr.G_ovrEyeFov[tr.viewDef->eye].DownTan;
+	ymax = zNear * oculus->G_ovrEyeFov[tr.viewDef->eye].UpTan;
+	ymin = -zNear * oculus->G_ovrEyeFov[tr.viewDef->eye].DownTan;
 
-	xmax = zNear * ovr.G_ovrEyeFov[tr.viewDef->eye].LeftTan;
-	xmin = -zNear * ovr.G_ovrEyeFov[tr.viewDef->eye].RightTan;
+	xmax = zNear * oculus->G_ovrEyeFov[tr.viewDef->eye].LeftTan;
+	xmin = -zNear * oculus->G_ovrEyeFov[tr.viewDef->eye].RightTan;
 
 	width = xmax - xmin;
 	height = ymax - ymin;
@@ -185,8 +183,8 @@ static void	RB_SetBuffer(const void *data, int eye)
 	const setBufferCommand_t	*cmd;
 	cmd = (const setBufferCommand_t *)data;
 	
-	ovr.SetCurrentFrambufferIndex(eye);
-	ovr.SelectBuffer(eye, fbo);
+	oculus->SetCurrentFrambufferIndex(eye);
+	oculus->SelectBuffer(eye, fbo);
 
 	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fbo);
 
@@ -250,7 +248,7 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 	int c_copyRenders = 0;
 
 	ovrPosef headPose[2];
-	ovrFrameTiming hmdFrameTiming = ovrHmd_BeginFrame(ovr.Hmd, 0);
+	ovrFrameTiming hmdFrameTiming = ovrHmd_BeginFrame(oculus->Hmd, 0);
 
 	bool needGuiDraw = true;
 
@@ -262,14 +260,14 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 		globalImages->CompleteBackgroundImageLoads();
 
 		GLuint fbo;
-		ovr.SelectBuffer(ovr.GetCurrentFrambufferIndex(), fbo);
+		oculus->SelectBuffer(oculus->GetCurrentFrambufferIndex(), fbo);
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 		RB_SetDefaultGLState();
 
 		// Set render to texture targets
-		globalImages->scratchImage->texnum = ovr.Scratch[i];
-		//globalImages->currentRenderImage->texnum = ovr.currentRenderImage[i];
+		globalImages->scratchImage->texnum = oculus->Scratch[i];
+		//globalImages->currentRenderImage->texnum = oculus->currentRenderImage[i];
 
 		//Sys_DebugPrintf("Eye %d: Start | ", i);
 
@@ -284,7 +282,7 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 			{
 				// Always left first. Oculus recommend that we let the HMD tell you what to render first so TODO
 				int eye = ((const drawSurfsCommand_t *)cmds)->viewDef->eye;
-				headPose[i] = ovrHmd_GetEyePose(ovr.Hmd, (ovrEyeType)i);
+				headPose[i] = ovrHmd_GetEyePose(oculus->Hmd, (ovrEyeType)i);
 
 				if (((const drawSurfsCommand_t *)cmds)->viewDef->viewEntitys) {			
 					// World
@@ -297,7 +295,7 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 					c_draw3d++;
 					
 #ifdef _DEBUG
-					if (i == RIGHT_EYE_TARGET && true) {
+					if (i == RIGHT_EYE_TARGET && false) {
 						glScissor(128,128,64,64);
 						glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
 						glClear(GL_COLOR_BUFFER_BIT);
@@ -337,10 +335,10 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 	//Sys_DebugPrintf("Finish\n");
 
 	// Done rendering. Send this off to the Oculus SDK
-	glViewport(0, 0, ovr.Hmd->Resolution.w, ovr.Hmd->Resolution.h);
-	glScissor(0, 0, ovr.Hmd->Resolution.w, ovr.Hmd->Resolution.h);
-	ovrHmd_EndFrame(ovr.Hmd, headPose, ovr.G_OvrTextures);
-	//glViewport(0, 0, ovr.GetFrameBufferWidth(), ovr.GetFrameBufferHeight());
+	glViewport(0, 0, oculus->Hmd->Resolution.w, oculus->Hmd->Resolution.h);
+	glScissor(0, 0, oculus->Hmd->Resolution.w, oculus->Hmd->Resolution.h);
+	ovrHmd_EndFrame(oculus->Hmd, headPose, oculus->G_OvrTextures);
+	//glViewport(0, 0, oculus->GetFrameBufferWidth(), oculus->GetFrameBufferHeight());
 
 	// go back to the default texture so the editor doesn't mess up a bound image
 	qglBindTexture( GL_TEXTURE_2D, 0 );
@@ -352,8 +350,8 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 		int scratchWidth = globalImages->scratchImage->uploadWidth;
 		int scratchHeight = globalImages->scratchImage->uploadHeight;
 
-		SaveImage("tmp/left_scratch.tga", ovr.Scratch[0], scratchWidth, scratchHeight);
-		SaveImage("tmp/right_scratch.tga", ovr.Scratch[1], scratchWidth, scratchHeight);
+		SaveImage("tmp/left_scratch.tga", oculus->Scratch[0], scratchWidth, scratchHeight);
+		SaveImage("tmp/right_scratch.tga", oculus->Scratch[1], scratchWidth, scratchHeight);
 	}
 #endif
 }
@@ -406,9 +404,9 @@ void Fn_OculusRenderScene(const renderView_t *renderView, idRenderWorldLocal *re
 	parms->eye = eye;
 
 	if (eye == 0)
-		parms->renderView.vieworg += ovr.GetViewAdjustVector(0).x * parms->renderView.viewaxis[1];
+		parms->renderView.vieworg += oculus->GetViewAdjustVector(0).x * parms->renderView.viewaxis[1];
 	else if (eye == 1)
-		parms->renderView.vieworg += ovr.GetViewAdjustVector(1).x * parms->renderView.viewaxis[1];
+		parms->renderView.vieworg += oculus->GetViewAdjustVector(1).x * parms->renderView.viewaxis[1];
 
 	if (tr.takingScreenshot) {
 		parms->renderView.forceUpdate = true;

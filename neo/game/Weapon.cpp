@@ -2981,14 +2981,6 @@ void idWeapon::Event_LaunchProjectiles( int num_projectiles, float spread, float
 				ang = idMath::Sin( spreadRad * gameLocal.random.RandomFloat() );
 				spin = (float)DEG2RAD( 360.0f ) * gameLocal.random.RandomFloat();
 				dir = playerViewAxis[ 0 ] + playerViewAxis[ 2 ] * ( ang * idMath::Sin( spin ) ) - playerViewAxis[ 1 ] * ( ang * idMath::Cos( spin ) );
-
-				// OCULUS BEGIN
-				idPlayer *player;
-				player = gameLocal.GetLocalPlayer();
-				idAngles aimAngle = dir.ToAngles() + player->aimangles;
-				dir = aimAngle.ToForward();
-				// OCULUS END
-
 				dir.Normalize();
 				gameLocal.clip.Translation( tr, muzzle_pos, muzzle_pos + dir * 4096.0f, NULL, mat3_identity, MASK_SHOT_RENDERMODEL, owner );
 				if ( tr.fraction < 1.0f ) {
@@ -3008,14 +3000,6 @@ void idWeapon::Event_LaunchProjectiles( int num_projectiles, float spread, float
 			ang = idMath::Sin( spreadRad * gameLocal.random.RandomFloat() );
 			spin = (float)DEG2RAD( 360.0f ) * gameLocal.random.RandomFloat();
 			dir = playerViewAxis[0] + playerViewAxis[2] * (ang * idMath::Sin(spin)) - playerViewAxis[1] * (ang * idMath::Cos(spin));
-			
-			// OCULUS BEGIN
-			idPlayer *player;
-			player = gameLocal.GetLocalPlayer();
-			idAngles aimAngle = dir.ToAngles() + player->aimangles;
-			dir = aimAngle.ToForward();
-			// OCULUS END
-
 			dir.Normalize();
 
 			if ( projectileEnt ) {

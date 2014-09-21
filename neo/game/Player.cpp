@@ -954,6 +954,10 @@ idPlayer::idPlayer() {
 	viewAngles				= ang_zero;
 	cmdAngles				= ang_zero;
 
+	// OCULUS BEGIN
+	lookAngles				= ang_zero;
+	// OCULUS END
+
 	oldButtons				= 0;
 	buttonMask				= 0;
 	oldFlags				= 0;
@@ -2277,6 +2281,11 @@ void idPlayer::SpawnToPoint( const idVec3 &spawn_origin, const idAngles &spawn_a
 	// if this is the first spawn of the map, we don't have a usercmd yet,
 	// so the delta angles won't be correct.  This will be fixed on the first think.
 	viewAngles = ang_zero;
+
+	// OCULUS BEGIN
+	lookAngles = ang_zero;
+	// OCULUS END
+
 	SetDeltaViewAngles( ang_zero );
 	SetViewAngles( spawn_angles );
 	spawnAngles = spawn_angles;
@@ -2689,7 +2698,9 @@ void idPlayer::DrawHUD( idUserInterface *_hud ) {
 		{
 			// OCULUS BEGIN
 			// Don't want a crosshair if we are in VR
-			// cursor->Redraw(gameLocal.realClientTime);
+			if (!oculus->isActivated) {
+				cursor->Redraw(gameLocal.realClientTime);
+			}
 			// OCULUS END
 		}
 	}
@@ -4442,14 +4453,9 @@ void idPlayer::UpdateFocus( void ) {
 
 	start = GetEyePosition();
 
-	// OCULUS BEGIN
-	//end = start + viewAngles.ToForward() * 80.0f;
-	end = start + (viewAngles + aimangles).ToForward() * 80.0f;
-	// OCULUS END
-
 	// player identification -> names to the hud
 	if ( gameLocal.isMultiplayer && entityNumber == gameLocal.localClientNum ) {
-		idVec3 end = start + (viewAngles + aimangles).ToForward() * 768.0f;
+		idVec3 end = start + viewAngles.ToForward() * 768.0f;
 		gameLocal.clip.TracePoint( trace, start, end, MASK_SHOT_BOUNDINGBOX, this );
 		int iclient = -1;
 		if ( ( trace.fraction < 1.0f ) && ( trace.c.entityNum < MAX_CLIENTS ) ) {
@@ -4915,6 +4921,22 @@ void idPlayer::UpdateDeltaViewAngles( const idAngles &angles ) {
 
 /*
 ================
+idPlayer::UpdateDeltaLookAngles
+================
+*/
+void idPlayer::UpdateDeltaLookAngles(const idAngles &angles) {
+	// set the delta angle
+	idAngles delta;
+	idAngles hmdAngles = oculus->GetHeadTrackingOrientation();
+
+	for (int i = 0; i < 3; i++) {
+		delta[i] = angles[i] - hmdAngles[i];
+	}
+	SetDeltaLookAngles(delta);
+}
+
+/*
+================
 idPlayer::SetViewAngles
 ================
 */
@@ -4938,12 +4960,33 @@ void idPlayer::UpdateViewAngles( void )
 		// no view changes at all, but we still want to update the deltas or else when
 		// we get out of this mode, our view will snap to a kind of random angle
 		UpdateDeltaViewAngles( viewAngles );
+
+		// OCULUS BEGIN
+		if (oculus->isActivated)
+			UpdateDeltaLookAngles( lookAngles );
+		// OCULUS END
 		return;
 	}
 
 	// if dead
 	if ( health <= 0 )
 	{
+		// OCULUS BEGIN
+		if (oculus->isActivated)
+		{
+			if (pm_thirdPersonDeath.GetBool())
+			{
+				lookAngles.roll = 0.0f;
+				lookAngles.pitch = 30.0f;
+			}
+			else {
+				lookAngles.roll = 40.0f;
+				lookAngles.pitch = -15.0f;
+			}
+			return;
+		}
+		// OCULUS END
+
 		if ( pm_thirdPersonDeath.GetBool() )
 		{
 			viewAngles.roll = 0.0f;
@@ -4970,6 +5013,24 @@ void idPlayer::UpdateViewAngles( void )
 		}
 	}
 
+	// OCULUS BEGIN
+	idAngles hmdAngles = oculus->GetHeadTrackingOrientation();
+
+	for (i = 0; i < 3; i++)
+	{
+		cmdAngles[i] = hmdAngles[i];
+
+		if (influenceActive == INFLUENCE_LEVEL3)
+		{
+			lookAngles[i] += idMath::ClampFloat(-1.0f, 1.0f, idMath::AngleDelta(idMath::AngleNormalize180(hmdAngles[i] + deltaLookAngles[i]), lookAngles[i]));
+		}
+		else
+		{
+			lookAngles[i] = idMath::AngleNormalize180(hmdAngles[i] + deltaLookAngles[i]);
+		}
+	}
+	// OCULUS END
+
 	if ( !centerView.IsDone( gameLocal.time ) )
 	{
 		viewAngles.pitch = centerView.GetCurrentValue(gameLocal.time);
@@ -4991,6 +5052,22 @@ void idPlayer::UpdateViewAngles( void )
 	}
 	else
 	{
+		// OCULUS BEGIN
+		if (oculus->isActivated)
+		{
+			if (lookAngles.pitch > pm_maxviewpitch.GetFloat())
+			{
+				// don't let the player look down enough to see the shadow of his (non-existant) feet
+				lookAngles.pitch = pm_maxviewpitch.GetFloat();
+			}
+			else if (lookAngles.pitch < pm_minviewpitch.GetFloat())
+			{
+				// don't let the player look up more than 89 degrees
+				lookAngles.pitch = pm_minviewpitch.GetFloat();
+			}
+		}
+		// OCULUS END
+
 		if ( viewAngles.pitch > pm_maxviewpitch.GetFloat() )
 		{
 			// don't let the player look down enough to see the shadow of his (non-existant) feet
@@ -5003,13 +5080,22 @@ void idPlayer::UpdateViewAngles( void )
 		}
 	}
 
-	UpdateDeltaViewAngles( viewAngles );
+	// OCULUS BEGIN
+	float lookDelta = idMath::AngleDelta(viewAngles.yaw, lookAngles.yaw);
 
+		
+
+	// OCULUS END
+
+	UpdateDeltaViewAngles(viewAngles);
+
+	// OCULUS BEGIN
+	UpdateDeltaLookAngles(lookAngles);
 	// orient the model towards the direction we're looking
-	SetAngles( idAngles( 0, viewAngles.yaw, 0 ) );
-
+	SetAngles(idAngles(0, lookAngles.yaw, 0));
 	// save in the log for analyzing weapon angle offsets
-	loggedViewAngles[ gameLocal.framenum & (NUM_LOGGED_VIEW_ANGLES-1) ] = viewAngles;
+	loggedViewAngles[gameLocal.framenum & (NUM_LOGGED_VIEW_ANGLES - 1)] = lookAngles;
+	// OCULUS END
 }
 
 /*
@@ -6050,7 +6136,14 @@ void idPlayer::Move( void ) {
 	}
 
 	physicsObj.SetDebugLevel( g_debugMove.GetBool() );
-	physicsObj.SetPlayerInput( usercmd, viewAngles );
+	
+	// OCULUS BEGIN
+	if (oculus->isActivated) {
+		physicsObj.SetPlayerInput(usercmd, lookAngles);
+	} else {
+		physicsObj.SetPlayerInput(usercmd, viewAngles);
+	}
+	// OCULUS END
 
 	// FIXME: physics gets disabled somehow
 	BecomeActive( TH_PHYSICS );
@@ -6125,7 +6218,14 @@ void idPlayer::Move( void ) {
 		}
 	}
 
-	BobCycle( pushVelocity );
+	// OCULUS BEGIN
+	if (!oculus->isActivated)
+	{
+		// NONO in VR
+		BobCycle(pushVelocity);
+	}
+	// OCULUS END
+	
 	CrashLand( oldOrigin, oldVelocity );
 }
 
@@ -6469,9 +6569,9 @@ void idPlayer::Think( void ) {
 		LinkCombat();
 
 		// OCULUSE BEGIN
-		UpdateAimAngles();
+		//UpdateAimAngles();
 		UpdateAimPointer();
-		UpdateLaserSight();
+		//UpdateLaserSight();
 		// OCULUS END
 
 		playerView.CalculateShake();
@@ -7185,12 +7285,6 @@ void idPlayer::CalculateViewWeaponPos( idVec3 &origin, idMat3 &axis ) {
 	// CalculateRenderView must have been called first
 	const idVec3 &viewOrigin = firstPersonViewOrigin;
 
-	// OCULUS BEGIN
-	//const idMat3 &viewAxis = firstPersonViewAxis;
-	idAngles dir = viewAngles + aimangles;
-	const idMat3 &viewAxis = dir.ToMat3();
-	// OCULUS END
-
 	// these cvars are just for hand tweaking before moving a value to the weapon def
 	idVec3	gunpos( g_gun_x.GetFloat(), g_gun_y.GetFloat(), g_gun_z.GetFloat() );
 
@@ -7210,6 +7304,11 @@ void idPlayer::CalculateViewWeaponPos( idVec3 &origin, idMat3 &axis ) {
 	angles.yaw		= scale * bobfracsin * 0.01f;
 	angles.pitch	= xyspeed * bobfracsin * 0.005f;
 
+	// OCULUS START
+	angles.yaw += viewAngles.yaw;
+	angles.pitch += viewAngles.pitch;
+	// OCULUS END
+	
 	// gun angles from turning
 	if ( gameLocal.isMultiplayer ) {
 		idAngles offset = GunTurningOffset();
@@ -7324,6 +7423,14 @@ idVec3 idPlayer::GetEyePosition( void ) const {
 	} else {
 		org = GetPhysics()->GetOrigin();
 	}
+
+	// OCULUS BEGIN
+	if (oculus->isMotionTrackingEnabled() && !oculus->isDebughmd)
+	{
+		org += oculus->GetHeadTrackingPosition();
+	}
+	// OCULUS END
+
 	return org + ( GetPhysics()->GetGravityNormal() * -eyeOffset.z );
 }
 
@@ -7337,14 +7444,15 @@ void idPlayer::GetViewPos( idVec3 &origin, idMat3 &axis ) const {
 
 	// if dead, fix the angle and don't add any kick
 	if ( health <= 0 ) {
-		angles.yaw = viewAngles.yaw;
+		angles.yaw = lookAngles.yaw;
 		angles.roll = 40;
 		angles.pitch = -15;
 		axis = angles.ToMat3();
 		origin = GetEyePosition();
 	} else {
 		origin = GetEyePosition() + viewBob;
-		angles = viewAngles + viewBobAngles + playerView.AngleOffset();
+
+		angles = lookAngles + viewBobAngles + playerView.AngleOffset();
 
 		axis = angles.ToMat3() * physicsObj.GetGravityAxis();
 
@@ -7369,11 +7477,12 @@ void idPlayer::CalculateFirstPersonView( void ) {
 
 		ang = viewBobAngles + playerView.AngleOffset();
 		ang.yaw += viewAxis[ 0 ].ToYaw();
-		
+
 		jointHandle_t joint = animator.GetJointHandle( "camera" );
 		animator.GetJointTransform( joint, gameLocal.time, origin, axis );
 		firstPersonViewOrigin = ( origin + modelOffset ) * ( viewAxis * physicsObj.GetGravityAxis() ) + physicsObj.GetOrigin() + viewBob;
 		firstPersonViewAxis = axis * ang.ToMat3() * physicsObj.GetGravityAxis();
+
 	} else {
 		// offset for local bobbing and kicks
 		GetViewPos( firstPersonViewOrigin, firstPersonViewAxis );
@@ -8643,25 +8752,13 @@ bool idPlayer::NeedsIcon( void ) {
 	return entityNumber != gameLocal.localClientNum && ( isLagged || isChatting );
 }
 
-// OCULUS BEGIN, Merge laser sight from BFG Edition
+// OCULUS BEGIN
 
 /*
 ==============
 idPlayer::UpdateAimAngles
 ==============
 */
-
-void ClampAngle(float &a)
-{
-	float top = 30.0f;
-
-	if (a >= top)
-		a = top;
-
-	if (a <= -top)
-		a = -top;
-}
-
 void idPlayer::UpdateAimAngles()
 {
 	const float scale = 0.08f;
@@ -8671,11 +8768,11 @@ void idPlayer::UpdateAimAngles()
 
 	if (mxDelta != 0 || myDelta != 0)
 	{
-		aimangles.yaw -= scale * (float)mxDelta;
-		aimangles.pitch -= scale * -(float)myDelta;
+		//aimangles.yaw -= scale * (float)mxDelta;
+		//aimangles.pitch -= scale * -(float)myDelta;
 
-		ClampAngle(aimangles.pitch);
-		ClampAngle(aimangles.yaw);
+		//ClampAngle(35.0f, viewAngles.pitch, aimangles.pitch);
+		//ClampAngle(35.0f, viewAngles.yaw, aimangles.yaw);
 
 		//common->Printf("UpdateAimAngles: [pitch: %0.4f yaw: %0.4f] [pitch: %0.4f yaw: %0.4f]\n", aimangles.pitch, aimangles.yaw, viewAngles.pitch, viewAngles.yaw);
 	}
@@ -8690,20 +8787,53 @@ idPlayer::UpdateAimPointer
 ==============
 */
 
+float dist(idVec3 a, idVec3 b)
+{
+	idVec3 c;
+
+	c.x = a.x - b.x;
+	c.y = a.y - b.y;
+	c.z = a.z - b.z;
+	return sqrt(c.x * c.x + c.y * c.y + c.z * c.z);
+}
+
+bool idPlayer::CheckOutsideofCameraBound()
+{
+	float distance = idMath::AngleDelta(viewAngles.yaw, lookAngles.yaw);
+	common->Printf("Yaw delta: %0.4f\n", distance);
+	if (distance > 45 || distance < -45) {
+		return true;
+	}
+
+	return false;
+}
+
 void idPlayer::UpdateAimPointer()
 {
-	trace_t tr;
+	trace_t tr, test;
 	idVec3 start = GetEyePosition();
+	idVec4 color = idVec4(0.0f, 1.0f, 0.0f, 1.0f);
 
-	if (!weapon.GetEntity()->ShowCrosshair() || GuiActive() || AI_RELOAD || AI_ONLADDER || AI_DEAD || weapon.GetEntity()->IsHidden())
+	//if (!weapon.GetEntity()->ShowCrosshair() || GuiActive() || AI_RELOAD || AI_ONLADDER || AI_DEAD || weapon.GetEntity()->IsHidden())
+	if ( GuiActive() || AI_ONLADDER || AI_DEAD )
 	{
 		return;
 	}
 
-	idAngles dir = viewAngles + aimangles;
+	// drag the cursor around when its outside the viewport bounds
+	if (CheckOutsideofCameraBound())
+	{
+		color = idVec4(1.0f, 0.0f, 0.0f, 1.0f);
+	}
 
-	gameLocal.clip.TracePoint(tr, start, (start + dir.ToForward() * 96.0f), CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
-	gameRenderWorld->DebugSphere(colorOrange, idSphere(tr.endpos, 0.5f));
+	gameLocal.clip.TracePoint(tr, start, (start + viewAngles.ToForward() * 96.0f), CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
+	gameLocal.clip.TracePoint(test, start, (start + lookAngles.ToForward() * 96.0f), CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
+
+	float distance = dist(start, tr.endpos);
+	float radius = 0.005f * distance;
+
+	gameRenderWorld->DebugSphere(colorRed, idSphere(tr.endpos, radius));
+	gameRenderWorld->DebugSphere(color, idSphere(test.endpos, 2.0f));
 }
 
 /*
@@ -8750,8 +8880,7 @@ void idPlayer::UpdateLaserSight()
 	idVec3	&target = *reinterpret_cast<idVec3 *>(&laserSightRenderEntity.shaderParms[SHADERPARM_BEAM_END_X]);
 
 	trace_t tr;
-	idAngles dir = viewAngles + aimangles;
-	gameLocal.clip.TracePoint(tr, laserSightRenderEntity.origin, (laserSightRenderEntity.origin + dir.ToForward() * 128.0f), CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
+	gameLocal.clip.TracePoint(tr, laserSightRenderEntity.origin, (laserSightRenderEntity.origin + viewAngles.ToForward() * 128.0f), CONTENTS_OPAQUE | MASK_SHOT_RENDERMODEL, this);
 	target = tr.endpos;
 
 	laserSightRenderEntity.shaderParms[SHADERPARM_BEAM_WIDTH] = vr_laserSightWidth.GetFloat();

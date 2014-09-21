@@ -29,8 +29,6 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
-#include "../Oculus/Oculus.h"
-
 #include "tr_local.h"
 
 // Vista OpenGL wrapper check
@@ -580,8 +578,8 @@ static bool R_GetModeInfo( int *width, int *height, int mode ) {
 #ifdef ENABLE_OCULUS_HMD
 	if (vr_enableOculusRiftRendering.GetBool())
 	{
-		*width = ovr.GetRenderWidth();
-		*height = ovr.GetRenderHeight();
+		*width = oculus->GetRenderWidth();
+		*height = oculus->GetRenderHeight();
 		return true;
 	}
 #endif
@@ -2323,7 +2321,7 @@ idRenderSystemLocal::GetScreenWidth
 */
 int idRenderSystemLocal::GetScreenWidth( void ) const {
 	if (vr_enableOculusRiftRendering.GetBool())
-		return ovr.GetRenderWidth();
+		return oculus->GetRenderWidth();
 	return glConfig.vidWidth;
 }
 
@@ -2334,7 +2332,7 @@ idRenderSystemLocal::GetScreenHeight
 */
 int idRenderSystemLocal::GetScreenHeight( void ) const {
 	if (vr_enableOculusRiftRendering.GetBool())
-		return ovr.GetRenderHeight();
+		return oculus->GetRenderHeight();
 	return glConfig.vidHeight;
 }
 // OCULUS END

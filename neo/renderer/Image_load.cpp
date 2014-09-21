@@ -29,7 +29,6 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
-#include "../Oculus/Oculus.h"
 #include "tr_local.h"
 
 /*
@@ -1873,7 +1872,7 @@ void idImage::CopyFramebuffer( int x, int y, int imageWidth, int imageHeight, bo
 
 	if (vr_enableOculusRiftRendering.GetBool()) {
 		GLuint fbo;
-		ovr.SelectBuffer(ovr.GetCurrentFrambufferIndex(), fbo);
+		oculus->SelectBuffer(oculus->GetCurrentFrambufferIndex(), fbo);
 		glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 
 		if (strcmp(this->imgName, "_scratch") == 0)

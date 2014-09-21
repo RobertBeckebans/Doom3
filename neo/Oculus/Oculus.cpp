@@ -28,46 +28,54 @@ If you have questions concerning this license or the applicable additional terms
 ===========================================================================
 */
 
-#include "../idlib/precompiled.h"
 #pragma hdrstop
-
-#include "Oculus.h"
-#include "../sys/win32/win_local.h"
-
+#include "../idlib/precompiled.h"
 #include "../extern/OculusSDK/LibOVR/Include/OVR_Kernel.h"
 #include "../extern/OculusSDK/LibOVR/Src/OVR_Stereo.h"
 #include "../extern/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h"
 
+static void ovrHmd_RecenterPose_f(const idCmdArgs &args);
+
 using namespace OVR;
 
 // VR setting cvar definitions
+
 idCVar vr_enableOculusRiftRendering("vr_enableOculusRiftRendering", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable Oculus Rift SDK rendering path");
-idCVar vr_enableOculusRiftTracking("vr_enableOculusRiftTracking", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable Oculus Rift SDK head motion tracking");
+idCVar vr_enableOculusRiftMotionTracking("vr_enableOculusRiftMotionTracking", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable Oculus Rift SDK head motion tracking");
 idCVar vr_enableLowPersistence("vr_enableLowPersistence", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable Oculus Rift low persistence display");
 idCVar vr_enableDynamicPrediction("vr_enableDynamicPrediction", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable Oculus Rift dynamic prediction");
 idCVar vr_enableVsync("vr_enableVsync", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable vsync");
 idCVar vr_enableMirror("vr_enableMirror", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable mirror to window mode");
 idCVar vr_enablezeroipd("vr_enablezeroipd", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Disable depth rendering");
 
-/*
-=================
-ovrHmd_RecenterPose_f
-=================
-*/
-static void ovrHmd_RecenterPose_f(const idCmdArgs &args)
-{
-	ovrHmd_RecenterPose(ovr.Hmd);
-}
+// OculusLocal BEGIN
 
-OculusHmd::OculusHmd()
+class OculusLocal : public Oculus
 {
+public:
+	int			Init( void );
+	int			InitPositionTracking( void );
+	void		InitScratch( void );
+	void		InitOpenGL( void );
+	void		Shutdown( void );
 
-}
+	bool		isMotionTrackingEnabled( void );
 
-OculusHmd::~OculusHmd()
-{
-	this->Shutdown();
-}
+	idAngles	GetHeadTrackingOrientation( void);
+	idVec3		GetHeadTrackingPosition( void );
+
+private:
+	void GenTexture(GLuint &tex);
+
+// Windows
+#ifdef WIN32
+public:
+	int		InitRendering(HWND h, HDC dc);
+protected:
+	HWND	hWnd;
+	HDC		dc;
+#endif
+};
 
 /*
 ====================
@@ -76,15 +84,18 @@ OvrSystemLocal::Init
 Init Oculus Rift HMD, get HMD properties and start head tracking
 ====================
 */
-int OculusHmd::Init()
+int OculusLocal::Init( void )
 {
 	// Initialize the Oculus VR library
 	ovr_Initialize();
 
-	if (!(Hmd = ovrHmd_Create(0))) {
+	Hmd = ovrHmd_Create(0);
+
+	if (!Hmd) {
 		isDebughmd = true;
 		common->Printf("Oculus HMD not found. Fall back to debug device.\n");
-		if (!(Hmd = ovrHmd_CreateDebug(DEBUGHMDTYPE))) {
+		Hmd = ovrHmd_CreateDebug(DEBUGHMDTYPE);
+		if (!Hmd) {
 			Sys_Error("Error during debug HMD initialization");
 			return false;
 		}
@@ -92,6 +103,8 @@ int OculusHmd::Init()
 
 	common->Printf("--- OVR Initialization Complete ---\n");
 	common->Printf("Device: %s - %s\n", Hmd->Manufacturer, Hmd->ProductName);
+
+	isActivated = true;
 
 	// Set Hardware caps.
 	unsigned hmdCaps;
@@ -129,9 +142,9 @@ int OculusHmd::Init()
 	ovrHmd_SetEnabledCaps(Hmd, hmdCaps);
 
 	// Enable position and rotation tracking
-	if (vr_enableOculusRiftTracking.GetBool())
+	if (vr_enableOculusRiftMotionTracking.GetBool())
 	{
-		if (!InitHmdPositionTracking())
+		if (!InitPositionTracking())
 			Sys_Error("Error during HMD head tracking initialization");
 	}
 
@@ -143,7 +156,6 @@ int OculusHmd::Init()
 
 	G_ovrEyeFov[0] = FovPort::Min(G_ovrEyeFov[0], FovPort(FovSideTanMax));
 	G_ovrEyeFov[1] = FovPort::Min(G_ovrEyeFov[1], FovPort(FovSideTanMax));
-
 
 	Sizei _textureSizeLeft = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Left, G_ovrEyeFov[0], PIXELDENSITY);
 	Sizei _textureSizeRight = ovrHmd_GetFovTextureSize(Hmd, ovrEye_Right, G_ovrEyeFov[1], PIXELDENSITY);
@@ -158,18 +170,13 @@ int OculusHmd::Init()
 	return 1;
 };
 
-void GenTexture(GLuint &tex)
+int OculusLocal::InitPositionTracking()
 {
-	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 16, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+	ovrHmd_ConfigureTracking(Hmd, ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0);
+	return 1;
 }
 
-void OculusHmd::Fn_InitScratch()
+void OculusLocal::InitScratch()
 {
 	GenTexture(Scratch[0]);
 	GenTexture(Scratch[1]);
@@ -177,11 +184,14 @@ void OculusHmd::Fn_InitScratch()
 	GenTexture(currentRenderImage[1]);
 }
 
-int OculusHmd::InitRendering()
+int OculusLocal::InitRendering(HWND h, HDC d)
 {
-	ovrHmd_AttachToWindow(Hmd, win32.hWnd, NULL, NULL);
+	this->hWnd = h;
+	this->dc = d;
 
-	GLInitExtensions();
+	ovrHmd_AttachToWindow(Hmd, hWnd, NULL, NULL);
+
+	InitOpenGL();
 
 	if (!SetupView())
 	{
@@ -199,11 +209,27 @@ OvrSystemLocal::Shutdown
 Disconnect from hmd
 ====================
 */
-void OculusHmd::Shutdown()
+void OculusLocal::Shutdown()
 {
 	ovrHmd_Destroy(Hmd);
 	ovr_Shutdown();
 };
+
+/*
+====================
+OculusLocal::isMotionTrackingEnabled
+
+Check if the user enabled the motion tracking camera and sensor
+====================
+*/
+
+bool OculusLocal::isMotionTrackingEnabled()
+{
+	if (!vr_enableOculusRiftMotionTracking.GetBool())
+		return false;
+
+	return true;
+}
 
 /*
 =======================
@@ -212,14 +238,9 @@ GetHeadTrackingOrientation
 =======================
 */
 
-float degtorad(float r)
+idAngles OculusLocal::GetHeadTrackingOrientation()
 {
-	return (r * (180.0f / idMath::PI));
-}
-
-idVec3 OculusHmd::GetHeadTrackingOrientation()
-{
-	idVec3 angles;
+	idAngles angles;
 
 	if (!Hmd)
 		return angles;
@@ -232,9 +253,9 @@ idVec3 OculusHmd::GetHeadTrackingOrientation()
 		float y, p, r;
 		pose.Rotation.GetEulerAngles<Axis_Y, Axis_X, Axis_Z>(&y, &p, &r);
 
-		angles.x = -degtorad(p);
-		angles.y = degtorad(y);
-		angles.z = -degtorad(r);
+		angles.pitch = RadToDegree(-p);//-DEG2RAD(p);
+		angles.yaw = RadToDegree(y);//DEG2RAD(y);
+		angles.roll = RadToDegree(-r);//-DEG2RAD(r);
 	}
 
 	return angles;
@@ -247,7 +268,7 @@ GetHeadTrackingPosition
 =======================
 */
 
-idVec3 OculusHmd::GetHeadTrackingPosition()
+idVec3 OculusLocal::GetHeadTrackingPosition()
 {
 	idVec3 position;
 
@@ -258,11 +279,13 @@ idVec3 OculusHmd::GetHeadTrackingPosition()
 
 	Posef pose = ts.HeadPose.ThePose;
 
+	float scale = 150.0f;
+
 	if (ts.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked))
 	{
-		position.x = pose.Translation.x;
-		position.y = pose.Translation.y;
-		position.z = pose.Translation.z;
+		position.y = (-pose.Translation.x * scale) / OVR2IDUNITS;
+		position.z = (pose.Translation.y * scale) / OVR2IDUNITS;
+		position.x = (-pose.Translation.z * scale) / OVR2IDUNITS;
 	}
 	return position;
 }
@@ -274,7 +297,7 @@ CreateOculusTexture
 Generate an ovrTexture with our opengl texture
 =======================
 */
-ovrTexture OculusHmd::Fn_GenOvrTexture(int eye)
+ovrTexture Oculus::Fn_GenOvrTexture(int eye)
 {
 	ovrTexture tex;
 
@@ -309,7 +332,7 @@ PFNGLGENRENDERBUFFERSPROC				glGenRenderbuffers;
 PFNGLBINDRENDERBUFFERPROC				glBindRenderbuffer;
 PFNGLRENDERBUFFERSTORAGEEXTPROC			glRenderbufferStorage;
 
-void OculusHmd::GLInitExtensions()
+void OculusLocal::InitOpenGL()
 {
 	if (glGenFramebuffers)
 		return;
@@ -333,7 +356,7 @@ This is how much we shift the eyes left and right
 =======================
 */
 
-idVec3 OculusHmd::GetViewAdjustVector(int eye)
+idVec3 Oculus::GetViewAdjustVector(int eye)
 {
 	idVec3 a;
 
@@ -344,13 +367,7 @@ idVec3 OculusHmd::GetViewAdjustVector(int eye)
 	return a;
 }
 
-int OculusHmd::InitHmdPositionTracking()
-{
-	ovrHmd_ConfigureTracking(Hmd, ovrTrackingCap_Orientation | ovrTrackingCap_MagYawCorrection | ovrTrackingCap_Position, 0);
-	return 1;
-}
-
-void OculusHmd::SelectBuffer(int idx, GLuint &fbo)
+void Oculus::SelectBuffer(int idx, GLuint &fbo)
 {
 	if (idx == LEFT_EYE_TARGET)
 	{
@@ -370,7 +387,14 @@ void OculusHmd::SelectBuffer(int idx, GLuint &fbo)
 	return;
 }
 
-int OculusHmd::Fn_SetupFrameBuffer(int idx)
+/*
+=======================
+Fn_SetupFrameBuffer
+
+=======================
+*/
+
+int Oculus::Fn_SetupFrameBuffer(int idx)
 {
 	if (!G_GLFrameBuffer[idx])
 	{
@@ -421,12 +445,17 @@ int OculusHmd::Fn_SetupFrameBuffer(int idx)
 	return 1;
 }
 
-extern int MakePowerOfTwo(int num);
+/*
+=======================
+SetupView
 
-int OculusHmd::SetupView()
+=======================
+*/
+
+int Oculus::SetupView()
 {
 	// Gen scratch render textures
-	Fn_InitScratch();
+	InitScratch();
 
 	if (vr_enablezeroipd.GetBool())
 	{
@@ -463,8 +492,8 @@ int OculusHmd::SetupView()
 	glcfg.OGL.Header.API = ovrRenderAPI_OpenGL;
 	glcfg.OGL.Header.RTSize = Sizei(Hmd->Resolution.w, Hmd->Resolution.h);
 	glcfg.OGL.Header.Multisample = 1;
-	glcfg.OGL.Window = win32.hWnd;
-	glcfg.OGL.DC = win32.hDC;
+	glcfg.OGL.Window = hWnd;
+	glcfg.OGL.DC = dc;
 
 	unsigned distortionCaps = NULL;
 	
@@ -491,5 +520,34 @@ int OculusHmd::SetupView()
 	return 1;
 }
 
-// We will refer to this in the Doom3 code when we need stuff from the Hmd
-OculusHmd ovr;
+/*
+=================
+OculusLocal::GenTexture
+
+=================
+*/
+void OculusLocal::GenTexture(GLuint &tex)
+{
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, 16, 16, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+}
+
+static OculusLocal localOculus;
+Oculus *oculus = &localOculus;
+
+// OculusLocal END
+
+/*
+=================
+ovrHmd_RecenterPose_f
+=================
+*/
+static void ovrHmd_RecenterPose_f(const idCmdArgs &args)
+{
+	ovrHmd_RecenterPose(oculus->Hmd);
+}

@@ -29,7 +29,6 @@ If you have questions concerning this license or the applicable additional terms
 #include "../idlib/precompiled.h"
 #pragma hdrstop
 
-#include "../oculus/Oculus.h"
 #include "../renderer/Image.h"
 
 #define	MAX_PRINT_MSG_SIZE	4096
@@ -2673,6 +2672,9 @@ void idCommonLocal::LoadGameDLL( void ) {
 	gameImport.declManager				= ::declManager;
 	gameImport.AASFileManager			= ::AASFileManager;
 	gameImport.collisionModelManager	= ::collisionModelManager;
+	// OCULUS BEGIN
+	gameImport.oculus					= ::oculus;
+	// OCULUS END
 
 	gameExport							= *GetGameAPI( &gameImport );
 
@@ -2836,7 +2838,7 @@ void idCommonLocal::Init( int argc, const char **argv, const char *cmdline )
 #ifdef ENABLE_OCULUS_HMD
 		if (vr_enableOculusRiftRendering.GetBool())
 		{
-			ovr.Init();
+			oculus->Init();
 		}
 #endif
 		// OCULUS END
@@ -2896,7 +2898,7 @@ void idCommonLocal::Shutdown( void ) {
 	// game specific shut down
 	ShutdownGame( false );
 
-	ovr.Shutdown();
+	oculus->Shutdown();
 
 	// shut down non-portable system services
 	Sys_Shutdown();

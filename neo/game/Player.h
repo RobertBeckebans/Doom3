@@ -214,7 +214,8 @@ public:
 	qhandle_t				laserSightHandle;
 	renderEntity_t			aimPointerRenderEntity;
 	qhandle_t				aimPointerHandle;
-	idAngles				aimangles;
+	idAngles				lookAngles;
+	idAngles				previouslookAngles;
 	int						previousmx;
 	int						previousmy;
 	int						mxDelta;
@@ -340,6 +341,7 @@ public:
 	void					UpdateAimAngles();
 	void					UpdateAimPointer();
 	void					UpdateLaserSight();
+	bool					CheckOutsideofCameraBound();
 	// END
 
 	// save games
@@ -379,6 +381,10 @@ public:
 
 							// delta view angles to allow movers to rotate the view of the player
 	void					UpdateDeltaViewAngles( const idAngles &angles );
+
+	// OCULUS BEGIN
+	void					UpdateDeltaLookAngles(const idAngles &angles);
+	// OCULUS END
 
 	virtual bool			Collide( const trace_t &collision, const idVec3 &velocity );
 

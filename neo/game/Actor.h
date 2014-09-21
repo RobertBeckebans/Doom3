@@ -180,6 +180,11 @@ public:
 	const idAngles &		GetDeltaViewAngles( void ) const;
 	void					SetDeltaViewAngles( const idAngles &delta );
 
+	// OCULUS BEGIN
+	const idAngles &		GetDeltaLookAngles(void) const;
+	void					SetDeltaLookAngles(const idAngles &delta);
+	// OCULUS END
+
 	bool					HasEnemies( void ) const;
 	idActor *				ClosestEnemyToPoint( const idVec3 &pos );
 	idActor *				EnemyWithMostHealth();
@@ -213,7 +218,9 @@ protected:
 	idVec3					modelOffset;		// offset of visual model relative to the physics origin
 
 	idAngles				deltaViewAngles;	// delta angles relative to view input angles
-
+	// OCULUS BEGIN
+	idAngles				deltaLookAngles;	// delta angles relative to view input angles
+	// OCULUS END
 	int						pain_debounce_time;	// next time the actor can show pain
 	int						pain_delay;			// time between playing pain sound
 	int						pain_threshold;		// how much damage monster can take at any one time before playing pain animation

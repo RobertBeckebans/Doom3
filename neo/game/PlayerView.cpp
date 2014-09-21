@@ -553,10 +553,10 @@ void idPlayerView::DoubleVision( idUserInterface *hud, const renderView_t *view,
 	shift = fabs( shift );
 
 	// if double vision, render to a texture
-	renderSystem->CropRenderSize( 512, 256, true );
+	//renderSystem->CropRenderSize( 1024, 1024, true );
 	SingleView( hud, view );
 	renderSystem->CaptureRenderToImage( "_scratch" );
-	renderSystem->UnCrop();
+	//renderSystem->UnCrop();
 
 	// carry red tint if in berserk mode
 	idVec4 color(1, 1, 1, 1);
@@ -577,10 +577,10 @@ idPlayerView::BerserkVision
 ===================
 */
 void idPlayerView::BerserkVision( idUserInterface *hud, const renderView_t *view ) {
-	renderSystem->CropRenderSize( 512, 256, true );
+	//renderSystem->CropRenderSize( 512, 256, true );
 	SingleView( hud, view );
 	renderSystem->CaptureRenderToImage( "_scratch" );
-	renderSystem->UnCrop();
+	//renderSystem->UnCrop();
 	renderSystem->SetColor4( 1.0f, 1.0f, 1.0f, 1.0f );
 	renderSystem->DrawStretchPic( 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 1, 1, 0, dvMaterial );
 }
@@ -725,9 +725,9 @@ void idPlayerView::RenderPlayerView( idUserInterface *hud )
 		renderSystem->DrawStretchPic( 10.0f, 380.0f, 64.0f, 64.0f, 0.0f, 0.0f, 1.0f, 1.0f, lagoMaterial );
 	}
 #ifdef _DEBUG
-	const idMaterial* currentMaterial;
-	currentMaterial = declManager->FindMaterial( "_currentRender" );
-	renderSystem->DrawStretchPic( 0, 0, SCREEN_WIDTH / 4, SCREEN_HEIGHT / 4, 0, 1, 1, 0, currentMaterial );
+	//const idMaterial* currentMaterial;
+	//currentMaterial = declManager->FindMaterial( "_currentRender" );
+	//renderSystem->DrawStretchPic( 0, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 0, 1, 1, 0, currentMaterial );
 #endif
 }
 

@@ -47,6 +47,7 @@ idDeclManager *				declManager = NULL;
 idAASFileManager *			AASFileManager = NULL;
 idCollisionModelManager *	collisionModelManager = NULL;
 idCVar *					idCVar::staticVars = NULL;
+Oculus *					oculus = NULL;
 
 idCVar com_forceGenericSIMD( "com_forceGenericSIMD", "0", CVAR_BOOL|CVAR_SYSTEM, "force generic platform independent SIMD" );
 
@@ -101,6 +102,9 @@ extern "C" gameExport_t *GetGameAPI( gameImport_t *import ) {
 		declManager					= import->declManager;
 		AASFileManager				= import->AASFileManager;
 		collisionModelManager		= import->collisionModelManager;
+		// OCULUS BEGIN
+		oculus						= import->oculus;
+		// OCULUS END
 	}
 
 	// set interface pointers used by idLib
@@ -142,7 +146,9 @@ void TestGameAPI( void ) {
 	testImport.declManager				= ::declManager;
 	testImport.AASFileManager			= ::AASFileManager;
 	testImport.collisionModelManager	= ::collisionModelManager;
-
+	// OCULUS BEGIN
+	testImport.oculus					= ::oculus;
+	// OCULUS END
 	testExport = *GetGameAPI( &testImport );
 }
 
