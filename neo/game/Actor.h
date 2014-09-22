@@ -181,8 +181,8 @@ public:
 	void					SetDeltaViewAngles( const idAngles &delta );
 
 	// OCULUS BEGIN
-	const idAngles &		GetDeltaLookAngles(void) const;
-	void					SetDeltaLookAngles(const idAngles &delta);
+	const idAngles &		GetDeltaAimAngles(void) const;
+	void					SetDeltaAimAngles(const idAngles &delta);
 	// OCULUS END
 
 	bool					HasEnemies( void ) const;
@@ -219,7 +219,7 @@ protected:
 
 	idAngles				deltaViewAngles;	// delta angles relative to view input angles
 	// OCULUS BEGIN
-	idAngles				deltaLookAngles;	// delta angles relative to view input angles
+	idAngles				deltaAimAngles;		// delta angles relative to view input angles
 	// OCULUS END
 	int						pain_debounce_time;	// next time the actor can show pain
 	int						pain_delay;			// time between playing pain sound

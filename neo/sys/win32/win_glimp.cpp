@@ -43,7 +43,6 @@ If you have questions concerning this license or the applicable additional terms
 #include "../../idlib/precompiled.h"
 #pragma hdrstop
 
-#include "../../oculus/Oculus.h"
 #include "win_local.h"
 #include "../../renderer/tr_local.h"
 
@@ -499,8 +498,8 @@ static bool GLW_InitDriver( glimpParms_t parms )
 #ifdef ENABLE_OCULUS_HMD
 	if (vr_enableOculusRiftRendering.GetBool())
 	{
-		ovr.InitRendering();
-		ovrHmd_DismissHSWDisplay(ovr.Hmd);
+		oculus->InitRendering(win32.hWnd, win32.hDC);
+		ovrHmd_DismissHSWDisplay(oculus->Hmd);
 	}
 #endif
 // OCULUS END
@@ -721,11 +720,18 @@ static bool GLW_CreateOculusWindow(glimpParms_t parms)
 	exstyle = 0;
 	AdjustWindowRect(&r, WS_OVERLAPPEDWINDOW, FALSE);
 
-	w = ovr.Hmd->Resolution.w;
-	h = ovr.Hmd->Resolution.h;
+	w = oculus->Hmd->Resolution.w;
+	h = oculus->Hmd->Resolution.h;
 
-	x = ovr.Hmd->WindowsPos.x;
-	y = ovr.Hmd->WindowsPos.y;
+
+	x = oculus->Hmd->WindowsPos.x;
+	y = oculus->Hmd->WindowsPos.y;
+
+	if (false)
+	{
+		x = 0;
+		y = 0;
+	}
 
 	win32.hWnd = CreateWindowEx(
 		exstyle,
@@ -956,7 +962,8 @@ bool GLimp_Init( glimpParms_t parms )
 	//GLW_GetWGLExtensionsWithFakeWindow();
 
 	// try to change to fullscreen
-	if ( parms.fullScreen )
+
+	if (parms.fullScreen && !oculus->isActivated)
 	{
 		if ( !GLW_SetFullScreen( parms ) )
 		{

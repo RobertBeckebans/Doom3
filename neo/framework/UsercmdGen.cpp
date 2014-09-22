@@ -341,11 +341,7 @@ public:
 
 private:
 	void			MakeCurrent( void );
-	// OCULUS BEGIN
-	void			MakeCurrentOculus(void);
-	//OCULUS END
 	void			InitCurrent( void );
-
 	bool			Inhibited( void );
 	void			AdjustAngles( void );
 	void			KeyMove( void );
@@ -804,87 +800,7 @@ creates the current command for this frame
 ================
 */
 
-// OCULUS BEGIN
-void idUsercmdGenLocal::MakeCurrentOculus(void)
-{
-	idVec3		oldAngles;
-	idVec3		oldAimAngles;
-
-	int		i;
-
-	oldAngles = viewangles;
-	oldAimAngles = aimangles;
-
-	if (!Inhibited())
-	{
-		// update toggled key states
-		toggled_crouch.SetKeyState(ButtonState(UB_DOWN), in_toggleCrouch.GetBool());
-		toggled_run.SetKeyState(ButtonState(UB_SPEED), in_toggleRun.GetBool() && idAsyncNetwork::IsActive());
-		toggled_zoom.SetKeyState(ButtonState(UB_ZOOM), in_toggleZoom.GetBool());
-
-		// set button bits
-		CmdButtons();
-
-		// get basic movement from keyboard
-		KeyMove();
-
-		// get basic movement from mouse
-		MouseMove();
-
-		// check to make sure the angles haven't wrapped
-		if (viewangles[PITCH] - oldAngles[PITCH] > 90)
-		{
-			viewangles[PITCH] = oldAngles[PITCH] + 90;
-		}
-		else if (oldAngles[PITCH] - viewangles[PITCH] > 90)
-		{
-			viewangles[PITCH] = oldAngles[PITCH] - 90;
-		}
-	}
-	else
-	{
-		mouseDx = 0;
-		mouseDy = 0;
-	}
-
-	//idVec3 finalviewangles = viewangles;
-	//idAngles ovrangles = oculus->GetHeadTrackingOrientation();
-	//idVec3 ovrposition = oculus->GetHeadTrackingPosition();
-
-	//Sys_DebugPrintf("viewangles: [%.4f, %.4f, %.4f]\n", viewangles.x, viewangles.y, viewangles.z);
-	//Sys_DebugPrintf("ovrangles: [%.4f, %.4f, %.4f]\n", ovrangles.x, ovrangles.y, ovrangles.z);
-	//Sys_DebugPrintf("ovrposition: [%.4f, %.4f, %.4f]\n", ovrposition.x, ovrposition.y, ovrposition.z);
-
-	/*
-	if (vr_enableOculusRiftRendering.GetBool() && !oculus->isDebughmd)
-	{
-		finalviewangles.x += ovrangles.pitch;
-		finalviewangles.y += ovrangles.yaw;
-		finalviewangles.z += ovrangles.roll;
-	}*/
-
-	//Sys_DebugPrintf("finalviewangles: [%.4f, %.4f, %.4f]\n", finalviewangles.x, finalviewangles.y, finalviewangles.z);
-
-	for (i = 0; i < 3; i++)
-	{
-		cmd.angles[i] = ANGLE2SHORT(viewangles[i]);
-	}
-	
-	cmd.mx = continuousMouseX;
-	cmd.my = continuousMouseY;
-
-	flags = cmd.flags;
-	impulse = cmd.impulse;
-}
-
-// OCULUS END
-
 void idUsercmdGenLocal::MakeCurrent( void ) {
-
-	// OCULUS BEGIN
-	//MakeCurrentOculus();
-	//return;
-	// OCULUS END
 
 	idVec3		oldAngles;
 

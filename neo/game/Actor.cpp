@@ -1774,26 +1774,6 @@ void idActor::SetDeltaViewAngles( const idAngles &delta ) {
 	deltaViewAngles = delta;
 }
 
-// OCULUS BEGIN
-/*
-================
-idActor::GetDeltaLookAngles
-================
-*/
-const idAngles &idActor::GetDeltaLookAngles(void) const {
-	return deltaLookAngles;
-}
-
-/*
-================
-idActor::SetDeltaLookAngles
-================
-*/
-void idActor::SetDeltaLookAngles(const idAngles &delta) {
-	deltaLookAngles = delta;
-}
-// OCULUS END
-
 /*
 ================
 idActor::HasEnemies

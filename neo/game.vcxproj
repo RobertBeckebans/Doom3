@@ -109,6 +109,7 @@
     <ClCompile Include="game\physics\Physics_Static.cpp" />
     <ClCompile Include="game\physics\Physics_StaticMulti.cpp" />
     <ClCompile Include="game\physics\Push.cpp" />
+    <ClCompile Include="game\Player_Oculus.cpp" />
     <ClCompile Include="game\script\Script_Compiler.cpp" />
     <ClCompile Include="game\script\Script_Interpreter.cpp" />
     <ClCompile Include="game\script\Script_Program.cpp" />

@@ -279,6 +279,10 @@ void idWeapon::Save( idSaveGame *savefile ) const {
 	savefile->WriteVec3( viewWeaponOrigin );
 	savefile->WriteMat3( viewWeaponAxis );
 
+	// OCULUS BEGIN
+	savefile->WriteMat3(playerAimAxis);
+	// OCULUS END
+
 	savefile->WriteVec3( muzzleOrigin );
 	savefile->WriteMat3( muzzleAxis );
 
@@ -413,6 +417,10 @@ void idWeapon::Restore( idRestoreGame *savefile ) {
 
 	savefile->ReadVec3( viewWeaponOrigin );
 	savefile->ReadMat3( viewWeaponAxis );
+
+	// OCULUS BEGIN
+	savefile->ReadMat3(playerAimAxis);
+	// OCULUS ENS
 
 	savefile->ReadVec3( muzzleOrigin );
 	savefile->ReadMat3( muzzleAxis );
@@ -633,6 +641,10 @@ void idWeapon::Clear( void ) {
 	muzzleAxis.Identity();
 	muzzleOrigin.Zero();
 	pushVelocity.Zero();
+
+	// OCULUS BEGIN
+	playerAimAxis.Identity();
+	// OCULUS END
 
 	status			= WP_HOLSTERED;
 	state			= "";
@@ -1961,6 +1973,10 @@ void idWeapon::PresentWeapon( bool showViewModel ) {
 	playerViewOrigin = owner->firstPersonViewOrigin;
 	playerViewAxis = owner->firstPersonViewAxis;
 
+	// OCULUS BEGIN
+	playerAimAxis = owner->aimAngles.ToMat3();
+	// OCULUS END
+
 	// calculate weapon position based on player movement bobbing
 	owner->CalculateViewWeaponPos( viewWeaponOrigin, viewWeaponAxis );
 
@@ -2980,7 +2996,16 @@ void idWeapon::Event_LaunchProjectiles( int num_projectiles, float spread, float
 			for( i = 0; i < num_projectiles; i++ ) {
 				ang = idMath::Sin( spreadRad * gameLocal.random.RandomFloat() );
 				spin = (float)DEG2RAD( 360.0f ) * gameLocal.random.RandomFloat();
-				dir = playerViewAxis[ 0 ] + playerViewAxis[ 2 ] * ( ang * idMath::Sin( spin ) ) - playerViewAxis[ 1 ] * ( ang * idMath::Cos( spin ) );
+							
+				// OCULUS BEGIN
+				if (oculus->isActivated)
+				{
+					dir = playerAimAxis[0] + playerAimAxis[2] * (ang * idMath::Sin(spin)) - playerAimAxis[1] * (ang * idMath::Cos(spin));
+				} else {
+					dir = playerViewAxis[ 0 ] + playerViewAxis[ 2 ] * ( ang * idMath::Sin( spin ) ) - playerViewAxis[ 1 ] * ( ang * idMath::Cos( spin ) );
+				}
+				// OCULUS END
+
 				dir.Normalize();
 				gameLocal.clip.Translation( tr, muzzle_pos, muzzle_pos + dir * 4096.0f, NULL, mat3_identity, MASK_SHOT_RENDERMODEL, owner );
 				if ( tr.fraction < 1.0f ) {
@@ -2999,7 +3024,16 @@ void idWeapon::Event_LaunchProjectiles( int num_projectiles, float spread, float
 		for( i = 0; i < num_projectiles; i++ ) {
 			ang = idMath::Sin( spreadRad * gameLocal.random.RandomFloat() );
 			spin = (float)DEG2RAD( 360.0f ) * gameLocal.random.RandomFloat();
-			dir = playerViewAxis[0] + playerViewAxis[2] * (ang * idMath::Sin(spin)) - playerViewAxis[1] * (ang * idMath::Cos(spin));
+
+			// OCULUS BEGIN
+			if (oculus->isActivated)
+			{
+				dir = playerAimAxis[0] + playerAimAxis[2] * (ang * idMath::Sin(spin)) - playerAimAxis[1] * (ang * idMath::Cos(spin));
+			} else {
+				dir = playerViewAxis[ 0 ] + playerViewAxis[ 2 ] * ( ang * idMath::Sin( spin ) ) - playerViewAxis[ 1 ] * ( ang * idMath::Cos( spin ) );
+			}
+			// OCULUS END
+
 			dir.Normalize();
 
 			if ( projectileEnt ) {

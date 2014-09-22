@@ -214,12 +214,9 @@ public:
 	qhandle_t				laserSightHandle;
 	renderEntity_t			aimPointerRenderEntity;
 	qhandle_t				aimPointerHandle;
-	idAngles				lookAngles;
-	idAngles				previouslookAngles;
-	int						previousmx;
-	int						previousmy;
-	int						mxDelta;
-	int						myDelta;
+	idAngles				aimAngles;
+	idAngles				hmdAngles;
+	idAngles				previoushmdAngles;
 	// END
 
 	bool					noclip;
@@ -383,7 +380,8 @@ public:
 	void					UpdateDeltaViewAngles( const idAngles &angles );
 
 	// OCULUS BEGIN
-	void					UpdateDeltaLookAngles(const idAngles &angles);
+	void					VR_UpdateDeltaViewAngles( const idAngles &angles );
+	void					UpdateDeltaAimAngles( const idAngles &angles );
 	// OCULUS END
 
 	virtual bool			Collide( const trace_t &collision, const idVec3 &velocity );
@@ -667,6 +665,12 @@ private:
 	void					CrashLand( const idVec3 &oldOrigin, const idVec3 &oldVelocity );
 	void					BobCycle( const idVec3 &pushVelocity );
 	void					UpdateViewAngles( void );
+	
+	// OCULUS BEGIN
+	// private
+	void					VR_UpdateViewAngles_Type0( void );
+	// OCULUS END
+
 	void					EvaluateControls( void );
 	void					AdjustSpeed( void );
 	void					AdjustBodyAngles( void );

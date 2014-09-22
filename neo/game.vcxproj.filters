@@ -164,6 +164,7 @@
     <ClCompile Include="game\anim\Anim_Testmodel.cpp">
       <Filter>Animation</Filter>
     </ClCompile>
+    <ClCompile Include="game\Player_Oculus.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="game\ai\AAS.h">
