@@ -34,8 +34,6 @@ If you have questions concerning this license or the applicable additional terms
 #include "../extern/OculusSDK/LibOVR/Src/OVR_Stereo.h"
 #include "../extern/OculusSDK/LibOVR/Src/OVR_CAPI_GL.h"
 
-static void ovrHmd_RecenterPose_f(const idCmdArgs &args);
-
 using namespace OVR;
 
 // VR setting cvar definitions
@@ -63,6 +61,7 @@ public:
 
 	idAngles	GetHeadTrackingOrientation( void);
 	idVec3		GetHeadTrackingPosition( void );
+	void		RecenterHmd( void );
 
 private:
 	void GenTexture(GLuint &tex);
@@ -165,8 +164,6 @@ int OculusLocal::Init( void )
 
 	// Init the _scratch texture for each eyes
 
-	cmdSystem->AddCommand("OvrHmd_RecenterPose", ovrHmd_RecenterPose_f, CMD_FL_SYSTEM, "Recenter the Hmd position tracking");
-
 	return 1;
 };
 
@@ -245,6 +242,14 @@ idAngles OculusLocal::GetHeadTrackingOrientation()
 	if (!Hmd)
 		return angles;
 
+	if (isDebughmd)
+	{
+		angles.pitch = 0;
+		angles.yaw = 0;
+		angles.roll = 0;
+		return angles;
+	}
+
 	ovrTrackingState ts = ovrHmd_GetTrackingState(Hmd, ovr_GetTimeInSeconds());
 	Posef pose = ts.HeadPose.ThePose;
 
@@ -253,9 +258,9 @@ idAngles OculusLocal::GetHeadTrackingOrientation()
 		float y, p, r;
 		pose.Rotation.GetEulerAngles<Axis_Y, Axis_X, Axis_Z>(&y, &p, &r);
 
-		angles.pitch = RadToDegree(-p);//-DEG2RAD(p);
-		angles.yaw = RadToDegree(y);//DEG2RAD(y);
-		angles.roll = RadToDegree(-r);//-DEG2RAD(r);
+		angles.pitch = RadToDegree(-p);
+		angles.yaw = RadToDegree(y);
+		angles.roll = RadToDegree(-r);
 	}
 
 	return angles;
@@ -288,6 +293,17 @@ idVec3 OculusLocal::GetHeadTrackingPosition()
 		position.x = (-pose.Translation.z * scale) / OVR2IDUNITS;
 	}
 	return position;
+}
+
+/*
+=======================
+RecenterHmd
+
+=======================
+*/
+
+void OculusLocal::RecenterHmd() {
+	ovrHmd_RecenterPose(Hmd);
 }
 
 /*
@@ -541,13 +557,3 @@ static OculusLocal localOculus;
 Oculus *oculus = &localOculus;
 
 // OculusLocal END
-
-/*
-=================
-ovrHmd_RecenterPose_f
-=================
-*/
-static void ovrHmd_RecenterPose_f(const idCmdArgs &args)
-{
-	ovrHmd_RecenterPose(oculus->Hmd);
-}

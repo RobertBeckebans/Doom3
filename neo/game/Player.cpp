@@ -2817,6 +2817,13 @@ Called when a weapon fires, generates head twitches, etc
 ==================
 */
 void idPlayer::WeaponFireFeedback( const idDict *weaponDef ) {
+
+	// OCULUS BEGIN
+	// Disable recoil. Make this an option?
+	if (oculus->isActivated)
+		return;
+	// OCULUS END
+
 	// force a blink
 	blink_time = 0;
 
@@ -4925,7 +4932,16 @@ idPlayer::SetViewAngles
 ================
 */
 void idPlayer::SetViewAngles( const idAngles &angles ) {
-	UpdateDeltaViewAngles( angles );
+	// OCULUS BEGIN
+	if (oculus->isActivated)
+	{
+		VR_UpdateDeltaViewAngles(angles);
+	}
+	else
+	{
+		UpdateDeltaViewAngles(angles);
+	}
+	// OCULUS END
 	viewAngles = angles;
 }
 
@@ -7204,7 +7220,11 @@ void idPlayer::CalculateViewWeaponPos( idVec3 &origin, idMat3 &axis ) {
 
 	// CalculateRenderView must have been called first
 	const idVec3 &viewOrigin = firstPersonViewOrigin;
-	const idMat3 &viewAxis = firstPersonViewAxis;
+	//const idMat3 &viewAxis = firstPersonViewAxis;
+	
+	// OCULUS BEGIN
+	const idMat3 &viewAxis = aimAngles.ToMat3();
+	// OCULUS END
 
 	// these cvars are just for hand tweaking before moving a value to the weapon def
 	idVec3	gunpos( g_gun_x.GetFloat(), g_gun_y.GetFloat(), g_gun_z.GetFloat() );
@@ -7224,11 +7244,6 @@ void idPlayer::CalculateViewWeaponPos( idVec3 &origin, idMat3 &axis ) {
 	angles.roll		= scale * bobfracsin * 0.005f;
 	angles.yaw		= scale * bobfracsin * 0.01f;
 	angles.pitch	= xyspeed * bobfracsin * 0.005f;
-
-	// OCULUS START
-	angles.yaw += aimAngles.yaw;
-	angles.pitch += aimAngles.pitch;
-	// OCULUS END
 	
 	// gun angles from turning
 	if ( gameLocal.isMultiplayer ) {

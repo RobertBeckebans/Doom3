@@ -66,9 +66,6 @@
     <ClCompile Include="game\gamesys\SysCvar.cpp">
       <Filter>GameSys</Filter>
     </ClCompile>
-    <ClCompile Include="game\gamesys\TypeInfo.cpp">
-      <Filter>GameSys</Filter>
-    </ClCompile>
     <ClCompile Include="game\physics\Clip.cpp">
       <Filter>Physics</Filter>
     </ClCompile>
@@ -186,9 +183,6 @@
       <Filter>GameSys</Filter>
     </ClInclude>
     <ClInclude Include="game\gamesys\Event.h">
-      <Filter>GameSys</Filter>
-    </ClInclude>
-    <ClInclude Include="game\gamesys\NoGameTypeInfo.h">
       <Filter>GameSys</Filter>
     </ClInclude>
     <ClInclude Include="game\gamesys\SaveGame.h">

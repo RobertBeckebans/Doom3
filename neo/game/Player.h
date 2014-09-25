@@ -217,6 +217,8 @@ public:
 	idAngles				aimAngles;
 	idAngles				hmdAngles;
 	idAngles				previoushmdAngles;
+	float					previousDistance;
+	idAngles				previousaimAngles;
 	// END
 
 	bool					noclip;
@@ -380,8 +382,10 @@ public:
 	void					UpdateDeltaViewAngles( const idAngles &angles );
 
 	// OCULUS BEGIN
+	void					VR_SetAimAngles(const idAngles &angles);
 	void					VR_UpdateDeltaViewAngles( const idAngles &angles );
-	void					UpdateDeltaAimAngles( const idAngles &angles );
+	void					VR_UpdateDeltaAimAngles( const idAngles &angles );
+	void					RecenterView();
 	// OCULUS END
 
 	virtual bool			Collide( const trace_t &collision, const idVec3 &velocity );

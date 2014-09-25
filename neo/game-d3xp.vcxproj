@@ -151,16 +151,14 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <PreBuildEvent>
-      <Command>cd $(SolutionDir)\..
-"build\Win32\$(Configuration)\TypeInfo.exe" d3xp
-</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines and memory log|Win32'">
     <PreBuildEvent>
-      <Command>cd $(SolutionDir)\..
-"build\Win32\$(Configuration)\TypeInfo.exe" d3xp
-</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug with inlines|Win32'">
@@ -209,7 +207,6 @@
     <ClCompile Include="d3xp\ai\AI_Vagary.cpp" />
     <ClCompile Include="d3xp\anim\Anim.cpp" />
     <ClCompile Include="d3xp\anim\Anim_Blend.cpp" />
-    <ClCompile Include="d3xp\anim\Anim_Import.cpp" />
     <ClCompile Include="d3xp\anim\Anim_Testmodel.cpp" />
     <ClCompile Include="d3xp\gamesys\Class.cpp" />
     <ClCompile Include="d3xp\gamesys\DebugGraph.cpp" />
@@ -217,7 +214,6 @@
     <ClCompile Include="d3xp\gamesys\SaveGame.cpp" />
     <ClCompile Include="d3xp\gamesys\SysCmds.cpp" />
     <ClCompile Include="d3xp\gamesys\SysCvar.cpp" />
-    <ClCompile Include="d3xp\gamesys\TypeInfo.cpp" />
     <ClCompile Include="d3xp\physics\Clip.cpp" />
     <ClCompile Include="d3xp\physics\Force.cpp" />
     <ClCompile Include="d3xp\physics\Force_Constant.cpp" />
@@ -281,7 +277,6 @@
     <ClInclude Include="d3xp\gamesys\Class.h" />
     <ClInclude Include="d3xp\gamesys\DebugGraph.h" />
     <ClInclude Include="d3xp\gamesys\Event.h" />
-    <ClInclude Include="d3xp\gamesys\NoGameTypeInfo.h" />
     <ClInclude Include="d3xp\gamesys\SaveGame.h" />
     <ClInclude Include="d3xp\gamesys\SysCmds.h" />
     <ClInclude Include="d3xp\gamesys\SysCvar.h" />

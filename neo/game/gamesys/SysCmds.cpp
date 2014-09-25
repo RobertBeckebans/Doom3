@@ -2232,6 +2232,29 @@ void Cmd_TestId_f( const idCmdArgs &args ) {
 	gameLocal.mpGame.AddChatLine( common->GetLanguageDict()->GetString( id ), "<nothing>", "<nothing>", "<nothing>" );	
 }
 
+// OCULUS BEGIN
+
+/*
+=================
+Com_Recenter_f
+=================
+*/
+static void Com_Recenter_f(const idCmdArgs &args) {
+
+	idPlayer	*player;
+
+	player = gameLocal.GetLocalPlayer();
+
+	if (!player) {
+		return;
+	}
+
+	player->RecenterView();
+}
+
+// OCULUS END
+
+
 /*
 =================
 idGameLocal::InitConsoleCommands
@@ -2241,9 +2264,6 @@ so it can perform tab completion
 =================
 */
 void idGameLocal::InitConsoleCommands( void ) {
-	cmdSystem->AddCommand( "listTypeInfo",			ListTypeInfo_f,				CMD_FL_GAME,				"list type info" );
-	cmdSystem->AddCommand( "writeGameState",		WriteGameState_f,			CMD_FL_GAME,				"write game state" );
-	cmdSystem->AddCommand( "testSaveGame",			TestSaveGame_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"test a save game for a level" );
 	cmdSystem->AddCommand( "game_memory",			idClass::DisplayInfo_f,		CMD_FL_GAME,				"displays game class info" );
 	cmdSystem->AddCommand( "listClasses",			idClass::ListClasses_f,		CMD_FL_GAME,				"lists game classes" );
 	cmdSystem->AddCommand( "listThreads",			idThread::ListThreads_f,	CMD_FL_GAME|CMD_FL_CHEAT,	"lists script threads" );
@@ -2329,6 +2349,10 @@ void idGameLocal::InitConsoleCommands( void ) {
 	// localization help commands
 	cmdSystem->AddCommand( "nextGUI",				Cmd_NextGUI_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"teleport the player to the next func_static with a gui" );
 	cmdSystem->AddCommand( "testid",				Cmd_TestId_f,				CMD_FL_GAME|CMD_FL_CHEAT,	"output the string for the specified id." );
+
+	// OCULUS BEGIN
+	cmdSystem->AddCommand("ovr_recenter", Com_Recenter_f, CMD_FL_SYSTEM, "");
+	// OCULUS END
 }
 
 /*

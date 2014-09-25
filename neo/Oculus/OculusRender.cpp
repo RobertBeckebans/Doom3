@@ -334,11 +334,12 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 	}
 	//Sys_DebugPrintf("Finish\n");
 
+	// Post
+
 	// Done rendering. Send this off to the Oculus SDK
 	glViewport(0, 0, oculus->Hmd->Resolution.w, oculus->Hmd->Resolution.h);
 	glScissor(0, 0, oculus->Hmd->Resolution.w, oculus->Hmd->Resolution.h);
 	ovrHmd_EndFrame(oculus->Hmd, headPose, oculus->G_OvrTextures);
-	//glViewport(0, 0, oculus->GetFrameBufferWidth(), oculus->GetFrameBufferHeight());
 
 	// go back to the default texture so the editor doesn't mess up a bound image
 	qglBindTexture( GL_TEXTURE_2D, 0 );

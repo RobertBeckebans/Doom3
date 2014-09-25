@@ -48,9 +48,6 @@
     <ClCompile Include="d3xp\anim\Anim_Blend.cpp">
       <Filter>Animation</Filter>
     </ClCompile>
-    <ClCompile Include="d3xp\anim\Anim_Import.cpp">
-      <Filter>Animation</Filter>
-    </ClCompile>
     <ClCompile Include="d3xp\anim\Anim_Testmodel.cpp">
       <Filter>Animation</Filter>
     </ClCompile>
@@ -70,9 +67,6 @@
       <Filter>GameSys</Filter>
     </ClCompile>
     <ClCompile Include="d3xp\gamesys\SysCvar.cpp">
-      <Filter>GameSys</Filter>
-    </ClCompile>
-    <ClCompile Include="d3xp\gamesys\TypeInfo.cpp">
       <Filter>GameSys</Filter>
     </ClCompile>
     <ClCompile Include="d3xp\physics\Clip.cpp">
@@ -196,9 +190,6 @@
       <Filter>GameSys</Filter>
     </ClInclude>
     <ClInclude Include="d3xp\gamesys\Event.h">
-      <Filter>GameSys</Filter>
-    </ClInclude>
-    <ClInclude Include="d3xp\gamesys\NoGameTypeInfo.h">
       <Filter>GameSys</Filter>
     </ClInclude>
     <ClInclude Include="d3xp\gamesys\SaveGame.h">

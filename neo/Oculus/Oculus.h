@@ -64,6 +64,7 @@ public:
 
 	virtual idAngles	GetHeadTrackingOrientation( void ) = 0;
 	virtual idVec3		GetHeadTrackingPosition( void ) = 0;
+	virtual void		RecenterHmd( void ) = 0;
 
 	virtual bool		isMotionTrackingEnabled( void ) = 0;
 

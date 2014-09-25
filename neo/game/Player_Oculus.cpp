@@ -5,7 +5,8 @@
 
 // OCULUS BEGIN
 
-#define AIMMAXANGLE 45
+idCVar vr_maxaimpitch("vr_maxaimpitch", "89", CVAR_GAME | CVAR_NETWORKSYNC | CVAR_FLOAT, "");
+idCVar vr_aimdragangle("vr_maxaimpitch", "16", CVAR_GAME | CVAR_NETWORKSYNC | CVAR_INTEGER, "");
 
 idCVar vr_laserSightWidth("vr_laserSightWidth", "0.2", CVAR_FLOAT | CVAR_ARCHIVE, "laser sight beam width");
 idCVar vr_laserSightLength("vr_laserSightLength", "128", CVAR_FLOAT | CVAR_ARCHIVE, "laser sight beam length");
@@ -33,7 +34,7 @@ void idActor::SetDeltaAimAngles( const idAngles &delta ) {
 idPlayer::UpdateDeltaAimAngles
 ================
 */
-void idPlayer::UpdateDeltaAimAngles( const idAngles &angles ) {
+void idPlayer::VR_UpdateDeltaAimAngles( const idAngles &angles ) {
 	// set the delta angle
 	idAngles delta;
 	for( int i = 0; i < 3; i++ ) {
@@ -92,67 +93,67 @@ void idPlayer::VR_UpdateViewAngles_Type0( void )
 	}
 
 	// circularly clamp the angles with deltas
-	for ( i = 0; i < 3; i++ )
-	{
+	for ( i = 0; i < 3; i++ ) {
 		cmdAngles[i] = SHORT2ANGLE( usercmd.angles[i] );
 
-		if ( influenceActive == INFLUENCE_LEVEL3 )
-		{
+		if ( influenceActive == INFLUENCE_LEVEL3 ) {
 			aimAngles[i] += idMath::ClampFloat( -1.0f, 1.0f, idMath::AngleDelta( idMath::AngleNormalize180( SHORT2ANGLE( usercmd.angles[i]) + deltaAimAngles[i] ) , aimAngles[i] ) );
-		}
-		else
-		{
+		} else {
 			aimAngles[i] = idMath::AngleNormalize180( SHORT2ANGLE( usercmd.angles[i]) + deltaAimAngles[i] );
 		}
 	}
 
-	// OCULUS BEGIN
-	for (i = 0; i < 3; i++)
-	{
+	for (i = 0; i < 3; i++) {
 		viewAngles[i] = idMath::AngleNormalize180(hmdAngles[i] + deltaViewAngles[i]);
 	}
-	// OCULUS END
 
-	if ( !centerView.IsDone( gameLocal.time ) )
-	{
+	if ( !centerView.IsDone( gameLocal.time ) ) {
 		viewAngles.pitch = centerView.GetCurrentValue(gameLocal.time);
 	}
 
 	// clamp the pitch
-	if ( noclip )
-	{
-		if ( viewAngles.pitch > 89.0f )
-		{
-			// don't let the player look down more than 89 degrees while noclipping
+	if ( noclip ) {
+		if ( viewAngles.pitch > 89.0f ) {
 			viewAngles.pitch = 89.0f;
-		}
-		else if ( viewAngles.pitch < -89.0f )
-		{
-			// don't let the player look up more than 89 degrees while noclipping
+		} else if ( viewAngles.pitch < -89.0f ) {
 			viewAngles.pitch = -89.0f;
 		}
-	}
-	else
-	{
-		if ( viewAngles.pitch > pm_maxviewpitch.GetFloat() )
-		{
-			// don't let the player look down enough to see the shadow of his (non-existant) feet
+	} else {
+		if ( viewAngles.pitch > pm_maxviewpitch.GetFloat() ) {
 			viewAngles.pitch = pm_maxviewpitch.GetFloat();
-		}
-		else if ( viewAngles.pitch < pm_minviewpitch.GetFloat() )
-		{
-			// don't let the player look up more than 89 degrees
+		} else if ( viewAngles.pitch < pm_minviewpitch.GetFloat() ) {
 			viewAngles.pitch = pm_minviewpitch.GetFloat();
+		}
+
+		if (aimAngles.pitch > -vr_maxaimpitch.GetFloat()) {
+			aimAngles.pitch = -vr_maxaimpitch.GetFloat();
+		} else if (aimAngles.pitch < vr_maxaimpitch.GetFloat()) {
+			aimAngles.pitch = vr_maxaimpitch.GetFloat();
 		}
 	}
 
-	//float lookDelta = idMath::AngleDelta(viewAngles.yaw, lookAngles.yaw);
+	float aimDistanceFromView = idMath::AngleDelta(viewAngles.yaw, aimAngles.yaw);
+	float aimAngleDelta = (aimAngles.yaw - previousaimAngles.yaw);
+
+	if ((aimDistanceFromView >= vr_aimdragangle.GetInteger() || aimDistanceFromView <= -vr_aimdragangle.GetInteger()) && aimAngleDelta != 0.0f && (abs(aimDistanceFromView) > previousDistance)) {
+		//gameLocal.Printf("Distance: %0.4f,  Delta: %0.4f\n", aimDistanceFromView, aimAngleDelta);
+
+		// Drag the viewport yaw
+		viewAngles.yaw += aimAngleDelta;
+	}
+
+	previousDistance = abs(aimDistanceFromView);
+	previousaimAngles = aimAngles;
+
+	gameLocal.Printf("Hmd Orientation: [%0.4f, %0.4f, %0.4f]\n", hmdAngles.yaw, hmdAngles.pitch, hmdAngles.roll);
+	gameLocal.Printf("View: [%0.4f, %0.4f, %0.4f]\n", viewAngles.yaw, viewAngles.pitch, viewAngles.roll);
+	gameLocal.Printf("Position: [%0.4f, %0.4f, %0.4f]\n", firstPersonViewOrigin.x, firstPersonViewOrigin.y, firstPersonViewOrigin.z);
 
 	VR_UpdateDeltaViewAngles(viewAngles);
 
-	//UpdateDeltaLookAngles(lookAngles);
 	// orient the model towards the direction we're looking
 	SetAngles(idAngles(0, viewAngles.yaw, 0));
+	
 	// save in the log for analyzing weapon angle offsets
 	loggedViewAngles[gameLocal.framenum & (NUM_LOGGED_VIEW_ANGLES - 1)] = viewAngles;
 	previoushmdAngles = hmdAngles;
@@ -207,7 +208,7 @@ bool idPlayer::CheckOutsideofCameraBound()
 {
 	float distance = idMath::AngleDelta(aimAngles.yaw, viewAngles.yaw);
 	//common->Printf("Yaw delta: %0.4f\n", distance);
-	if (distance > AIMMAXANGLE || distance < -AIMMAXANGLE) {
+	if (distance > vr_aimdragangle.GetInteger() || distance < -vr_aimdragangle.GetInteger()) {
 		return true;
 	}
 
@@ -296,5 +297,33 @@ void idPlayer::UpdateLaserSight()
 	{
 		gameRenderWorld->UpdateEntityDef(laserSightHandle, &laserSightRenderEntity);
 	}
+}
+
+/*
+================
+idPlayer::VR_SetAimAngles
+================
+*/
+void idPlayer::VR_SetAimAngles(const idAngles &angles) {
+	VR_UpdateDeltaAimAngles(angles);
+	aimAngles = angles;
+}
+
+/*
+================
+idPlayer::RecenterView
+
+================
+*/
+void idPlayer::RecenterView()
+{
+
+	if (oculus->isActivated) {
+		oculus->RecenterHmd();
+	}
+
+	deltaViewAngles = ang_zero;
+	SetViewAngles(ang_zero);
+	oldViewYaw = viewAngles.yaw;
 }
 // OCULUS END

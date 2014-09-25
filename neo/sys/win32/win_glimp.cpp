@@ -727,7 +727,7 @@ static bool GLW_CreateOculusWindow(glimpParms_t parms)
 	x = oculus->Hmd->WindowsPos.x;
 	y = oculus->Hmd->WindowsPos.y;
 
-	if (false)
+	if (true)
 	{
 		x = 0;
 		y = 0;
