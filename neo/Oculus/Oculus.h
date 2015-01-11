@@ -58,8 +58,6 @@ public:
 	virtual int			Init( void ) = 0;
 	virtual int			InitPositionTracking( void ) = 0;
 	virtual void		InitScratch( void ) = 0;
-	virtual void		InitOpenGL( void ) = 0;
-
 	virtual void		Shutdown( void ) = 0;
 
 	virtual idAngles	GetHeadTrackingOrientation( void ) = 0;
@@ -72,6 +70,8 @@ public:
 	bool				isActivated;
 
 	int					multiSamples;
+	int               WindowWidth;
+	int					WindowHeight;
 
 	ovrTexture			G_OvrTextures[2];
 	GLuint				EyeTexture[2];

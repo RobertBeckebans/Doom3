@@ -69,9 +69,11 @@ If you have questions concerning this license or the applicable additional terms
 #define _memicmp		use_idStr_Icmpn
 #define snprintf		use_idStr_snPrintf
 #define _snprintf		use_idStr_snPrintf
-#define vsnprintf		use_idStr_vsnPrintf
-#define _vsnprintf		use_idStr_vsnPrintf
-
+// OCULUS BEGIN
+// Messing up the oculus SDK and nobody use it anyway
+//#define vsnprintf		use_idStr_vsnPrintf
+//#define _vsnprintf		use_idStr_vsnPrintf
+// OCULUS END
 class idVec4;
 
 #ifndef FILE_HASH_SIZE

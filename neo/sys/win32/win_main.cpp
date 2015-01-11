@@ -1369,6 +1369,15 @@ WinMain
 
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow )
 {
+	// OCULUS BEGIN
+#ifdef ENABLE_OCULUS_HMD
+	if (true)
+	{
+		oculus->Init();
+	}
+#endif
+	// OCULUS END
+
 	const HCURSOR hcurSave = ::SetCursor( LoadCursor( 0, IDC_WAIT ) );
 	Sys_SetPhysicalWorkMemory( 192 << 20, 1024 << 20 );
 	Sys_GetCurrentMemoryStatus( exeLaunchMemoryStats );

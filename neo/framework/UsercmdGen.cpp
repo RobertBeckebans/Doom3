@@ -681,31 +681,6 @@ void idUsercmdGenLocal::MouseMove( void ) {
 	} else {
 		cmd.forwardmove = idMath::ClampChar( (int)(cmd.forwardmove - strafeMy) );
 	}
-
-	// OCULUS BEGIN
-	/*
-	const float scale = 0.022f;
-
-	if (aimangles[YAW] <= 30.0f || aimangles[YAW] >= -30.0f)
-	{
-		aimangles[YAW] -= scale * -mx;
-	}
-
-	if (aimangles[PITCH] <= 30.0f || aimangles[PITCH] >= -30.0f)
-	{
-		aimangles[PITCH] -= scale * my;
-	}
-
-	if (aimangles[YAW] >= 30.0f || aimangles[YAW] <= -30.0f)
-	{
-		viewangles[YAW] -= m_yaw.GetFloat() * mx;
-	}
-
-	ClampAngle(aimangles[YAW]);
-	ClampAngle(aimangles[PITCH]);
-	*/
-	// Sys_DebugPrintf("Usercmd aimangles: [Yaw: %0.4f Pitch: %0.4f] viewangles: [Yaw: %0.4f Pitch: %0.4f]\n", aimangles[YAW], aimangles[PITCH], viewangles[YAW], viewangles[PITCH]);
-	// OCULUS END
 }
 
 /*

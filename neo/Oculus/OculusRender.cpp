@@ -282,7 +282,7 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 			{
 				// Always left first. Oculus recommend that we let the HMD tell you what to render first so TODO
 				int eye = ((const drawSurfsCommand_t *)cmds)->viewDef->eye;
-				headPose[i] = ovrHmd_GetEyePose(oculus->Hmd, (ovrEyeType)i);
+				headPose[i] = ovrHmd_GetHmdPosePerEye(oculus->Hmd, (ovrEyeType)i);
 
 				if (((const drawSurfsCommand_t *)cmds)->viewDef->viewEntitys) {			
 					// World
@@ -340,6 +340,8 @@ void RBO_ExecuteBackEndCommands(const emptyCommand_t *allCmds)
 	glViewport(0, 0, oculus->Hmd->Resolution.w, oculus->Hmd->Resolution.h);
 	glScissor(0, 0, oculus->Hmd->Resolution.w, oculus->Hmd->Resolution.h);
 	ovrHmd_EndFrame(oculus->Hmd, headPose, oculus->G_OvrTextures);
+
+	//glUseProgram(0);
 
 	// go back to the default texture so the editor doesn't mess up a bound image
 	qglBindTexture( GL_TEXTURE_2D, 0 );

@@ -27,7 +27,6 @@ If you have questions concerning this license or the applicable additional terms
 
 ===========================================================================
 */
-
 #pragma hdrstop
 #include "../idlib/precompiled.h"
 #include "../extern/OculusSDK/LibOVR/Include/OVR_Kernel.h"
@@ -100,6 +99,17 @@ int OculusLocal::Init( void )
 		}
 	}
 
+	if (Hmd->HmdCaps & ovrHmdCap_ExtendDesktop)
+	{
+		WindowWidth = Hmd->Resolution.w;
+		WindowHeight = Hmd->Resolution.h;
+	}
+	else
+	{
+		WindowWidth = 1100;
+		WindowHeight = 618;
+	}
+
 	common->Printf("--- OVR Initialization Complete ---\n");
 	common->Printf("Device: %s - %s\n", Hmd->Manufacturer, Hmd->ProductName);
 
@@ -107,7 +117,11 @@ int OculusLocal::Init( void )
 
 	// Set Hardware caps.
 	unsigned hmdCaps;
-	
+
+	hmdCaps |= ovrHmdCap_LowPersistence;
+	hmdCaps |= ovrHmdCap_DynamicPrediction;
+
+	/*
 	if (!vr_enableVsync.GetBool())
 	{
 		hmdCaps |= ovrHmdCap_NoVSync;
@@ -137,15 +151,17 @@ int OculusLocal::Init( void )
 	{
 		common->Printf("HMD Device in Extended display mode\n");
 	}
-
+	*/
 	ovrHmd_SetEnabledCaps(Hmd, hmdCaps);
 
 	// Enable position and rotation tracking
+
 	if (vr_enableOculusRiftMotionTracking.GetBool())
 	{
 		if (!InitPositionTracking())
 			Sys_Error("Error during HMD head tracking initialization");
 	}
+	
 
 	G_ovrEyeFov[0] = Hmd->DefaultEyeFov[0];
 	G_ovrEyeFov[1] = Hmd->DefaultEyeFov[1];
@@ -185,8 +201,6 @@ int OculusLocal::InitRendering(HWND h, HDC d)
 {
 	this->hWnd = h;
 	this->dc = d;
-
-	ovrHmd_AttachToWindow(Hmd, hWnd, NULL, NULL);
 
 	InitOpenGL();
 
@@ -235,6 +249,11 @@ GetHeadTrackingOrientation
 =======================
 */
 
+float RadToDegree(float rads)
+{
+	return rads * (MATH_DOUBLE_RADTODEGREEFACTOR);
+}
+
 idAngles OculusLocal::GetHeadTrackingOrientation()
 {
 	idAngles angles;
@@ -261,6 +280,7 @@ idAngles OculusLocal::GetHeadTrackingOrientation()
 		angles.pitch = RadToDegree(-p);
 		angles.yaw = RadToDegree(y);
 		angles.roll = RadToDegree(-r);
+
 	}
 
 	return angles;
@@ -275,10 +295,10 @@ GetHeadTrackingPosition
 
 idVec3 OculusLocal::GetHeadTrackingPosition()
 {
-	idVec3 position;
+	idVec3 ovrCameraPosition = idVec3(0, 0, 0);
 
 	if (!Hmd)
-		return position;
+		return ovrCameraPosition;
 
 	ovrTrackingState ts = ovrHmd_GetTrackingState(Hmd, ovr_GetTimeInSeconds());
 
@@ -288,11 +308,11 @@ idVec3 OculusLocal::GetHeadTrackingPosition()
 
 	if (ts.StatusFlags & (ovrStatus_OrientationTracked | ovrStatus_PositionTracked))
 	{
-		position.y = (-pose.Translation.x * scale) / OVR2IDUNITS;
-		position.z = (pose.Translation.y * scale) / OVR2IDUNITS;
-		position.x = (-pose.Translation.z * scale) / OVR2IDUNITS;
+		ovrCameraPosition.y = (-pose.Translation.x * scale) / OVR2IDUNITS;
+		ovrCameraPosition.z = (pose.Translation.y * scale) / OVR2IDUNITS;
+		ovrCameraPosition.x = (-pose.Translation.z * scale) / OVR2IDUNITS;
 	}
-	return position;
+	return ovrCameraPosition;
 }
 
 /*
@@ -347,6 +367,7 @@ PFNGLBINDFRAMEBUFFERPROC				glBindFramebuffer;
 PFNGLGENRENDERBUFFERSPROC				glGenRenderbuffers;
 PFNGLBINDRENDERBUFFERPROC				glBindRenderbuffer;
 PFNGLRENDERBUFFERSTORAGEEXTPROC			glRenderbufferStorage;
+PFNGLUSEPROGRAMPROC						glUseProgram;
 
 void OculusLocal::InitOpenGL()
 {
@@ -362,6 +383,7 @@ void OculusLocal::InitOpenGL()
 	glGenRenderbuffers =			(PFNGLGENRENDERBUFFERSPROC)GLGetProcAddress("glGenRenderbuffersEXT");
 	glBindRenderbuffer =			(PFNGLBINDRENDERBUFFERPROC)GLGetProcAddress("glBindRenderbufferEXT");
 	glRenderbufferStorage =			(PFNGLRENDERBUFFERSTORAGEEXTPROC)GLGetProcAddress("glRenderbufferStorageEXT");
+	glUseProgram =					(PFNGLUSEPROGRAMPROC)GLGetProcAddress("glUseProgram");
 }
 
 /*
@@ -376,9 +398,9 @@ idVec3 Oculus::GetViewAdjustVector(int eye)
 {
 	idVec3 a;
 
-	a.x = (G_ovrEyeRenderDesc[eye].ViewAdjust.x * 100) / OVR2IDUNITS;
-	a.y = (G_ovrEyeRenderDesc[eye].ViewAdjust.y * 100) / OVR2IDUNITS;
-	a.z = (G_ovrEyeRenderDesc[eye].ViewAdjust.z * 100) / OVR2IDUNITS;
+	a.x = (G_ovrEyeRenderDesc[eye].HmdToEyeViewOffset.x * 100) / OVR2IDUNITS;
+	a.y = (G_ovrEyeRenderDesc[eye].HmdToEyeViewOffset.y * 100) / OVR2IDUNITS;
+	a.z = (G_ovrEyeRenderDesc[eye].HmdToEyeViewOffset.z * 100) / OVR2IDUNITS;
 
 	return a;
 }
@@ -430,16 +452,7 @@ int Oculus::Fn_SetupFrameBuffer(int idx)
 	glBindRenderbuffer(GL_RENDERBUFFER, rbo);
 	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, G_FrameBufferWidth, G_FrameBufferHeight);
 	glBindRenderbuffer(GL_RENDERBUFFER, 0);
-
-
-	//glGenTextures(1, &G_GLDepthTexture[idx]);
-	//glBindTexture(GL_TEXTURE_2D, G_GLDepthTexture[idx]);
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	//glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	//glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8, G_FrameBufferWidth, G_FrameBufferHeight, 0, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, NULL);
-
+	
 	glBindFramebuffer(GL_FRAMEBUFFER, G_GLFrameBuffer[idx]);
 
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, EyeTexture[idx], 0);
@@ -500,13 +513,14 @@ int Oculus::SetupView()
 	if (vr_enablezeroipd.GetBool())
 	{
 		// Remove IPD adjust
-		G_ovrEyeRenderDesc[0].ViewAdjust = Vector3f(0);
-		G_ovrEyeRenderDesc[1].ViewAdjust = Vector3f(0);
+		G_ovrEyeRenderDesc[0].HmdToEyeViewOffset = Vector3f(0);
+		G_ovrEyeRenderDesc[1].HmdToEyeViewOffset = Vector3f(0);
 	}
 
 	ovrGLConfig glcfg;
 	glcfg.OGL.Header.API = ovrRenderAPI_OpenGL;
-	glcfg.OGL.Header.RTSize = Sizei(Hmd->Resolution.w, Hmd->Resolution.h);
+	glcfg.OGL.Header.BackBufferSize.w = Hmd->Resolution.w;
+	glcfg.OGL.Header.BackBufferSize.h = Hmd->Resolution.h;
 	glcfg.OGL.Header.Multisample = 1;
 	glcfg.OGL.Window = hWnd;
 	glcfg.OGL.DC = dc;

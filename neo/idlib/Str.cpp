@@ -1503,9 +1503,11 @@ int idStr::vsnPrintf( char *dest, int size, const char *fmt, va_list argptr ) {
 	int ret;
 
 #ifdef _WIN32
-#undef _vsnprintf
+// OCULUS BEGIN
+//#undef _vsnprintf
 	ret = _vsnprintf( dest, size-1, fmt, argptr );
-#define _vsnprintf	use_idStr_vsnPrintf
+//#define _vsnprintf	use_idStr_vsnPrintf
+// OCULUS END
 #else
 #undef vsnprintf
 	ret = vsnprintf( dest, size, fmt, argptr );

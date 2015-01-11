@@ -493,17 +493,6 @@ static bool GLW_InitDriver( glimpParms_t parms )
 		return false;
 	}
 	common->Printf( "succeeded\n" );
-
-// OCULUS BEGIN
-#ifdef ENABLE_OCULUS_HMD
-	if (vr_enableOculusRiftRendering.GetBool())
-	{
-		oculus->InitRendering(win32.hWnd, win32.hDC);
-		ovrHmd_DismissHSWDisplay(oculus->Hmd);
-	}
-#endif
-// OCULUS END
-
 	return true;
 }
 
@@ -723,11 +712,13 @@ static bool GLW_CreateOculusWindow(glimpParms_t parms)
 	w = oculus->Hmd->Resolution.w;
 	h = oculus->Hmd->Resolution.h;
 
+	//w = oculus->WindowWidth;
+	//h = oculus->WindowHeight;
 
 	x = oculus->Hmd->WindowsPos.x;
 	y = oculus->Hmd->WindowsPos.y;
 
-	if (true)
+	if (false)
 	{
 		x = 0;
 		y = 0;
@@ -737,7 +728,7 @@ static bool GLW_CreateOculusWindow(glimpParms_t parms)
 		exstyle,
 		WIN32_VR_WINDOW_CLASS_NAME,
 		GAME_NAME_VR,
-		WS_POPUP | WS_VISIBLE,
+		WS_OVERLAPPEDWINDOW | WS_CLIPCHILDREN,
 		x, y, w, h,
 		NULL,
 		NULL,
@@ -755,6 +746,8 @@ static bool GLW_CreateOculusWindow(glimpParms_t parms)
 	UpdateWindow(win32.hWnd);
 	common->Printf("...created window @ %d,%d (%dx%d)\n", x, y, w, h);
 
+	ovrHmd_AttachToWindow(oculus->Hmd, win32.hWnd, NULL, NULL);
+
 	if (!GLW_InitDriver(parms)) {
 		ShowWindow(win32.hWnd, SW_HIDE);
 		DestroyWindow(win32.hWnd);
@@ -764,6 +757,16 @@ static bool GLW_CreateOculusWindow(glimpParms_t parms)
 
 	SetForegroundWindow(win32.hWnd);
 	SetFocus(win32.hWnd);
+
+	// OCULUS BEGIN
+#ifdef ENABLE_OCULUS_HMD
+	if (vr_enableOculusRiftRendering.GetBool())
+	{
+		oculus->InitRendering(win32.hWnd, win32.hDC);
+		ovrHmd_DismissHSWDisplay(oculus->Hmd);
+	}
+#endif
+	// OCULUS END
 
 	glConfig.isFullscreen = parms.fullScreen;
 

@@ -2838,7 +2838,7 @@ void idCommonLocal::Init( int argc, const char **argv, const char *cmdline )
 #ifdef ENABLE_OCULUS_HMD
 		if (vr_enableOculusRiftRendering.GetBool())
 		{
-			oculus->Init();
+			//oculus->Init();
 		}
 #endif
 		// OCULUS END

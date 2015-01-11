@@ -73,7 +73,8 @@ void idPlayer::VR_UpdateViewAngles_Type0( void )
 	{
 		// no view changes at all, but we still want to update the deltas or else when
 		// we get out of this mode, our view will snap to a kind of random angle
-		VR_UpdateDeltaViewAngles( viewAngles );
+		VR_UpdateDeltaViewAngles(viewAngles);
+		VR_UpdateDeltaAimAngles(aimAngles);
 
 		return;
 	}
@@ -97,11 +98,14 @@ void idPlayer::VR_UpdateViewAngles_Type0( void )
 		cmdAngles[i] = SHORT2ANGLE( usercmd.angles[i] );
 
 		if ( influenceActive == INFLUENCE_LEVEL3 ) {
-			aimAngles[i] += idMath::ClampFloat( -1.0f, 1.0f, idMath::AngleDelta( idMath::AngleNormalize180( SHORT2ANGLE( usercmd.angles[i]) + deltaAimAngles[i] ) , aimAngles[i] ) );
+			aimAngles[i] += idMath::ClampFloat(-1.0f, 1.0f, idMath::AngleDelta(idMath::AngleNormalize180(cmdAngles[i] + deltaAimAngles[i]), aimAngles[i]));
 		} else {
-			aimAngles[i] = idMath::AngleNormalize180( SHORT2ANGLE( usercmd.angles[i]) + deltaAimAngles[i] );
+			aimAngles[i] = idMath::AngleNormalize180(cmdAngles[i] + deltaAimAngles[i] );
 		}
 	}
+
+	//gameLocal.Printf("Command: %0.4f, %0.4f, %0.4f\n", cmdAngles[0], cmdAngles[1], cmdAngles[2]);
+	//gameLocal.Printf("Delta Aim: %0.4f, %0.4f, %0.4f\n", deltaAimAngles[0], deltaAimAngles[1], deltaAimAngles[2]);
 
 	for (i = 0; i < 3; i++) {
 		viewAngles[i] = idMath::AngleNormalize180(hmdAngles[i] + deltaViewAngles[i]);
@@ -124,32 +128,41 @@ void idPlayer::VR_UpdateViewAngles_Type0( void )
 		} else if ( viewAngles.pitch < pm_minviewpitch.GetFloat() ) {
 			viewAngles.pitch = pm_minviewpitch.GetFloat();
 		}
-
-		if (aimAngles.pitch > -vr_maxaimpitch.GetFloat()) {
-			aimAngles.pitch = -vr_maxaimpitch.GetFloat();
-		} else if (aimAngles.pitch < vr_maxaimpitch.GetFloat()) {
-			aimAngles.pitch = vr_maxaimpitch.GetFloat();
+		
+		if (aimAngles.pitch > pm_maxviewpitch.GetFloat())
+		{
+			aimAngles.pitch = pm_maxviewpitch.GetFloat();
 		}
+		else if (aimAngles.pitch < pm_minviewpitch.GetFloat())
+		{
+			aimAngles.pitch = pm_minviewpitch.GetFloat();
+		}
+		
 	}
 
 	float aimDistanceFromView = idMath::AngleDelta(viewAngles.yaw, aimAngles.yaw);
-	float aimAngleDelta = (aimAngles.yaw - previousaimAngles.yaw);
+	float aimAngleDelta = idMath::AngleNormalize180(aimAngles.yaw - previousaimAngles.yaw);
 
-	if ((aimDistanceFromView >= vr_aimdragangle.GetInteger() || aimDistanceFromView <= -vr_aimdragangle.GetInteger()) && aimAngleDelta != 0.0f && (abs(aimDistanceFromView) > previousDistance)) {
-		//gameLocal.Printf("Distance: %0.4f,  Delta: %0.4f\n", aimDistanceFromView, aimAngleDelta);
+	//gameLocal.Printf("Hmd Orientation: [%0.4f, %0.4f, %0.4f]\n", hmdAngles.yaw, hmdAngles.pitch, hmdAngles.roll);
+	//gameLocal.Printf("View: [%0.4f, %0.4f, %0.4f]\n", viewAngles.yaw, viewAngles.pitch, viewAngles.roll);
 
-		// Drag the viewport yaw
+	if ((aimDistanceFromView > 25.0f || aimDistanceFromView < -25.0f) && (previousaimAngles != aimAngles))
+	{
+		gameLocal.Printf("Abs: %0.4f, %0.4f\n", abs(aimDistanceFromView), previousDistance);
 		viewAngles.yaw += aimAngleDelta;
 	}
 
 	previousDistance = abs(aimDistanceFromView);
 	previousaimAngles = aimAngles;
 
+	/*
 	gameLocal.Printf("Hmd Orientation: [%0.4f, %0.4f, %0.4f]\n", hmdAngles.yaw, hmdAngles.pitch, hmdAngles.roll);
 	gameLocal.Printf("View: [%0.4f, %0.4f, %0.4f]\n", viewAngles.yaw, viewAngles.pitch, viewAngles.roll);
 	gameLocal.Printf("Position: [%0.4f, %0.4f, %0.4f]\n", firstPersonViewOrigin.x, firstPersonViewOrigin.y, firstPersonViewOrigin.z);
+	*/
 
 	VR_UpdateDeltaViewAngles(viewAngles);
+	VR_UpdateDeltaAimAngles(aimAngles);
 
 	// orient the model towards the direction we're looking
 	SetAngles(idAngles(0, viewAngles.yaw, 0));

@@ -2288,6 +2288,12 @@ void idPlayer::SpawnToPoint( const idVec3 &spawn_origin, const idAngles &spawn_a
 
 	SetDeltaViewAngles( ang_zero );
 	SetViewAngles( spawn_angles );
+
+	// OCULUS BEGIN
+	SetDeltaAimAngles(ang_zero);
+	VR_SetAimAngles(spawn_angles);
+	// OCULUS END
+
 	spawnAngles = spawn_angles;
 	spawnAnglesSet = false;
 
@@ -6504,10 +6510,12 @@ void idPlayer::Think( void ) {
 
 		LinkCombat();
 
-		// OCULUSE BEGIN
-		//UpdateAimAngles();
-		UpdateAimPointer();
-		//UpdateLaserSight();
+		// OCULUS BEGIN
+		if (oculus->isActivated)
+		{
+			UpdateAimPointer();
+			//UpdateLaserSight();
+		}
 		// OCULUS END
 
 		playerView.CalculateShake();
@@ -7016,6 +7024,10 @@ void idPlayer::Teleport( const idVec3 &origin, const idAngles &angles, idEntity 
 
 	SetViewAngles( angles );
 
+	// OCULUS BEGIN
+	// VR_SetAimAngles(angles);
+	// OCULUS END
+
 	legsYaw = 0.0f;
 	idealLegsYaw = 0.0f;
 	oldViewYaw = viewAngles.yaw;
@@ -7223,7 +7235,11 @@ void idPlayer::CalculateViewWeaponPos( idVec3 &origin, idMat3 &axis ) {
 	//const idMat3 &viewAxis = firstPersonViewAxis;
 	
 	// OCULUS BEGIN
-	const idMat3 &viewAxis = aimAngles.ToMat3();
+	if (oculus->isActivated)
+	{
+		const idMat3 &viewAxis = aimAngles.ToMat3();
+	}
+
 	// OCULUS END
 
 	// these cvars are just for hand tweaking before moving a value to the weapon def
@@ -7361,7 +7377,7 @@ idVec3 idPlayer::GetEyePosition( void ) const {
 	}
 
 	// OCULUS BEGIN
-	if (oculus->isMotionTrackingEnabled() && !oculus->isDebughmd)
+	if (oculus->isActivated && oculus->isMotionTrackingEnabled() && !oculus->isDebughmd)
 	{
 		org += oculus->GetHeadTrackingPosition();
 	}
