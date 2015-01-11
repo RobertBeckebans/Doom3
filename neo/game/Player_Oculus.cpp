@@ -338,5 +338,9 @@ void idPlayer::RecenterView()
 	deltaViewAngles = ang_zero;
 	SetViewAngles(ang_zero);
 	oldViewYaw = viewAngles.yaw;
+
+	deltaAimAngles = ang_zero;
+	VR_SetAimAngles(ang_zero);
+
 }
 // OCULUS END

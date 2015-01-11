@@ -115,10 +115,6 @@ If you have questions concerning this license or the applicable additional terms
 // id lib
 #include "../idlib/Lib.h"
 
-// OCULUS BEGIN
-#include "../oculus/oculus.h"
-// OCULUS END
-
 // framework
 #include "../framework/BuildVersion.h"
 #include "../framework/BuildDefines.h"
@@ -129,6 +125,10 @@ If you have questions concerning this license or the applicable additional terms
 #include "../framework/File.h"
 #include "../framework/FileSystem.h"
 #include "../framework/UsercmdGen.h"
+
+// OCULUS BEGIN
+#include "../oculus/oculus.h"
+// OCULUS END
 
 // decls
 #include "../framework/DeclManager.h"

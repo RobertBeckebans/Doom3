@@ -2814,6 +2814,15 @@ void idCommonLocal::Init( int argc, const char **argv, const char *cmdline )
 		// init the console so we can take prints
 		console->Init();
 
+		// OCULUS BEGIN
+#ifdef ENABLE_OCULUS_HMD
+		if (true)
+		{
+			oculus->Init();
+		}
+#endif
+		// OCULUS END
+		
 		// get architecture info
 		Sys_Init();
 
@@ -2833,15 +2842,6 @@ void idCommonLocal::Init( int argc, const char **argv, const char *cmdline )
 
 		// init commands
 		InitCommands();
-
-		// OCULUS BEGIN
-#ifdef ENABLE_OCULUS_HMD
-		if (vr_enableOculusRiftRendering.GetBool())
-		{
-			//oculus->Init();
-		}
-#endif
-		// OCULUS END
 
 #ifdef ID_WRITE_VERSION
 		config_compressor = idCompressor::AllocArithmetic();

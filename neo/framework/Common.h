@@ -73,11 +73,6 @@ extern idCVar		com_makingBuild;
 extern idCVar		com_updateLoadSize;
 extern idCVar		com_videoRam;
 
-// OCULUS BEGIN
-extern idCVar		vr_enableOculusRiftRendering;
-extern idCVar		vr_enableOculusRiftTracking;
-// OCULUS END
-
 extern int			time_gameFrame;			// game logic time
 extern int			time_gameDraw;			// game present time
 extern int			time_frontend;			// renderer frontend time

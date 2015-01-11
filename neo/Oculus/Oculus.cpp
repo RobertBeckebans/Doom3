@@ -35,16 +35,6 @@ If you have questions concerning this license or the applicable additional terms
 
 using namespace OVR;
 
-// VR setting cvar definitions
-
-idCVar vr_enableOculusRiftRendering("vr_enableOculusRiftRendering", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable Oculus Rift SDK rendering path");
-idCVar vr_enableOculusRiftMotionTracking("vr_enableOculusRiftMotionTracking", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable Oculus Rift SDK head motion tracking");
-idCVar vr_enableLowPersistence("vr_enableLowPersistence", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable Oculus Rift low persistence display");
-idCVar vr_enableDynamicPrediction("vr_enableDynamicPrediction", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable Oculus Rift dynamic prediction");
-idCVar vr_enableVsync("vr_enableVsync", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable vsync");
-idCVar vr_enableMirror("vr_enableMirror", "1", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Enable mirror to window mode");
-idCVar vr_enablezeroipd("vr_enablezeroipd", "0", CVAR_BOOL | CVAR_SYSTEM | CVAR_NOCHEAT, "Disable depth rendering");
-
 // OculusLocal BEGIN
 
 class OculusLocal : public Oculus
@@ -74,6 +64,16 @@ protected:
 	HDC		dc;
 #endif
 };
+
+// VR setting cvar definitions
+
+idCVar vr_enableOculusRiftRendering("vr_enableOculusRiftRendering", "0", CVAR_SYSTEM | CVAR_BOOL, "Enable Oculus Rift SDK rendering path");
+idCVar vr_enableOculusRiftMotionTracking("vr_enableOculusRiftMotionTracking", "1", CVAR_SYSTEM | CVAR_BOOL, "Enable Oculus Rift SDK head motion tracking");
+idCVar vr_enableLowPersistence("vr_enableLowPersistence", "1", CVAR_SYSTEM | CVAR_BOOL, "Enable Oculus Rift low persistence display");
+idCVar vr_enableDynamicPrediction("vr_enableDynamicPrediction", "1", CVAR_SYSTEM | CVAR_BOOL, "Enable Oculus Rift dynamic prediction");
+idCVar vr_enableVsync("vr_enableVsync", "1", CVAR_SYSTEM | CVAR_BOOL, "Enable vsync");
+idCVar vr_enableMirror("vr_enableMirror", "1", CVAR_SYSTEM | CVAR_BOOL, "Enable mirror to window mode");
+idCVar vr_enablezeroipd("vr_enablezeroipd", "0", CVAR_SYSTEM | CVAR_BOOL, "Disable depth rendering");
 
 /*
 ====================
@@ -118,10 +118,6 @@ int OculusLocal::Init( void )
 	// Set Hardware caps.
 	unsigned hmdCaps;
 
-	hmdCaps |= ovrHmdCap_LowPersistence;
-	hmdCaps |= ovrHmdCap_DynamicPrediction;
-
-	/*
 	if (!vr_enableVsync.GetBool())
 	{
 		hmdCaps |= ovrHmdCap_NoVSync;
@@ -151,7 +147,7 @@ int OculusLocal::Init( void )
 	{
 		common->Printf("HMD Device in Extended display mode\n");
 	}
-	*/
+
 	ovrHmd_SetEnabledCaps(Hmd, hmdCaps);
 
 	// Enable position and rotation tracking
@@ -486,7 +482,7 @@ int Oculus::SetupView()
 	// Gen scratch render textures
 	InitScratch();
 
-	if (vr_enablezeroipd.GetBool())
+	if ( false /*vr_enablezeroipd.GetBool()*/)
 	{
 		G_FrameBufferWidth = G_ovrRenderWidth;
 		G_FrameBufferHeight = G_ovrRenderHeight;
@@ -509,13 +505,13 @@ int Oculus::SetupView()
 		G_OvrTextures[1] = Fn_GenOvrTexture(1);
 	}
 
-
+	/*
 	if (vr_enablezeroipd.GetBool())
 	{
 		// Remove IPD adjust
 		G_ovrEyeRenderDesc[0].HmdToEyeViewOffset = Vector3f(0);
 		G_ovrEyeRenderDesc[1].HmdToEyeViewOffset = Vector3f(0);
-	}
+	}*/
 
 	ovrGLConfig glcfg;
 	glcfg.OGL.Header.API = ovrRenderAPI_OpenGL;
@@ -569,5 +565,3 @@ void OculusLocal::GenTexture(GLuint &tex)
 
 static OculusLocal localOculus;
 Oculus *oculus = &localOculus;
-
-// OculusLocal END

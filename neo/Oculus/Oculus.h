@@ -49,6 +49,14 @@ If you have questions concerning this license or the applicable additional terms
 #define RIGHT_EYE_TARGET 1
 #define GUI_TARGET 2
 
+extern idCVar		vr_enableOculusRiftRendering;
+extern idCVar		vr_enableOculusRiftMotionTracking;
+extern idCVar		vr_enableLowPersistence;
+extern idCVar		vr_enableDynamicPrediction;
+extern idCVar		vr_enableVsync;
+extern idCVar		vr_enableMirror;
+extern idCVar		vr_enablezeroipd;
+
 class Oculus
 {
 public:
@@ -91,7 +99,7 @@ public:
 	int					GetFrameBufferHeight()	{ return G_FrameBufferHeight; }
 	virtual void		SelectBuffer(int i, GLuint &fbo);
 	idVec3				GetViewAdjustVector(int id);
-	
+
 protected:
 
 	int					currentEye;

@@ -1373,7 +1373,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
 #ifdef ENABLE_OCULUS_HMD
 	if (true)
 	{
-		oculus->Init();
+		//oculus->Init();
 	}
 #endif
 	// OCULUS END
